@@ -11,18 +11,18 @@ All branches must be named using the following conventions :
  - bugfix/issue-15469
 
  Developers should follow the following steps :
-  - Updated the `master` : `git pull origin master`
+  - updated the `master` : `git pull origin master`
   - create feature branch : `git chekout -b feature/issue-15469`
-  - Develop the specified requirements
-  - commit and Push the code
-  - Raise a Pull request when the code meets **[Checklist]((#pr-checklist))**
-  - Ask one of the pears for the review
-  - Address the required review comments
-  - After the review squash-merge the PR
+  - develop the specified requirements
+  - commit only changed files, in the commit optionally use # with issue number, ex. "#111" to link commit to issue
+  - raise a Pull request
+  - ask one of the pears for the review
+  - address the required review comments
+  - after the review squash-merge the PR
 
 ###  PR Checklist :
 - code done as per the requirements. It should meet the acceptance criteria.
 - unit tests done for all business components
-- Integration test done the specified REST APIs
-- Build is passing  
+- integration test done the specified REST APIs
+- build is passing  
 
