@@ -1,8 +1,8 @@
 # Development Process
 
-The application is developed using modified Feature model. Developers cannot commit to **master** branch.  All features are developed in feature branches. A feature can then be merged into master using Pull/merge request.
+Devs, please do not commit to the **main** branch!  All features are developed in feature branches. A feature can then be merged into master using a PR.
 
-All branches must be named using the following conventions :
+Please do your best to name branches using the following conventions:
  - `feature/issue-{number}` : use for application new features 
  - `bugfix/issue-{number}` : use for fixing application bugs / issues 
 
