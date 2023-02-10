@@ -10,11 +10,18 @@ Team organizational information can be found in the docs/ repo.
 
 | Topic                                                 | Description                                                  |
 | ----------------------------------------------------- | ------------------------------------------------------------ |
-| [Team](docs/01-team)                                     | Documents related to team structure                          |
-| [Onboarding](docs/02-onboarding)                         | Documents related to new developer onboarding                |
-| [Development Process](docs/03-development-process)       | Documents related to software development process            |
+| [Team](docs/01-team)                                  | Documents related to team structure                          |
+| [Onboarding](docs/02-onboarding)                      | Documents related to new developer onboarding                |
+| [Development Process](docs/03-development-process)    | Documents related to software development process            |
 
 More to come later.
+
+## Project Documents
+
+| Doc                                                   | Description                                                  |
+| [Engineering Document 1](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=12d1d9669c36749e783362a134334325d&authkey=ASvC5gWnOL4U8wIaWOqIEjM&e=aemlCX) | Needs, Problem Statement, Metrics, Benchmarking, and Target Specification |
+
+
 
 ## References
 
