@@ -19,6 +19,7 @@ More to come later.
 ## Project Documents
 
 | Doc                                                   | Description                                                  |
+| ----------------------------------------------------- | ------------------------------------------------------------ |
 | [Engineering Document 1](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=12d1d9669c36749e783362a134334325d&authkey=ASvC5gWnOL4U8wIaWOqIEjM&e=aemlCX) | Needs, Problem Statement, Metrics, Benchmarking, and Target Specification |
 
 
