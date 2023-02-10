@@ -13,6 +13,7 @@ Team organizational information can be found in the docs/ repo.
 | [Team](docs/01-team)                                  | Documents related to team structure                          |
 | [Onboarding](docs/02-onboarding)                      | Documents related to new developer onboarding                |
 | [Development Process](docs/03-development-process)    | Documents related to software development process            |
+| [Meeting Minutes](docs/09-meeting-minutes)            | Brief minutes for all our team meetings                      |
 
 More to come later.
 
