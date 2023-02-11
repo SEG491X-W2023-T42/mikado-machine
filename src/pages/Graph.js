@@ -6,24 +6,14 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
 } from 'reactflow';
-
-import { initializeApp } from "firebase/app";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { firebase } from '../firebase';
+import { useNavigate  } from 'react-router-dom';
 
 import 'reactflow/dist/style.css';
+import { FirebaseContext } from '../context/FirebaseContext';
 
-// Public credentials
-const firebaseConfig = {
-  apiKey: "AIzaSyAqv6_n045I2vtjTIAfDUB9m2l_pru4a6k",
-  authDomain: "mikado-method.firebaseapp.com",
-  projectId: "mikado-method",
-  storageBucket: "mikado-method.appspot.com",
-  messagingSenderId: "802728306359",
-  appId: "1:802728306359:web:103ed63ed1ba448ef80f32"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getFirestore(firebase);
 
 // Intitial values for the nodes & edges -- DO NOT MAKE THEM EMPTY --
 const initialNodes = [{ id: '1', position: { x: 0, y: 0}, data: { label: '1'} }];
@@ -33,6 +23,22 @@ function Graph() {
   // Flow setup
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const { user } = FirebaseContext();
+  const navigate = useNavigate();
+
+  // Make sure the user is signed in
+  useEffect(() => {
+    if (user != null) {
+        if (Object.keys(user).length === 0) {
+            navigate('/');
+        }
+    }
+
+    if (user == null) {
+      navigate('/');
+    }
+}, [user]);
 
   useEffect(() => {
     const getData = async () => {
