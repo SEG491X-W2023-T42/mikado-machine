@@ -32,6 +32,9 @@ const initialNodes = [{ id: '1', position: { x: 0, y: 0}, data: { label: '1'} }]
 const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
 
 function App() {
+  // Flow setup
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   useEffect(() => {
     const getData = async () => {
@@ -45,7 +48,7 @@ function App() {
         // Load nodes from db
         const nodeLoad = docSnap.data().node_names;
         const positionLoad = docSnap.data().positions;
-        initialNodes.length = 0;
+        const newNodes = [];
         
         // Construct JSON object
         for (let key in nodeLoad) {
@@ -53,13 +56,14 @@ function App() {
           node.id = key.toString();
           node.position = {x: positionLoad[key]['x'], y: positionLoad[key]['y']};
           node.data = { label: nodeLoad[key] };
-          initialNodes.push(node);
+          newNodes.push(node);
         }
-        setNodes(initialNodes);
+        setNodes(newNodes);
 
 
         // Load edges from db
         const edgeLoad = docSnap.data().connections;
+        const newEdges = [];
         initialEdges.length = 0;
 
         // Construct JSON for edges, each has a unique ID 
@@ -69,10 +73,10 @@ function App() {
             edge.id = "e" + key.toString() + "-" + item.toString();
             edge.source = key.toString();
             edge.target = item.toString();
-            initialEdges.push(edge);
-            setEdges(initialEdges)
+            newEdges.push(edge);
           });
         }
+        setEdges(newEdges)
 
       } else {
         console.log("not exist");
@@ -80,11 +84,7 @@ function App() {
   
     }
     getData();
-  }, []);
-
-  // Flow setup
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  }, [setEdges, setNodes]);
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
