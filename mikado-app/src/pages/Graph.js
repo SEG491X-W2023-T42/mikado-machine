@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from 'react';
 import ReactFlow, {
-  Controls,
   Background,
   useNodesState,
   useEdgesState,
@@ -8,10 +7,12 @@ import ReactFlow, {
 } from 'reactflow';
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { firebase } from '../firebase';
-import { useNavigate  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { FirebaseContext } from '../context/FirebaseContext';
+import CustomControl from '../components/save';
 
 import 'reactflow/dist/style.css';
-import { FirebaseContext } from '../context/FirebaseContext';
 
 const db = getFirestore(firebase);
 
@@ -94,6 +95,7 @@ function Graph() {
 
   return (
     <div style={{height: "100vh"}}>
+      
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -101,7 +103,7 @@ function Graph() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
-        <Controls />
+        <CustomControl />
         <Background />
       </ReactFlow>
     </div>
