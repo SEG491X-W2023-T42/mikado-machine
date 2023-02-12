@@ -133,6 +133,7 @@ function Graph() {
       
     }
 
+    // Update users collection
     await setDoc(doc(db, id, "graph-1"), {
       connections: connections,
       node_names: node_names,
