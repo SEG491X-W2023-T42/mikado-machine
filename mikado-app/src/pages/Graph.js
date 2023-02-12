@@ -4,6 +4,7 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
+  MarkerType,
 } from 'reactflow';
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase } from '../firebase';
@@ -93,6 +94,18 @@ function Graph() {
             edge.id = "e" + key.toString() + "-" + item.toString();
             edge.source = key.toString();
             edge.target = item.toString();
+            
+            // Add arrows to edge
+            edge.markerStart = {
+              type: MarkerType.ArrowClosed,
+              width: 10, 
+              height: 10,
+              color: "black"
+            }
+            edge.style = {
+              strokeWidth: 3,
+              stroke: "black",
+            }
             newEdges.push(edge);
           });
         }
