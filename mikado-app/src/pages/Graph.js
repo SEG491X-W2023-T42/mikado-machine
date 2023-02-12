@@ -1,23 +1,25 @@
 import { useCallback, useEffect } from 'react';
 import ReactFlow, {
-  Controls,
   Background,
   useNodesState,
   useEdgesState,
   addEdge,
 } from 'reactflow';
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase } from '../firebase';
-import { useNavigate  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+import { FirebaseContext } from '../context/FirebaseContext';
+import CustomControl from '../components/save';
 
 import 'reactflow/dist/style.css';
-import { FirebaseContext } from '../context/FirebaseContext';
 
 const db = getFirestore(firebase);
+let id = 'user-1';
 
-// Intitial values for the nodes & edges -- DO NOT MAKE THEM EMPTY --
-const initialNodes = [{ id: '1', position: { x: 0, y: 0}, data: { label: '1'} }];
-const initialEdges = [{ id: 'e1-2', source: '1', target: '2' }];
+// Intitial values for the nodes & edges
+const initialNodes = [];
+const initialEdges = [];
 
 function Graph() {
   // Flow setup
@@ -42,10 +44,24 @@ function Graph() {
 
   useEffect(() => {
     const getData = async () => {
+
+      if (user != null) {
+        if (Object.keys(user).length !== 0) {
+          id = user.uid;
+        }
+      }
       
-      // Grab the temp user data
-      const docRef = doc(db, "user-1", "graph-1");
-      const docSnap = await getDoc(docRef);
+      // Grab the user's graph
+      const docRef = doc(db, id, "graph-1");
+      let docSnap = await getDoc(docRef);
+
+      // Grab fallback graph
+      const fallbackRef = doc(db, "user-1", "graph-1");
+      const fallBackSnap = await getDoc(fallbackRef);
+
+      if (!docSnap.exists()) {
+        docSnap = fallBackSnap;
+      }
   
       if (docSnap.exists()) {
 
@@ -92,8 +108,43 @@ function Graph() {
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
+  const onSave = async () => {
+
+    // Construct objects for database
+    let connections = {};
+    let node_names = {};
+    let positions = {};
+
+    for (let key in nodes) {
+      node_names[parseInt(key) + 1] = nodes[key].data.label
+
+      positions[parseInt(key) + 1] = ({x: nodes[key].position.x, y: nodes[key].position.y});
+    }
+
+    for (let key in edges) {
+
+      // Loop thru every connection and add to an array
+      if (connections[parseInt(edges[key].source)] === undefined) {
+        connections[parseInt(edges[key].source)] = [];
+        connections[parseInt(edges[key].source)].push(parseInt(edges[key].target));
+      } else {
+        connections[parseInt(edges[key].source)].push(parseInt(edges[key].target));
+      }
+      
+    }
+
+    // Update users collection
+    await setDoc(doc(db, id, "graph-1"), {
+      connections: connections,
+      node_names: node_names,
+      positions: positions
+    });
+
+  };
+
   return (
     <div style={{height: "100vh"}}>
+      
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -101,7 +152,7 @@ function Graph() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
-        <Controls />
+        <CustomControl onClick={() => {onSave()}}/>
         <Background />
       </ReactFlow>
     </div>
