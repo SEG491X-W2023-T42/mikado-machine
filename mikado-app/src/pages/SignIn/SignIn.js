@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { GoogleButton } from 'react-google-button';
-import { FirebaseContext } from '../context/FirebaseContext';
+import { FirebaseContext } from '../../context/FirebaseContext';
 import { useNavigate } from 'react-router-dom';
 
 function SignIn() {

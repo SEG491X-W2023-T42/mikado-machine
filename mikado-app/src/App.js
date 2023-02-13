@@ -1,8 +1,8 @@
 import './App.css';
 import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Graph from './pages/Graph';
-import SignIn from './pages/SignIn';
+import Graph from './pages/Graph/Graph';
+import SignIn from './pages/SignIn/SignIn';
 import { FirebaseContextProvider } from './context/FirebaseContext';
 
 function App() {

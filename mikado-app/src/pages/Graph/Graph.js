@@ -9,11 +9,11 @@ import ReactFlow, {
   MarkerType,
 } from 'reactflow';
 import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
-import { firebase } from '../firebase';
+import { firebase } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 
-import { FirebaseContext } from '../context/FirebaseContext';
-import CustomControl from '../components/save';
+import { FirebaseContext } from '../../context/FirebaseContext';
+import CustomControl from '../../components/save/save';
 
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
