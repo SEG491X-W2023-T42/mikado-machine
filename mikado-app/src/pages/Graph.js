@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import * as React from 'react';
 import ReactFlow, {
   Background,
   useNodesState,
@@ -12,6 +13,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { FirebaseContext } from '../context/FirebaseContext';
 import CustomControl from '../components/save';
+
+import MuiAlert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 import 'reactflow/dist/style.css';
 
@@ -27,6 +31,9 @@ function Graph() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  const [successOpen, setSucessOpen] = React.useState(false);
+  const [errorOpen, setErrorOpen] = React.useState(false);
+
   const { user } = FirebaseContext();
   const navigate = useNavigate();
 
@@ -41,8 +48,9 @@ function Graph() {
     if (user == null) {
       navigate('/');
     }
-}, [user]);
+  }, [user]);
 
+  // Load data from db
   useEffect(() => {
     const getData = async () => {
 
@@ -119,6 +127,19 @@ function Graph() {
     getData();
   }, [setEdges, setNodes]);
 
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+  })
+
+  const handleToastClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSucessOpen(false);
+    setErrorOpen(false);
+  }
+
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   const onSave = async () => {
@@ -146,12 +167,18 @@ function Graph() {
       
     }
 
-    // Update users collection
-    await setDoc(doc(db, id, "graph-1"), {
-      connections: connections,
-      node_names: node_names,
-      positions: positions
-    });
+    try {
+      // Update users collection
+      await setDoc(doc(db, id, "graph-1"), {
+        connections: connections,
+        node_names: node_names,
+        positions: positions
+      });
+      setSucessOpen(true);
+    } catch (e) {
+      setErrorOpen(true);
+      console.log(e.message);
+    }
 
   };
 
@@ -167,7 +194,28 @@ function Graph() {
       >
         <CustomControl onClick={() => {onSave()}}/>
         <Background />
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          open={successOpen} 
+          autoHideDuration={6000} 
+          onClose={handleToastClose}
+        >
+          <Alert onClose={handleToastClose} severity="success" sx={{width: '100%'}}>
+            Graph sucessfully saved!
+          </Alert>
+        </Snackbar>
+        <Snackbar 
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+          open={errorOpen} 
+          autoHideDuration={6000} 
+          onClose={handleToastClose}
+        >
+          <Alert onClose={handleToastClose} severity="error" sx={{width: '100%'}}>
+            There was a problem saving your graph. Please check console for more details.
+          </Alert>
+        </Snackbar>
       </ReactFlow>
+      
     </div>
   );
 }
