@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/mikado-machine/static/css/main.49bb5858.css",
-    "main.js": "/mikado-machine/static/js/main.045caf5b.js",
+    "main.js": "/mikado-machine/static/js/main.024ef723.js",
     "index.html": "/mikado-machine/index.html",
     "main.49bb5858.css.map": "/mikado-machine/static/css/main.49bb5858.css.map",
-    "main.045caf5b.js.map": "/mikado-machine/static/js/main.045caf5b.js.map"
+    "main.024ef723.js.map": "/mikado-machine/static/js/main.024ef723.js.map"
   },
   "entrypoints": [
     "static/css/main.49bb5858.css",
-    "static/js/main.045caf5b.js"
+    "static/js/main.024ef723.js"
   ]
 }
