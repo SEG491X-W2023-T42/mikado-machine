@@ -9,6 +9,8 @@ firebase login
 
 # Running
 
+`src/firebase.js` will detect if the browser is open to `localhost:PORT`. It will then tell the whole app to attempt to connect to the emulators running on the local machine. If this behavior is not desired, then connect to `127.0.0.1:PORT` instead. To start the emulators, run the following:
+
 ```bash
 firebase emulators:start
 ```

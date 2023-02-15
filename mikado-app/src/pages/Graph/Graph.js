@@ -8,8 +8,8 @@ import ReactFlow, {
   addEdge,
   MarkerType,
 } from 'reactflow';
-import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
-import { firebase } from '../../firebase';
+import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { firebase, USING_DEBUG_EMULATORS } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 
 import { FirebaseContext } from '../../context/FirebaseContext';
@@ -21,6 +21,9 @@ import Snackbar from '@mui/material/Snackbar';
 import 'reactflow/dist/style.css';
 
 const db = getFirestore(firebase);
+if (USING_DEBUG_EMULATORS) {
+  connectFirestoreEmulator(db, "localhost", 8080);
+}
 let id = 'user-1';
 
 // Intitial values for the nodes & edges

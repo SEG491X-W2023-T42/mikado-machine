@@ -1,10 +1,12 @@
 import { useContext, createContext, useState, useEffect } from 'react';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
-import { getAuth } from 'firebase/auth';
-import { firebase } from '../firebase';
+import { connectAuthEmulator, getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
+import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 
 const ctxt = createContext();
 const auth = getAuth(firebase);
+if (USING_DEBUG_EMULATORS) {
+  connectAuthEmulator(auth, "http://localhost:9099")
+}
 
 export const FirebaseContextProvider = ({children}) => {
 
