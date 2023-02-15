@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { GoogleButton } from 'react-google-button';
-// import { GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 import { FirebaseContext } from '../../context/FirebaseContext';
 import { useNavigate } from 'react-router-dom';
 import './SignIn.css';
@@ -9,25 +8,25 @@ import {Helmet} from "react-helmet";
 
 function SignIn() {
 
-    const { googleSignIn, user } = FirebaseContext();
-    const navigate = useNavigate();
+  const {googleSignIn, user} = FirebaseContext();
+  const navigate = useNavigate();
 
-    const handleGoogleSignIn = async() => {
-        try {
-            await googleSignIn();
-        } catch (e) {
-            console.log(e);
-        }
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+    } catch (e) {
+      console.log(e);
     }
+  }
 
-    // Redirects user to main graph after sign in
-    useEffect(() => {
-        if (user != null) {
-            if (Object.keys(user).length !== 0) {
-                navigate('/graph')
-            }
-        }
-    }, [user]);
+  // Redirects user to main graph after sign in
+  useEffect(() => {
+    if (user != null) {
+      if (Object.keys(user).length !== 0) {
+        navigate('/graph')
+      }
+    }
+  }, [user]);
 
     return (
             <div>
