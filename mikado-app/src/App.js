@@ -10,7 +10,7 @@ function App() {
     <FirebaseContextProvider>
       <div>
         <Routes>
-          <Route path='/' element={<SignIn />}/>
+          <Route path='/' element={<SignIn />} />
           <Route path='/graph' element={<Graph />} />
         </Routes>
       </div>
