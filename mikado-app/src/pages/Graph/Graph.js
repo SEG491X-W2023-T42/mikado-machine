@@ -35,15 +35,15 @@ function Graph() {
   const [successOpen, setSucessOpen] = React.useState(false);
   const [errorOpen, setErrorOpen] = React.useState(false);
 
-  const { user } = FirebaseContext();
+  const {user} = FirebaseContext();
   const navigate = useNavigate();
 
   // Make sure the user is signed in
   useEffect(() => {
     if (user != null) {
-        if (Object.keys(user).length === 0) {
-            navigate('/');
-        }
+      if (Object.keys(user).length === 0) {
+        navigate('/');
+      }
     }
 
     if (user == null) {
@@ -60,7 +60,7 @@ function Graph() {
           id = user.uid;
         }
       }
-      
+
       // Grab the user's graph
       const docRef = doc(db, id, "graph-1");
       let docSnap = await getDoc(docRef);
@@ -72,20 +72,20 @@ function Graph() {
       if (!docSnap.exists()) {
         docSnap = fallBackSnap;
       }
-  
+
       if (docSnap.exists()) {
 
         // Load nodes from db
         const nodeLoad = docSnap.data().node_names;
         const positionLoad = docSnap.data().positions;
         const newNodes = [];
-        
+
         // Construct JSON object
         for (let key in nodeLoad) {
           const node = {};
           node.id = key.toString();
           node.position = {x: positionLoad[key]['x'], y: positionLoad[key]['y']};
-          node.data = { label: nodeLoad[key] };
+          node.data = {label: nodeLoad[key]};
           newNodes.push(node);
         }
         setNodes(newNodes);
@@ -96,18 +96,18 @@ function Graph() {
         const newEdges = [];
         initialEdges.length = 0;
 
-        // Construct JSON for edges, each has a unique ID 
+        // Construct JSON for edges, each has a unique ID
         for (let key in edgeLoad) {
           edgeLoad[key].forEach((item, index) => {
             const edge = {};
             edge.id = "e" + key.toString() + "-" + item.toString();
             edge.source = key.toString();
             edge.target = item.toString();
-            
+
             // Add arrows to edge
             edge.markerStart = {
               type: MarkerType.ArrowClosed,
-              width: 10, 
+              width: 10,
               height: 10,
               color: "black"
             }
@@ -123,7 +123,7 @@ function Graph() {
       } else {
         console.log("not exist");
       }
-  
+
     }
     getData();
   }, [setEdges, setNodes]);
@@ -165,7 +165,7 @@ function Graph() {
       } else {
         connections[parseInt(edges[key].source)].push(parseInt(edges[key].target));
       }
-      
+
     }
 
     try {
@@ -185,7 +185,7 @@ function Graph() {
 
   return (
     <div style={{height: "100vh"}}>
-      
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -193,22 +193,24 @@ function Graph() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
-        <CustomControl onClick={() => {onSave()}}/>
+        <CustomControl onClick={() => {
+          onSave()
+        }} />
         <Background />
         <Snackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          open={successOpen} 
-          autoHideDuration={6000} 
+          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+          open={successOpen}
+          autoHideDuration={6000}
           onClose={handleToastClose}
         >
           <Alert onClose={handleToastClose} severity="success" sx={{width: '100%'}}>
             Graph sucessfully saved!
           </Alert>
         </Snackbar>
-        <Snackbar 
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
-          open={errorOpen} 
-          autoHideDuration={6000} 
+        <Snackbar
+          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+          open={errorOpen}
+          autoHideDuration={6000}
           onClose={handleToastClose}
         >
           <Alert onClose={handleToastClose} severity="error" sx={{width: '100%'}}>
@@ -216,7 +218,7 @@ function Graph() {
           </Alert>
         </Snackbar>
       </ReactFlow>
-      
+
     </div>
   );
 }
