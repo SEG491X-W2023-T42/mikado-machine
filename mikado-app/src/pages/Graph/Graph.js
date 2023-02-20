@@ -13,7 +13,7 @@ import { firebase } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 
 import { FirebaseContext } from '../../context/FirebaseContext';
-import CustomControl from '../../components/save/save';
+import CustomControl from '../../components/CustomControl/CustomControl';
 
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
@@ -196,7 +196,9 @@ function Graph() {
         <CustomControl onClick={() => {
           onSave()
         }} />
+
         <Background />
+
         <Snackbar
           anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
           open={successOpen}
@@ -207,6 +209,7 @@ function Graph() {
             Graph sucessfully saved!
           </Alert>
         </Snackbar>
+
         <Snackbar
           anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
           open={errorOpen}
