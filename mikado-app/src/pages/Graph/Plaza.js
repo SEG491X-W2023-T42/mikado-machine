@@ -1,6 +1,8 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
+import MyDrawer from "./MyDrawer";
+import { useState } from "react";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -13,10 +15,14 @@ import useSnackbar from "./MySnackbar";
  */
 function Plaza({ uid }) {
   const [snackbar, notifySuccessElseError] = useSnackbar();
+  // Wires the active DisplayLayer to the bottom panel
+  // Any inactive DisplayLayer can receive a noop callback
+  const [selectionData, setSelectionData] = useState(void 0);
 
   return <main>
-    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} />
+    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} setSelectionData={setSelectionData} />
     {snackbar}
+    <MyDrawer selectionData={selectionData} />
   </main>
 }
 
