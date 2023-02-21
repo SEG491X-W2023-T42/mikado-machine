@@ -2,6 +2,7 @@ import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "fir
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 import { runtime_assert } from "./assert";
 import generateAutoincremented from "./autoincrement";
+import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 
 const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
@@ -60,11 +61,7 @@ export async function loadFromDb(uid) {
     databaseKeysToNewIdsLookup[key] = id;
     forwardConnections[id] = [];
     backwardConnections[id] = []
-    return {
-      id,
-      position: { x: +x, y: +y },
-      data: { label: label.toString() },
-    };
+    return createNodeObject(id, +x, +y, label.toString());
   });
 
   // Load edges from db
@@ -77,7 +74,7 @@ export async function loadFromDb(uid) {
       forwardConnections[source].push(target);
       backwardConnections[target].push(source);
       // Construct JSON for edges, each has a unique ID
-      return { id: `e${source}-${target}`, source, target };
+      return createEdgeObject(source, target);
     });
   });
 
