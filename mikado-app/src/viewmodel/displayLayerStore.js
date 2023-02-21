@@ -168,7 +168,7 @@ const useDisplayLayerStore = create((set, get) => ({
      * Connects or disconnects two nodes.
      */
     connectOrDisconnect(srcId, dstId) {
-      const { edges, _internal: { loading, forwardConnections, backwardConnections } } = get();
+      const { edges, _internal: { loading, forwardConnections, backwardConnections, depthFirstSearch } } = get();
       if (loading) return;
       if (forwardConnections[dstId].includes(srcId)) {
         // Backward connection found
@@ -177,7 +177,30 @@ const useDisplayLayerStore = create((set, get) => ({
         srcId = tmp;
       } else if (!forwardConnections[srcId].includes(dstId)) {
         // No connection found
-        // TODO DFS to enforce acyclic
+
+        // Check for cycles
+        const autoincremented = generateAutoincremented();
+        const dfs = (otherId) => {
+          // Use autoincremented as a visited boolean
+          if (depthFirstSearch[otherId] === autoincremented) return;
+          depthFirstSearch[otherId] = autoincremented;
+          // An invariant, somewhat related to induction, is that
+          // the graph does not previously contain cycles.
+          // Therefore, any newly added cycle must involve the newly added
+          // node, so we only need to check if that is involved in any loop
+          for (const connection of forwardConnections[otherId]) {
+            // Use exceptions to unwind quickly
+            if (connection === srcId) throw new Error();
+            dfs(connection);
+          }
+        };
+        try {
+          dfs(dstId);
+        } catch (_) {
+          // Cycle detected, don't add edge
+          return;
+        }
+
         forwardConnections[srcId].push(dstId);
         backwardConnections[dstId].push(srcId);
         set({ edges: [...edges, createEdgeObject(srcId, dstId)] });
