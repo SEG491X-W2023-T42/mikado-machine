@@ -77,6 +77,7 @@ export async function loadFromDb(uid) {
       return createEdgeObject(source, target);
     });
   });
+  // TODO verify acyclic (#41)
 
   return [newNodes, newEdges, forwardConnections, backwardConnections];
 }
