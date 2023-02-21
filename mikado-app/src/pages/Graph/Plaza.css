@@ -16,3 +16,9 @@ main {
   padding: 2px 5px;
   font-weight: 700;
 }
+
+.react-flow__handle.source {
+  top: 50%;
+  pointer-events: none;
+  opacity: 0;
+}

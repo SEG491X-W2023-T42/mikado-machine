@@ -5,7 +5,7 @@ import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
-import { CONNECTION_LINE_STYLE, CONNECTION_LINE_TYPE, DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_ORIGIN, NODE_TYPES } from "./graphTheme";
+import { CONNECTION_LINE_STYLE, CONNECTION_LINE_TYPE, DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 
 /**
@@ -56,7 +56,6 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       edgeTypes={EDGE_TYPES}
       connectionLineStyle={CONNECTION_LINE_STYLE}
       connectionLineType={CONNECTION_LINE_TYPE}
-      nodeOrigin={NODE_ORIGIN}
       connectionMode={MY_NODE_CONNECTION_MODE}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
