@@ -1,98 +1,113 @@
 import { MarkerType } from "reactflow";
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
+import { runtime_assert } from "./assert";
 
 const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
   connectFirestoreEmulator(db, "localhost", 8080);
 }
 
+/**
+ * The default Mikado to open.
+ *
+ * For now this default graph is the only graph available until saving/multiple different files/documents is implemented.
+ * Also, there is only one layer of the graph available until the subtrees feature is implemented.
+ */
+const DEFAULT_GRAPH_ID = "graph-1";
+
+/**
+ * A fallback "user account" to grab initial data from to introduce the user with.
+ */
+const FALLBACK_TEMPLATE_USER_ID = "user-1";
+
+/**
+ * Loads the nodes and edges from the database.
+ */
 export async function loadFromDb(uid) {
   // Grab the user's graph
-  let docSnap = await getDoc(doc(db, uid, "graph-1"));
+  let docSnap = await getDoc(doc(db, uid, DEFAULT_GRAPH_ID));
 
   if (!docSnap.exists()) {
     // Grab fallback graph
-    docSnap = await getDoc(doc(db, "user-1", "graph-1"));
+    docSnap = await getDoc(doc(db, FALLBACK_TEMPLATE_USER_ID, DEFAULT_GRAPH_ID));
   }
 
-  if (docSnap.exists()) {
-    // Load nodes from db
-    const nodeLoad = docSnap.data().node_names;
-    const positionLoad = docSnap.data().positions;
-    const newNodes = [];
+  runtime_assert(docSnap.exists());
 
-    // Construct JSON object
-    for (let key in nodeLoad) {
-      const node = {};
-      node.id = key.toString();
-      node.position = { x: positionLoad[key]['x'], y: positionLoad[key]['y'] };
-      node.data = { label: nodeLoad[key] };
-      newNodes.push(node);
-    }
+  // TODO add a version key and prevent loading newer schemas
+  const { node_names, positions, connections } = docSnap.data();
 
-    // Load edges from db
-    const edgeLoad = docSnap.data().connections;
-    const newEdges = [];
+  // Load nodes from db
+  const newNodes = Object.entries(node_names).map(([key, label]) => {
+    const { x, y } = positions[key];
+    // Construct object for React Flow
+    // Coerce everything to the expected types to ignore potential database schema changes
+    return {
+      id: key.toString(),
+      position: { x: +x, y: +y },
+      data: { label: label.toString() },
+    };
+  });
 
-    // Construct JSON for edges, each has a unique ID
-    for (let key in edgeLoad) {
-      edgeLoad[key].forEach((item, index) => {
-        const edge = {};
-        edge.id = "e" + key.toString() + "-" + item.toString();
-        edge.source = key.toString();
-        edge.target = item.toString();
-
-        // Add arrows to edge
-        edge.markerStart = {
+  // Load edges from db
+  const newEdges = Object.entries(connections).flatMap(([key, values]) => {
+    const source = key.toString();
+    // Map through outgoing connections
+    // Remember that these are directed edges, so {1:[2]} != {2:[1]}
+    return values.map(value => {
+      const target = value.toString();
+      // Construct JSON for edges, each has a unique ID
+      return {
+        id: `e${source}-${target}`,
+        source,
+        target,
+        markerStart: {
           type: MarkerType.ArrowClosed,
           width: 10,
           height: 10,
-          color: "black"
-        }
-        edge.style = {
+          color: "black",
+        },
+        style: {
           strokeWidth: 3,
           stroke: "black",
-        }
-        newEdges.push(edge);
-      });
-    }
+        },
+      };
+    });
+  });
 
-    return [newNodes, newEdges];
-  } else {
-    console.log("not exist");
-  }
+  return [newNodes, newEdges];
 }
 
+/**
+ * Saves the nodes and edges to the database.
+ */
 export async function saveToDb(nodes, edges, uid) {
   // Construct objects for database
-  let connections = {};
-  let node_names = {};
-  let positions = {};
 
-  for (let key in nodes) {
-    node_names[parseInt(key) + 1] = nodes[key].data.label
-    positions[parseInt(key) + 1] = ({ x: nodes[key].position.x, y: nodes[key].position.y });
+  // Serialize the nodes
+  // For some reason, the database is in Struct-Of-Arrays layout even though it's NoSQL
+  const node_names = {};
+  const positions = {};
+  nodes.forEach((node, key) => {
+    key += 1; // For some reason the database is one-indexed
+    // No need to coerce as we own node.data: T for Node<T>
+    node_names[key] = node.data.label;
+    // Assuming there is no reason React Flow will change away from { x: number, y: number }
+    positions[key] = node.position;
+  });
+
+  const connections = {};
+  // Loop thru every connection and add to a map
+  for (const edge of edges) {
+    const { source, target } = edge;
+    (connections[source] = connections[source] || []).push(target);
   }
 
-  for (let key in edges) {
-    // Loop thru every connection and add to an array
-    if (connections[parseInt(edges[key].source)] === undefined) {
-      connections[parseInt(edges[key].source)] = [];
-      connections[parseInt(edges[key].source)].push(parseInt(edges[key].target));
-    } else {
-      connections[parseInt(edges[key].source)].push(parseInt(edges[key].target));
-    }
-
-  }
-
+  const data = { connections, node_names, positions };
   try {
     // Update users collection
-    await setDoc(doc(db, uid, "graph-1"), {
-      connections: connections,
-      node_names: node_names,
-      positions: positions
-    });
+    await setDoc(doc(db, uid, DEFAULT_GRAPH_ID), data);
   } catch (e) {
     console.log(e.message);
     return false;
