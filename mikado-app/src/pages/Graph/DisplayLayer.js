@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useReactFlow, } from 'reactflow';
+import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
@@ -24,10 +24,10 @@ const selector = (state) => state;
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError }) {
+function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData }) {
   const {
     nodes, edges, loadAutoincremented, operations: {
-      onNodesChange, load, save, markNodePosition, restoreNodePosition, connectOrDisconnect,
+      onNodesChange, load, save, markNodePosition, restoreNodePosition, connectOrDisconnect, renameNode,
     }
   } = useDisplayLayerStore(selector, shallow);
   const { fitView } = useReactFlow();
@@ -48,6 +48,22 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
     const id = setTimeout(() => fitView(), 0);
     return () => clearTimeout(id);
   }, [fitView, loadAutoincremented]);
+
+  useOnSelectionChange({
+    onChange({ nodes }) {
+      if (nodes.length !== 1) {
+        setSelectionData(void 0);
+        return;
+      }
+      const { id, data: { label: name } } = nodes[0];
+      setSelectionData({
+        name,
+        setName(name) {
+          renameNode(id, name);
+        },
+      })
+    }
+  });
 
   function onNodeDragStart(_, node) {
     markNodePosition(node.id);
@@ -93,9 +109,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, notifySuccessElseError }) {
+function DisplayLayer({ uid, notifySuccessElseError, setSelectionData }) {
   return <ReactFlowProvider>
-    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} />
+    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} setSelectionData={setSelectionData} />
   </ReactFlowProvider>;
 }
 

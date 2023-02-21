@@ -189,6 +189,11 @@ const useDisplayLayerStore = create((set, get) => ({
       backward.splice(backward.indexOf(srcId), 1);
       set({ edges: edges.filter(edge => edge.source !== srcId || edge.target !== dstId) });
     },
+    renameNode(id, name) {
+      const { nodes, _internal } = get();
+      if (_internal.loading) return;
+      set({ nodes: nodes.map(node => node.id !== id ? node : { ...node, data: { ...node.data, label: name } }) });
+    },
   }
 }));
 
