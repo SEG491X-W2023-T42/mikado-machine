@@ -1,7 +1,7 @@
 import { SwipeableDrawer } from "@mui/material";
 import "./MyDrawer.css";
 
-function MyDrawer() {
+function MyDrawer({ selectionData }) {
   // TODO fix the swiping on desktop
   return <SwipeableDrawer
     open={true}
@@ -9,11 +9,14 @@ function MyDrawer() {
     onOpen={() => void 0}
     anchor="bottom"
     variant="persistent"
-    drawerBleeding={56}
     disableSwipeToOpen={false}
   >
     <div id="puller"></div>
-    Hello
+    {selectionData ?
+      "Selected"
+      :
+      "Not Selected"
+    }
   </SwipeableDrawer>
 }
 
