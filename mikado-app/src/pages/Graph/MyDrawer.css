@@ -15,3 +15,9 @@
   top: 8px;
   left: calc(50% - 15px);
 }
+
+#add-node-button {
+  border: 1px solid #000;
+  padding: 8px;
+  border-radius: 8px;
+}
