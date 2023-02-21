@@ -89,8 +89,9 @@ export async function saveToDb(nodes, edges, uid) {
   // For some reason, the database is in Struct-Of-Arrays layout even though it's NoSQL
   const node_names = {};
   const positions = {};
-  nodes.forEach((node, key) => {
-    key += 1; // For some reason the database is one-indexed
+  nodes.forEach((node) => {
+    // By the way, for some reason the database is one-indexed
+    const key = node.id;
     // No need to coerce as we own node.data: T for Node<T>
     node_names[key] = node.data.label;
     // Assuming there is no reason React Flow will change away from { x: number, y: number }
