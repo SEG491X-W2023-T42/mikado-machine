@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
-import { createEdgeObject } from "./displayObjectFactory";
+import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 
 function myOnNodesChange(changes, nodes, set) {
   const changesById = {};
@@ -137,6 +137,29 @@ const useDisplayLayerStore = create((set, get) => ({
       });
     },
     addNode(position) {
+      const { nodes, _internal } = get();
+      if (_internal.loading) return;
+
+      // Reject upon intersection
+      // Too bad it's not possible to know the dimensions of the current node to be added
+      // So we will just hardcode some kind of size
+      const { x: l, y: t } = position;
+      const r = l + 100, b = t + 60;
+      if (nodes.some(other => {
+        const { x: oL, y: oT } = other.position;
+        const oR = oL + other.width, oB = oT + other.height;
+        return !(r < oL || l > oR || t > oB || b < oT);
+      })) {
+        console.log("dup");
+        return;
+      }
+
+      // Allocate everything
+      const id = generateAutoincremented().toString();
+      _internal.forwardConnections[id] = [];
+      _internal.backwardConnections[id] = [];
+      _internal.depthFirstSearch[id] = id;
+      set({ nodes: [...nodes, createNodeObject(id, l, t)] });
     },
     deleteNode(id) {
     },
