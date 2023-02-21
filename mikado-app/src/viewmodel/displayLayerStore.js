@@ -7,11 +7,11 @@ function myOnNodesChange(changes, nodes, set) {
   let affected = false;
   for (const change of changes) {
     const { id, type } = change;
-    // Ignore dimensions, the DB can't persist it anyway
     // Ignore add, remove, reset. Those changes should be done through this viewmodel
     switch (type) {
       case "select":
       case "position":
+      case "dimensions":
         break;
       default:
         continue;
@@ -33,9 +33,19 @@ function myOnNodesChange(changes, nodes, set) {
           case "position": {
             const { position, dragging } = change;
             position && (node.position = position);
-            // noinspection BadExpressionStatementJS
-            dragging ?? (node.dragging = dragging);
+            node.dragging = dragging ?? node.dragging;
             // Ignoring positionAbsolute and expandParent as the DB can't persist them
+            break;
+          }
+          case "dimensions": {
+            // Store dimensions so that other places can use it
+            // This is calculated on start, and not directly changed by the user
+            const { dimensions } = change;
+            if (dimensions) {
+              node.width = dimensions.width;
+              node.height = dimensions.height;
+            }
+            // Ignore styling and resizing as they are not used
             break;
           }
           default:
@@ -135,7 +145,6 @@ const useDisplayLayerStore = create((set, get) => ({
     markNodePosition(id) {
       const { nodes, _internal } = get();
       if (_internal.loading) return;
-      console.log("mark", nodes);
       set({
         nodes: nodes.map(node => node.id !== id ? node : { ...node, data: { ...node.data, savedPosition: node.position } }),
       });
@@ -150,12 +159,12 @@ const useDisplayLayerStore = create((set, get) => ({
         nodes: nodes.map(node => {
           if (node.id !== id) return node;
           const { savedPosition } = node.data;
-          console.log("restore", savedPosition);
           return !savedPosition ? node : { ...node, position: savedPosition };
         }),
       });
     },
-    connectOrDisconnect(src, dst) {
+    connectOrDisconnect(srcId, dstId) {
+      console.log(srcId, dstId);
     },
   }
 }));

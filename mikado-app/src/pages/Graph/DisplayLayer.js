@@ -27,7 +27,7 @@ const selector = (state) => state;
 function DisplayLayerInternal({ uid, notifySuccessElseError }) {
   const {
     nodes, edges, loadAutoincremented, operations: {
-      onNodesChange, load, save, markNodePosition, restoreNodePosition,
+      onNodesChange, load, save, markNodePosition, restoreNodePosition, connectOrDisconnect,
     }
   } = useDisplayLayerStore(selector, shallow);
   const { fitView } = useReactFlow();
@@ -54,7 +54,17 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
   }
 
   function onNodeDragStop(_, node) {
-    restoreNodePosition(node.id);
+    const { id, position: { x: l, y: t } } = node;
+    const r = l + node.width, b = t + node.height;
+    const target = nodes.find(other => {
+      const { x: oL, y: oT } = other.position;
+      const oR = oL + other.width, oB = oT + other.height;
+      return !(other.id === id || r < oL || l > oR || t > oB || b < oT);
+    });
+    if (target) {
+      restoreNodePosition(id);
+      connectOrDisconnect(id, target.id);
+    }
   }
 
   return <main>
