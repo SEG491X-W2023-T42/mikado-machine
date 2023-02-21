@@ -26,10 +26,6 @@ if (USING_DEBUG_EMULATORS) {
 }
 let id = 'user-1';
 
-// Intitial values for the nodes & edges
-const initialNodes = [];
-const initialEdges = [];
-
 /**
  * The DisplayLayer component shows ane layer of a Mikado that can be edited.
  *
@@ -38,8 +34,8 @@ const initialEdges = [];
  */
 function DisplayLayer() {
   // Flow setup
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [successOpen, setSucessOpen] = React.useState(false);
   const [errorOpen, setErrorOpen] = React.useState(false);
@@ -83,7 +79,6 @@ function DisplayLayer() {
       }
 
       if (docSnap.exists()) {
-
         // Load nodes from db
         const nodeLoad = docSnap.data().node_names;
         const positionLoad = docSnap.data().positions;
@@ -99,11 +94,9 @@ function DisplayLayer() {
         }
         setNodes(newNodes);
 
-
         // Load edges from db
         const edgeLoad = docSnap.data().connections;
         const newEdges = [];
-        initialEdges.length = 0;
 
         // Construct JSON for edges, each has a unique ID
         for (let key in edgeLoad) {
