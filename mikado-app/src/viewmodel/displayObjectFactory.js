@@ -1,4 +1,4 @@
-export function createNodeObject(id, x, y, label) {
+export function createNodeObject(id, x, y, label = "New Node") {
   return  {
     id,
     position: { x, y },
