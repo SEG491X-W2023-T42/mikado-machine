@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* .background{
+    color: black;
+    background-image: radial-gradient();
+} */
+
+.sign-in-card{
+    width: 400px;
+    height: fit-content + 20px;
+    margin: 0 auto;
+    margin-top: 100px;
+    background-color: #e6e4f2;
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 #e7e6ea;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif !important;
+    text-align: center;
+    color: #0a021c;
+}
+
+.google-sign-in-button{
+    width: fit-content;
+    height: 50px;
+    background-color: #0a021c;
+    /* border: 1px solid #000; */
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.3);
+    border-radius: 5px;
+    border: 1px solid #EEE;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    color: #e6e4f2;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 16px;
+}
+
+.google-button-text{
+    padding-left: 8px;
+}
+
+.footnote{
+    font-size: 10px;
+}
