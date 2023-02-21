@@ -1,3 +1,8 @@
+/*
+ * Take over styling from React Flow by importing base.css instead of style.css.
+ * This is now needed as we are reusing the default node name for our own styles.
+ */
+@import "reactflow/dist/base.css";
 
 main {
   height: 100%;
