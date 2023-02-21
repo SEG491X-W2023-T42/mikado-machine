@@ -7,9 +7,6 @@ import { firebase, USING_DEBUG_EMULATORS } from '../../firebase';
 
 import CustomControl from '../../components/CustomControl/CustomControl';
 
-import MuiAlert from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
-
 import 'reactflow/dist/style.css';
 
 const db = getFirestore(firebase);
@@ -23,13 +20,10 @@ if (USING_DEBUG_EMULATORS) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid }) {
+function DisplayLayer({ uid, setSuccessOpen, setErrorOpen }) {
   // Flow setup
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-
-  const [successOpen, setSucessOpen] = React.useState(false);
-  const [errorOpen, setErrorOpen] = React.useState(false);
 
   // Load data from db
   useEffect(() => {
@@ -92,23 +86,9 @@ function DisplayLayer({ uid }) {
     getData();
   }, [setEdges, setNodes, uid]);
 
-  const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
-  })
-
-  const handleToastClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setSucessOpen(false);
-    setErrorOpen(false);
-  }
-
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   const onSave = async () => {
-
     // Construct objects for database
     let connections = {};
     let node_names = {};
@@ -139,17 +119,15 @@ function DisplayLayer({ uid }) {
         node_names: node_names,
         positions: positions
       });
-      setSucessOpen(true);
+      setSuccessOpen(true);
     } catch (e) {
       setErrorOpen(true);
       console.log(e.message);
     }
-
   };
 
   return (
-    <div style={{height: "100vh"}}>
-
+    <main>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -162,31 +140,8 @@ function DisplayLayer({ uid }) {
         }} />
 
         <Background />
-
-        <Snackbar
-          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-          open={successOpen}
-          autoHideDuration={6000}
-          onClose={handleToastClose}
-        >
-          <Alert onClose={handleToastClose} severity="success" sx={{width: '100%'}}>
-            Graph sucessfully saved!
-          </Alert>
-        </Snackbar>
-
-        <Snackbar
-          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
-          open={errorOpen}
-          autoHideDuration={6000}
-          onClose={handleToastClose}
-        >
-          <Alert onClose={handleToastClose} severity="error" sx={{width: '100%'}}>
-            There was a problem saving your graph. Please check console for more details.
-          </Alert>
-        </Snackbar>
       </ReactFlow>
-
-    </div>
+    </main>
   );
 }
 

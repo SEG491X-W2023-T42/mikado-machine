@@ -8,12 +8,10 @@ import { FirebaseContextProvider } from './context/FirebaseContext';
 function App() {
   return (
     <FirebaseContextProvider>
-      <div>
-        <Routes>
-          <Route path='/' element={<SignIn />} />
-          <Route path='/graph' element={<GraphPage />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path='/' element={<SignIn />} />
+        <Route path='/graph' element={<GraphPage />} />
+      </Routes>
     </FirebaseContextProvider>
   );
 }
