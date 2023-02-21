@@ -1,7 +1,51 @@
 import { create } from "zustand";
-import { applyNodeChanges } from "reactflow";
 import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
+
+function myOnNodesChange(changes, nodes, set) {
+  const changesById = {};
+  let affected = false;
+  for (const change of changes) {
+    const { id, type } = change;
+    // Ignore dimensions, the DB can't persist it anyway
+    // Ignore add, remove, reset. Those changes should be done through this viewmodel
+    switch (type) {
+      case "select":
+      case "position":
+        break;
+      default:
+        continue;
+    }
+    affected = true;
+    (changesById[id] = changesById[id] || []).push(change);
+  }
+  if (!affected) return;
+  set({
+    nodes: nodes.map(node => {
+      const myChanges = changesById[node.id];
+      if (!myChanges) return node;
+      node = { ...node };
+      for (const change of myChanges) {
+        switch (change.type) {
+          case "select":
+            node.selected = change.selected;
+            break;
+          case "position": {
+            const { position, dragging } = change;
+            position && (node.position = position);
+            // noinspection BadExpressionStatementJS
+            dragging ?? (node.dragging = dragging);
+            // Ignoring positionAbsolute and expandParent as the DB can't persist them
+            break;
+          }
+          default:
+            break;
+        }
+      }
+      return node;
+    }),
+  });
+}
 
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
@@ -29,9 +73,7 @@ const useDisplayLayerStore = create((set, get) => ({
     onNodesChange(changes) {
       const state = get();
       if (state._internal.loading) return;
-      set({
-        nodes: applyNodeChanges(changes, state.nodes),
-      });
+      myOnNodesChange(changes, state.nodes, set);
     },
     load(uid) {
       const { _internal } = get();
