@@ -25,7 +25,7 @@ const selector = (state) => state;
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function DisplayLayerInternal({ uid, notifySuccessElseError }) {
-  const { nodes, edges, loadAutoincremented, onNodesChange, load, save } = useDisplayLayerStore(selector, shallow);
+  const { nodes, edges, loadAutoincremented, operations: { onNodesChange, load, save } } = useDisplayLayerStore(selector, shallow);
   const { fitView } = useReactFlow();
 
   // Assert uid will never change
