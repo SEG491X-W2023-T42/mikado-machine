@@ -58,6 +58,13 @@ function myOnNodesChange(changes, nodes, set) {
   });
 }
 
+function arrayRemoveByValueIfPresent(array, value) {
+  const i = array.indexOf(value);
+  if (i >= 0) {
+    array.splice(i, 1);
+  }
+}
+
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
   edges: [],
@@ -139,6 +146,27 @@ const useDisplayLayerStore = create((set, get) => ({
     addNode(position) {
     },
     deleteNode(id) {
+      const { nodes, edges, _internal: { loading, forwardConnections, backwardConnections, depthFirstSearch } } = get();
+      if (loading) return;
+      console.log(JSON.stringify(forwardConnections), JSON.stringify(backwardConnections));
+
+      // Unlink everything touching this
+      for (const connection of backwardConnections[id]) {
+        arrayRemoveByValueIfPresent(forwardConnections[connection], id);
+      }
+      for (const connection of forwardConnections[id]) {
+        arrayRemoveByValueIfPresent(backwardConnections[connection], id);
+      }
+      // Then delete the containers for this vertex
+      delete forwardConnections[id];
+      delete backwardConnections[id];
+      delete depthFirstSearch[id];
+
+      set({
+        nodes: nodes.filter(node => node.id !== id),
+        edges: edges.filter(edge => edge.source !== id && edge.target !== id),
+      });
+      console.log(JSON.stringify(forwardConnections), JSON.stringify(backwardConnections));
     },
     /**
      * Saves the position of the node.
