@@ -30,7 +30,13 @@ let id = 'user-1';
 const initialNodes = [];
 const initialEdges = [];
 
-function Graph() {
+/**
+ * The DisplayLayer component shows ane layer of a Mikado that can be edited.
+ *
+ * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
+ * The Plaza survives on the other hand such an action and contains long-living UI controls.
+ */
+function DisplayLayer() {
   // Flow setup
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -229,4 +235,4 @@ function Graph() {
   );
 }
 
-export default Graph;
+export default DisplayLayer;
