@@ -1,19 +1,17 @@
 import './App.css';
 import * as React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import Graph from './pages/Graph/Graph';
+import GraphPage from "./pages/Graph/GraphPage";
 import SignIn from './pages/SignIn/SignIn';
 import { FirebaseContextProvider } from './context/FirebaseContext';
 
 function App() {
   return (
     <FirebaseContextProvider>
-      <div>
-        <Routes>
-          <Route path='/' element={<SignIn />} />
-          <Route path='/graph' element={<Graph />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route path='/' element={<SignIn />} />
+        <Route path='/graph' element={<GraphPage />} />
+      </Routes>
     </FirebaseContextProvider>
   );
 }

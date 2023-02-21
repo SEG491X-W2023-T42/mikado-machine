@@ -2,10 +2,10 @@ import { useContext, createContext, useState, useEffect } from 'react';
 import { connectAuthEmulator, getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 
-const ctxt = createContext();
+const ctxt = createContext(void 0);
 const auth = getAuth(firebase);
 if (USING_DEBUG_EMULATORS) {
-  connectAuthEmulator(auth, "http://localhost:9099")
+  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true })
 }
 
 export const FirebaseContextProvider = ({children}) => {
@@ -35,6 +35,6 @@ export const FirebaseContextProvider = ({children}) => {
   );
 }
 
-export const FirebaseContext = () => {
+export const useFirebase = () => {
   return useContext(ctxt);
 }
