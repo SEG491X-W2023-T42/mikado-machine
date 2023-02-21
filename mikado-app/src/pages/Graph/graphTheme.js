@@ -1,7 +1,7 @@
 import { MarkerType, StraightEdge } from "reactflow";
 
 export const DEFAULT_EDGE_OPTIONS = {
-  markerStart: {
+  markerEnd: {
     type: MarkerType.ArrowClosed,
     width: 10,
     height: 10,
