@@ -61,6 +61,27 @@ const useDisplayLayerStore = create((set, get) => ({
      * This also helps with preventing other race conditions.
      */
     loading: false,
+    /**
+     * The forwards connection map of arrays of IDs.
+     *
+     * This duplicates the edges data, but is in a format easier to manipulate. It will also be the version
+     * stored in the database. The forward connections are used for depth-first search and updating
+     * node completion.
+     *
+     * These arrays are not sorted. On one hand this allows fast insertion. On the other hand query is O(n).
+     * But in practice linear scans are quite fast or even faster due to CPU caching / branch prediction.
+     */
+    forwardConnections: {},
+    /**
+     * Similar to forwardConnections.
+     *
+     * Used mainly for deletion.
+     */
+    backwardConnections: {},
+    /**
+     * A scratch area for depth-first search.
+     */
+    depthFirstSearch: {},
   },
   /**
    * Set to a new value on load. This is used passing a callback to load() runs too early.
@@ -79,16 +100,27 @@ const useDisplayLayerStore = create((set, get) => ({
       const { _internal } = get();
       if (_internal.loading) return;
       _internal.loading = true;
-      loadFromDb(uid).then(([nodes, edges]) => {
-        _internal.loading = false;
+      loadFromDb(uid).then(([nodes, edges, forwardConnections, backwardConnections]) => {
+        _internal.forwardConnections = forwardConnections;
+        _internal.backwardConnections = backwardConnections;
+
+        // Reset depthFirstSearch
+        const depthFirstSearch = {};
+        const autoincremented = generateAutoincremented();
+        for (const key in autoincremented) {
+          depthFirstSearch[key] = autoincremented;
+        }
+        _internal.depthFirstSearch = depthFirstSearch;
+
         set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
+        _internal.loading = false;
       });
     },
     save(uid, notifySuccessElseError) {
-      const { nodes, edges, _internal } = get();
+      const { nodes, _internal } = get();
       if (_internal.loading) return;
       _internal.loading = true;
-      saveToDb(nodes, edges, uid).then(x => {
+      saveToDb(nodes, _internal.forwardConnections, uid).then(x => {
         _internal.loading = false;
         notifySuccessElseError(x);
       });

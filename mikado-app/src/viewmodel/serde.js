@@ -49,13 +49,19 @@ export async function loadFromDb(uid) {
    * With autoincrement, adding a node is also guaranteed not to collide.
    */
   const databaseKeysToNewIdsLookup = {};
+  const forwardConnections = {};
+  const backwardConnections = {};
   // Load nodes from db
   const newNodes = Object.entries(node_names).map(([key, label]) => {
     const { x, y } = positions[key];
     // Construct object for React Flow
     // Coerce everything to the expected types to ignore potential database schema changes
+    const id = generateAutoincremented().toString();
+    databaseKeysToNewIdsLookup[key] = id;
+    forwardConnections[id] = [];
+    backwardConnections[id] = []
     return {
-      id: (databaseKeysToNewIdsLookup[key] = generateAutoincremented().toString()),
+      id,
       position: { x: +x, y: +y },
       data: { label: label.toString() },
     };
@@ -68,18 +74,20 @@ export async function loadFromDb(uid) {
     // Remember that these are directed edges, so {1:[2]} != {2:[1]}
     return values.map(value => {
       const target = databaseKeysToNewIdsLookup[value];
+      forwardConnections[source].push(target);
+      backwardConnections[target].push(source);
       // Construct JSON for edges, each has a unique ID
       return { id: `e${source}-${target}`, source, target };
     });
   });
 
-  return [newNodes, newEdges];
+  return [newNodes, newEdges, forwardConnections, backwardConnections];
 }
 
 /**
  * Saves the nodes and edges to the database.
  */
-export async function saveToDb(nodes, edges, uid) {
+export function saveToDb(nodes, forwardConnections, uid) {
   // Construct objects for database
 
   /**
@@ -121,19 +129,14 @@ export async function saveToDb(nodes, edges, uid) {
 
   const connections = {};
   // Loop thru every connection and add to a map
-  for (const edge of edges) {
-    const src = newIdsToDatabaseKeysLookup[edge.source];
-    const dst = newIdsToDatabaseKeysLookup[edge.target];
-    (connections[src] = connections[src] || []).push(dst);
+  for (const [key, values] of Object.entries(forwardConnections)) {
+    connections[newIdsToDatabaseKeysLookup[key]] = values.map(x => newIdsToDatabaseKeysLookup[x]);
   }
 
   const data = { connections, node_names, positions };
-  try {
-    // Update users collection
-    await setDoc(doc(db, uid, DEFAULT_GRAPH_ID), data);
-  } catch (e) {
+  // Update users collection
+  return setDoc(doc(db, uid, DEFAULT_GRAPH_ID), data).then(() => true).catch((e) => {
     console.log(e.message);
     return false;
-  }
-  return true;
+  });
 }
