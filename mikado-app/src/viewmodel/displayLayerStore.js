@@ -129,6 +129,32 @@ const useDisplayLayerStore = create((set, get) => ({
     },
     deleteNode(id) {
     },
+    /**
+     * Saves the position of the node.
+     */
+    markNodePosition(id) {
+      const { nodes, _internal } = get();
+      if (_internal.loading) return;
+      console.log("mark", nodes);
+      set({
+        nodes: nodes.map(node => node.id !== id ? node : { ...node, data: { ...node.data, savedPosition: node.position } }),
+      });
+    },
+    /**
+     * Moves the node back to the saved position.
+     */
+    restoreNodePosition(id) {
+      const { nodes, _internal } = get();
+      if (_internal.loading) return;
+      set({
+        nodes: nodes.map(node => {
+          if (node.id !== id) return node;
+          const { savedPosition } = node.data;
+          console.log("restore", savedPosition);
+          return !savedPosition ? node : { ...node, position: savedPosition };
+        }),
+      });
+    },
     connectOrDisconnect(src, dst) {
     },
   }

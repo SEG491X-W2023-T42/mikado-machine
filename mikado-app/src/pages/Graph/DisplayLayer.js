@@ -25,7 +25,11 @@ const selector = (state) => state;
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function DisplayLayerInternal({ uid, notifySuccessElseError }) {
-  const { nodes, edges, loadAutoincremented, operations: { onNodesChange, load, save } } = useDisplayLayerStore(selector, shallow);
+  const {
+    nodes, edges, loadAutoincremented, operations: {
+      onNodesChange, load, save, markNodePosition, restoreNodePosition,
+    }
+  } = useDisplayLayerStore(selector, shallow);
   const { fitView } = useReactFlow();
 
   // Assert uid will never change
@@ -45,6 +49,14 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
     return () => clearTimeout(id);
   }, [fitView, loadAutoincremented]);
 
+  function onNodeDragStart(_, node) {
+    markNodePosition(node.id);
+  }
+
+  function onNodeDragStop(_, node) {
+    restoreNodePosition(node.id);
+  }
+
   return <main>
     <ReactFlow
       nodes={nodes}
@@ -56,6 +68,8 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       nodeTypes={NODE_TYPES}
       edgeTypes={EDGE_TYPES}
       connectionMode={MY_NODE_CONNECTION_MODE}
+      onNodeDragStart={onNodeDragStart}
+      onNodeDragStop={onNodeDragStop}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
       <Background />
