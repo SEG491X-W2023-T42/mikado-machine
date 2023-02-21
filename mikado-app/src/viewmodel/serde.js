@@ -58,21 +58,7 @@ export async function loadFromDb(uid) {
     return values.map(value => {
       const target = value.toString();
       // Construct JSON for edges, each has a unique ID
-      return {
-        id: `e${source}-${target}`,
-        source,
-        target,
-        markerStart: {
-          type: MarkerType.ArrowClosed,
-          width: 10,
-          height: 10,
-          color: "black",
-        },
-        style: {
-          strokeWidth: 3,
-          stroke: "black",
-        },
-      };
+      return { id: `e${source}-${target}`, source, target };
     });
   });
 
