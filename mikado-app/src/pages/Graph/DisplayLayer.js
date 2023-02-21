@@ -12,7 +12,7 @@ import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "fir
 import { firebase, USING_DEBUG_EMULATORS } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
 
-import { FirebaseContext } from '../../context/FirebaseContext';
+import { useFirebase } from '../../context/FirebaseContext';
 import CustomControl from '../../components/CustomControl/CustomControl';
 
 import MuiAlert from '@mui/material/Alert';
@@ -44,7 +44,7 @@ function DisplayLayer() {
   const [successOpen, setSucessOpen] = React.useState(false);
   const [errorOpen, setErrorOpen] = React.useState(false);
 
-  const {user} = FirebaseContext();
+  const {user} = useFirebase();
   const navigate = useNavigate();
 
   // Make sure the user is signed in

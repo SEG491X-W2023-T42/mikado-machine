@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
-import { FirebaseContext } from '../../context/FirebaseContext';
+import { useFirebase } from '../../context/FirebaseContext';
 import { useNavigate } from 'react-router-dom';
 import './SignIn.css';
 import {Helmet} from "react-helmet";
 
 function SignIn() {
 
-  const {googleSignIn, user} = FirebaseContext();
+  const {googleSignIn, user} = useFirebase();
   const navigate = useNavigate();
 
   const handleGoogleSignIn = async () => {
@@ -29,7 +29,7 @@ function SignIn() {
 
     return (
             <div>
-                <Helmet 
+                <Helmet
                 bodyAttributes={{style: 'background-color : #0a021c; background-image : radial-gradient(#EEE 1px, transparent 0); background-size: 40px 40px;'}}>
                 </Helmet>
                 <div className='sign-in-card max-w-[240px] m-auto py-4'>
