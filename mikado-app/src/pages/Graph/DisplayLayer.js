@@ -4,9 +4,7 @@ import { useCallback, useEffect } from 'react';
 import ReactFlow, { addEdge, Background, MarkerType, useEdgesState, useNodesState, } from 'reactflow';
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../../firebase';
-import { useNavigate } from 'react-router-dom';
 
-import { useFirebase } from '../../context/FirebaseContext';
 import CustomControl from '../../components/CustomControl/CustomControl';
 
 import MuiAlert from '@mui/material/Alert';
@@ -25,40 +23,17 @@ if (USING_DEBUG_EMULATORS) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer() {
+function DisplayLayer({ uid }) {
   // Flow setup
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [successOpen, setSucessOpen] = React.useState(false);
   const [errorOpen, setErrorOpen] = React.useState(false);
-  const [uid, setUid] = React.useState("");
-
-  const {user} = useFirebase();
-  const navigate = useNavigate();
-
-  // Make sure the user is signed in
-  useEffect(() => {
-    if (user != null) {
-      if (Object.keys(user).length === 0) {
-        navigate('/');
-      }
-    }
-
-    if (user == null) {
-      navigate('/');
-    }
-  }, [user]);
 
   // Load data from db
   useEffect(() => {
     const getData = async () => {
-      if (user != null) {
-        if (Object.keys(user).length !== 0) {
-          setUid(user.uid);
-        }
-      }
-
       // Grab the user's graph
       let docSnap = await getDoc(doc(db, uid, "graph-1"));
 
@@ -115,7 +90,7 @@ function DisplayLayer() {
       }
     }
     getData();
-  }, [setEdges, setNodes, uid, setUid]);
+  }, [setEdges, setNodes, uid]);
 
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />

@@ -9,9 +9,9 @@ import DisplayLayer from "./DisplayLayer";
  * Plaza may also be responsible for animating tow DisplayLayers, one exiting and one entering.
  * It also contains the bottom sheet.
  */
-function Plaza() {
+function Plaza({ uid }) {
   return <>
-    <DisplayLayer></DisplayLayer>
+    <DisplayLayer uid={uid} />
   </>
 }
 
