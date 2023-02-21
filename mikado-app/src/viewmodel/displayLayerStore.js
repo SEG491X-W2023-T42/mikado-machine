@@ -5,27 +5,46 @@ import { loadFromDb, saveToDb } from "./serde";
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
   edges: [],
+  /**
+   * A loading indicator.
+   *
+   * React sometimes likes to run useEffect twice.
+   * This also helps with preventing other race conditions.
+   */
+  loading: false,
   onNodesChange(changes) {
+    const state = get();
+    if (state.loading) return;
     set({
-      nodes: applyNodeChanges(changes, get().nodes),
+      nodes: applyNodeChanges(changes, state.nodes),
     });
   },
   onEdgesChange(changes) {
+    const state = get();
+    if (state.loading) return;
     set({
-      edges: applyEdgeChanges(changes, get().edges),
+      edges: applyEdgeChanges(changes, state.edges),
     });
   },
   onConnect(connection) {
+    const state = get();
+    if (state.loading) return;
     set({
-      edges: addEdge(connection, get().edges),
+      edges: addEdge(connection, state.edges),
     });
   },
   load(uid) {
-    loadFromDb(uid).then(([nodes, edges]) => set({ nodes, edges }));
+    set({ loading: true });
+    loadFromDb(uid).then(([nodes, edges]) => set({ nodes, edges, loading: false }));
   },
   save(uid, notifySuccessElseError) {
-    const { nodes, edges } = get();
-    saveToDb(nodes, edges, uid).then(notifySuccessElseError);
+    const { nodes, edges, loading } = get();
+    if (loading) return;
+    set({ loading: true });
+    saveToDb(nodes, edges, uid).then(x => {
+      set({ loading: false });
+      notifySuccessElseError(x);
+    });
   },
 }));
 
