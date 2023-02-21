@@ -1,6 +1,8 @@
 import { ConnectionLineType, MarkerType, StraightEdge } from "reactflow";
 import MyNode from "./MyNode";
 
+export const NODE_ORIGIN = [0.5, 0.5];
+
 export const CONNECTION_LINE_STYLE = {
   strokeWidth: 3,
   stroke: "black",
