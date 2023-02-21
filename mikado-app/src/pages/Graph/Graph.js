@@ -183,6 +183,12 @@ function Graph() {
 
   };
 
+  const logout = () => {
+    firebase.auth().signOut();
+    console.log("logout");
+  }
+  
+
   return (
     <div style={{height: "100vh"}}>
 
@@ -193,9 +199,10 @@ function Graph() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
       >
-        <CustomControl onClick={() => {
-          onSave()
-        }} />
+        <CustomControl 
+          onSaveClick={() => { onSave() }} 
+          onLogoutClick={() => { logout() }}
+        />
 
         <Background />
 
