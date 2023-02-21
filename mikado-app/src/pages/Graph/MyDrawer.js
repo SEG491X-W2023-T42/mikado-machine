@@ -3,10 +3,11 @@ import "./MyDrawer.css";
 
 export const DRAG_AND_DROP_MIME = "application/mikado-app";
 export const DRAG_AND_DROP_MAGIC = "mikado-mikado";
+export const DRAG_AND_DROP_EFFECT = "copy";
 
 function onDragStart(event) {
   event.dataTransfer.setData(DRAG_AND_DROP_MIME, DRAG_AND_DROP_MAGIC);
-  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.effectAllowed = DRAG_AND_DROP_EFFECT;
 }
 
 function MyDrawer({ selectionData }) {

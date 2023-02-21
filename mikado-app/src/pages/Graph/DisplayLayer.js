@@ -7,7 +7,7 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import { DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
+import { DRAG_AND_DROP_EFFECT, DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -21,7 +21,7 @@ const selector = (state) => state;
 
 function onDragOver(event) {
   event.preventDefault();
-  event.dataTransfer.dropEffect = "move";
+  event.dataTransfer.dropEffect = DRAG_AND_DROP_EFFECT;
 }
 
 /**
