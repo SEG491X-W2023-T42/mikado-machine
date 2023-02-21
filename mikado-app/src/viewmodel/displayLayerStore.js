@@ -93,6 +93,12 @@ const useDisplayLayerStore = create((set, get) => ({
         notifySuccessElseError(x);
       });
     },
+    addNode(position) {
+    },
+    deleteNode(id) {
+    },
+    connectOrDisconnect(src, dst) {
+    },
   }
 }));
 
