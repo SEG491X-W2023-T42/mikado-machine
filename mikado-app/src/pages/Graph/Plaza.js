@@ -1,6 +1,7 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
+import MyDrawer from "./MyDrawer";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -17,6 +18,7 @@ function Plaza({ uid }) {
   return <main>
     <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} />
     {snackbar}
+    <MyDrawer />
   </main>
 }
 
