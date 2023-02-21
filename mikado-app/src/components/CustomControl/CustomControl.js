@@ -4,7 +4,7 @@ import SaveIcon from '@mui/icons-material/Save';
 
 function CustomControl(props) {
   return (
-    <Controls>
+    <Controls position="top-right">
       <ControlButton onClick={props.onClick}>
         <SaveIcon />
       </ControlButton>
