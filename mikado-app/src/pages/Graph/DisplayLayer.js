@@ -7,6 +7,13 @@ import 'reactflow/dist/style.css';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 
+/**
+ * Remove the React Flow attribution temporarily so the demo looks cleaner.
+ *
+ * It should be readded if this project becomes commercialized.
+ */
+const proOptions = { hideAttribution: true };
+
 // Not much point writing a proper selector if everything will be used
 const selector = (state) => state;
 
@@ -42,6 +49,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
+      proOptions={proOptions}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
       <Background />
