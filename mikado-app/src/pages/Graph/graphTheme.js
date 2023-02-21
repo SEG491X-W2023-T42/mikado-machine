@@ -1,4 +1,10 @@
-import { MarkerType, StraightEdge } from "reactflow";
+import { ConnectionLineType, MarkerType, StraightEdge } from "reactflow";
+
+export const CONNECTION_LINE_STYLE = {
+  strokeWidth: 3,
+  stroke: "black",
+};
+export const CONNECTION_LINE_TYPE = ConnectionLineType.Straight;
 
 export const DEFAULT_EDGE_OPTIONS = {
   markerEnd: {
@@ -7,10 +13,7 @@ export const DEFAULT_EDGE_OPTIONS = {
     height: 10,
     color: "black",
   },
-  style: {
-    strokeWidth: 3,
-    stroke: "black",
-  }
+  style: CONNECTION_LINE_STYLE,
 };
 
 export const EDGE_TYPES = {
