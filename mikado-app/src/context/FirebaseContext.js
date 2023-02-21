@@ -5,7 +5,7 @@ import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 const ctxt = createContext(void 0);
 const auth = getAuth(firebase);
 if (USING_DEBUG_EMULATORS) {
-  connectAuthEmulator(auth, "http://localhost:9099")
+  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true })
 }
 
 export const FirebaseContextProvider = ({children}) => {
