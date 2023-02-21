@@ -1,4 +1,5 @@
 import { ConnectionLineType, MarkerType, StraightEdge } from "reactflow";
+import MyNode from "./MyNode";
 
 export const CONNECTION_LINE_STYLE = {
   strokeWidth: 3,
@@ -22,3 +23,10 @@ export const EDGE_TYPES = {
    */
   default: StraightEdge,
 };
+
+export const NODE_TYPES = {
+  /**
+   * Override default (and, so far, only) node type
+   */
+  default: MyNode,
+}

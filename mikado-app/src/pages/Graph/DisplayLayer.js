@@ -6,7 +6,7 @@ import CustomControl from '../../components/CustomControl/CustomControl';
 import 'reactflow/dist/style.css';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
-import { CONNECTION_LINE_STYLE, CONNECTION_LINE_TYPE, DEFAULT_EDGE_OPTIONS, EDGE_TYPES } from "./graphTheme";
+import { CONNECTION_LINE_STYLE, CONNECTION_LINE_TYPE, DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -52,6 +52,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       onConnect={onConnect}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
+      nodeTypes={NODE_TYPES}
       edgeTypes={EDGE_TYPES}
       connectionLineStyle={CONNECTION_LINE_STYLE}
       connectionLineType={CONNECTION_LINE_TYPE}
