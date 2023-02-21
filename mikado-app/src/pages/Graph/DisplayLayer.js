@@ -4,15 +4,20 @@ import { useCallback, useEffect } from 'react';
 import ReactFlow, { addEdge, Background, MarkerType, useEdgesState, useNodesState, } from 'reactflow';
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../../firebase';
+import { shallow } from "zustand/shallow";
 
 import CustomControl from '../../components/CustomControl/CustomControl';
 
 import 'reactflow/dist/style.css';
+import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 
 const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
   connectFirestoreEmulator(db, "localhost", 8080);
 }
+
+// Not much point writing a proper selector if everything will be used
+const selector = (state) => state;
 
 /**
  * The DisplayLayer component shows ane layer of a Mikado that can be edited.
@@ -21,9 +26,7 @@ if (USING_DEBUG_EMULATORS) {
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
 function DisplayLayer({ uid, notifySuccessElseError }) {
-  // Flow setup
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const { nodes, edges, setNodes, setEdges, onNodesChange, onEdgesChange, onConnect } = useDisplayLayerStore(selector, shallow);
 
   // Load data from db
   useEffect(() => {
@@ -85,8 +88,6 @@ function DisplayLayer({ uid, notifySuccessElseError }) {
     }
     getData();
   }, [setEdges, setNodes, uid]);
-
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   const onSave = async () => {
     // Construct objects for database
