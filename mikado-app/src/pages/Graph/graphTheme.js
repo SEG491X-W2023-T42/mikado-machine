@@ -1,7 +1,6 @@
-import { BezierEdge, MarkerType } from "reactflow";
-import { createElement } from "react";
+import { MarkerType } from "reactflow";
 
-const EDGE_PROPS = {
+export const DEFAULT_EDGE_OPTIONS = {
   markerStart: {
     type: MarkerType.ArrowClosed,
     width: 10,
@@ -11,15 +10,5 @@ const EDGE_PROPS = {
   style: {
     strokeWidth: 3,
     stroke: "black",
-  }
-};
-
-export const EDGE_TYPES = {
-  /**
-   * Override default (and, so far, only) edge type
-   */
-  default(props) {
-    // Seems like BezierEdge is a MemoExoticComponent not a FC
-    return createElement(BezierEdge, { ...props, ...EDGE_PROPS });
   }
 };
