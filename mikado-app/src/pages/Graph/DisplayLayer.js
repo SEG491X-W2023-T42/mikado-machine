@@ -1,13 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect } from 'react';
 import * as React from 'react';
-import ReactFlow, {
-  Background,
-  useNodesState,
-  useEdgesState,
-  addEdge,
-  MarkerType,
-} from 'reactflow';
+import { useCallback, useEffect } from 'react';
+import ReactFlow, { addEdge, Background, MarkerType, useEdgesState, useNodesState, } from 'reactflow';
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -59,7 +53,6 @@ function DisplayLayer() {
   // Load data from db
   useEffect(() => {
     const getData = async () => {
-
       if (user != null) {
         if (Object.keys(user).length !== 0) {
           id = user.uid;
@@ -67,15 +60,11 @@ function DisplayLayer() {
       }
 
       // Grab the user's graph
-      const docRef = doc(db, id, "graph-1");
-      let docSnap = await getDoc(docRef);
-
-      // Grab fallback graph
-      const fallbackRef = doc(db, "user-1", "graph-1");
-      const fallBackSnap = await getDoc(fallbackRef);
+      let docSnap = await getDoc(doc(db, id, "graph-1"));
 
       if (!docSnap.exists()) {
-        docSnap = fallBackSnap;
+        // Grab fallback graph
+        docSnap = await getDoc(doc(db, "user-1", "graph-1"));
       }
 
       if (docSnap.exists()) {
@@ -121,11 +110,9 @@ function DisplayLayer() {
           });
         }
         setEdges(newEdges)
-
       } else {
         console.log("not exist");
       }
-
     }
     getData();
   }, [setEdges, setNodes]);
