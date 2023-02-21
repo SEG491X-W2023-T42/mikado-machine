@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { addEdge, applyEdgeChanges, applyNodeChanges, MarkerType } from "reactflow";
+import { applyNodeChanges } from "reactflow";
 import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
 
@@ -7,33 +7,43 @@ const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
   edges: [],
   /**
-   * A loading indicator.
-   *
-   * React sometimes likes to run useEffect twice.
-   * This also helps with preventing other race conditions.
+   * Internal object modified directly, and avoids getting in the way of the shallow comparison.
    */
-  loading: false,
+  _internal: {
+    /**
+     * A loading indicator.
+     *
+     * React sometimes likes to run useEffect twice, so this variable must be assigned directly and immediately.
+     * This also helps with preventing other race conditions.
+     */
+    loading: false,
+  },
   /**
    * Set to a new value on load. This is used passing a callback to load() runs too early.
    */
   loadAutoincremented: generateAutoincremented(),
   onNodesChange(changes) {
     const state = get();
-    if (state.loading) return;
+    if (state._internal.loading) return;
     set({
       nodes: applyNodeChanges(changes, state.nodes),
     });
   },
   load(uid) {
-    set({ loading: true });
-    loadFromDb(uid).then(([nodes, edges]) => set({ nodes, edges, loading: false, loadAutoincremented: generateAutoincremented() }));
+    const { _internal } = get();
+    if (_internal.loading) return;
+    _internal.loading = true;
+    loadFromDb(uid).then(([nodes, edges]) => {
+      _internal.loading = false;
+      set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
+    });
   },
   save(uid, notifySuccessElseError) {
-    const { nodes, edges, loading } = get();
-    if (loading) return;
-    set({ loading: true });
+    const { nodes, edges, _internal } = get();
+    if (_internal.loading) return;
+    _internal.loading = true;
     saveToDb(nodes, edges, uid).then(x => {
-      set({ loading: false });
+      _internal.loading = false;
       notifySuccessElseError(x);
     });
   },

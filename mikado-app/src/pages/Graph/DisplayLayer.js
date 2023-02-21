@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactFlow, { Background, ReactFlowProvider, useReactFlow, } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
@@ -40,7 +40,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
   }, [load, uid]);
   // Workaround to run fitView on the next render after the store is updated
   useEffect(() => {
-    fitView();
+    // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
+    const id = setTimeout(() => fitView(), 0);
+    return () => clearTimeout(id);
   }, [fitView, loadAutoincremented]);
 
   return <main>
