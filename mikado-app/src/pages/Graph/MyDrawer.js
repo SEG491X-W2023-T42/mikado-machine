@@ -24,9 +24,10 @@ function MyDrawer({ selectionData }) {
     {selectionData ?
       "Selected"
       :
-      <div onDragStart={onDragStart} draggable>Add Node</div>
+      <div id="add-node-button" onDragStart={onDragStart} draggable>Add Node</div>
     }
-  </SwipeableDrawer>
+  </SwipeableDrawer>;
+  // TODO add onclick random insertion when drag and drop is not available, and implement that in a way that doesn't cancel on intersections
 }
 
 export default MyDrawer;
