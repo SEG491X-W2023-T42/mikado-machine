@@ -18,7 +18,6 @@ const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
   connectFirestoreEmulator(db, "localhost", 8080);
 }
-let id = 'user-1';
 
 /**
  * The DisplayLayer component shows ane layer of a Mikado that can be edited.
@@ -33,6 +32,7 @@ function DisplayLayer() {
 
   const [successOpen, setSucessOpen] = React.useState(false);
   const [errorOpen, setErrorOpen] = React.useState(false);
+  const [uid, setUid] = React.useState("");
 
   const {user} = useFirebase();
   const navigate = useNavigate();
@@ -55,12 +55,12 @@ function DisplayLayer() {
     const getData = async () => {
       if (user != null) {
         if (Object.keys(user).length !== 0) {
-          id = user.uid;
+          setUid(user.uid);
         }
       }
 
       // Grab the user's graph
-      let docSnap = await getDoc(doc(db, id, "graph-1"));
+      let docSnap = await getDoc(doc(db, uid, "graph-1"));
 
       if (!docSnap.exists()) {
         // Grab fallback graph
@@ -115,7 +115,7 @@ function DisplayLayer() {
       }
     }
     getData();
-  }, [setEdges, setNodes]);
+  }, [setEdges, setNodes, uid, setUid]);
 
   const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -159,7 +159,7 @@ function DisplayLayer() {
 
     try {
       // Update users collection
-      await setDoc(doc(db, id, "graph-1"), {
+      await setDoc(doc(db, uid, "graph-1"), {
         connections: connections,
         node_names: node_names,
         positions: positions
