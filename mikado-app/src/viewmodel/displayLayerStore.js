@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
+import { createEdgeObject } from "./displayObjectFactory";
 
 function myOnNodesChange(changes, nodes, set) {
   const changesById = {};
@@ -163,8 +164,30 @@ const useDisplayLayerStore = create((set, get) => ({
         }),
       });
     },
+    /**
+     * Connects or disconnects two nodes.
+     */
     connectOrDisconnect(srcId, dstId) {
-      console.log(srcId, dstId);
+      const { edges, _internal: { loading, forwardConnections, backwardConnections } } = get();
+      if (loading) return;
+      if (forwardConnections[dstId].includes(srcId)) {
+        // Backward connection found
+        const tmp = dstId;
+        dstId = srcId;
+        srcId = tmp;
+      } else if (!forwardConnections[srcId].includes(dstId)) {
+        // No connection found
+        // TODO DFS to enforce acyclic
+        forwardConnections[srcId].push(dstId);
+        backwardConnections[dstId].push(srcId);
+        set({ edges: [...edges, createEdgeObject(srcId, dstId)] });
+        return;
+      } // else forward connection found
+      const forward = forwardConnections[srcId];
+      const backward = backwardConnections[dstId];
+      forward.splice(forward.indexOf(dstId), 1);
+      backward.splice(backward.indexOf(srcId), 1);
+      set({ edges: edges.filter(edge => edge.source !== srcId || edge.target !== dstId) });
     },
   }
 }));
