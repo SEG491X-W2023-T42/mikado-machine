@@ -7,6 +7,7 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
+import { DRAG_AND_DROP_EFFECT, DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -18,6 +19,11 @@ const proOptions = { hideAttribution: true };
 // Not much point writing a proper selector if everything will be used
 const selector = (state) => state;
 
+function onDragOver(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = DRAG_AND_DROP_EFFECT;
+}
+
 /**
  * @see DisplayLayer
  *
@@ -25,12 +31,13 @@ const selector = (state) => state;
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData }) {
+  const reactFlowWrapper = useRef(void 0);
   const {
     nodes, edges, loadAutoincremented, operations: {
-      onNodesChange, load, save, markNodePosition, restoreNodePosition, connectOrDisconnect, renameNode,
+      onNodesChange, load, save, markNodePosition, restoreNodePosition, connectOrDisconnect, renameNode, addNode,
     }
   } = useDisplayLayerStore(selector, shallow);
-  const { fitView } = useReactFlow();
+  const { project, fitView } = useReactFlow();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -83,7 +90,24 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
     }
   }
 
-  return <main>
+  function onDrop(event) {
+    event.preventDefault();
+
+    // check if the dropped element is valid
+    if (event.dataTransfer.getData(DRAG_AND_DROP_MIME) !== DRAG_AND_DROP_MAGIC) {
+      return;
+    }
+
+    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    const position = project({
+      x: event.clientX - reactFlowBounds.left,
+      y: event.clientY - reactFlowBounds.top,
+    });
+
+    addNode(position);
+  }
+
+  return <main ref={reactFlowWrapper}>
     <ReactFlow
       nodes={nodes}
       edges={edges}
@@ -96,6 +120,8 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
       connectionMode={MY_NODE_CONNECTION_MODE}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
       <Background />
