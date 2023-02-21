@@ -24,20 +24,6 @@ const useDisplayLayerStore = create((set, get) => ({
       nodes: applyNodeChanges(changes, state.nodes),
     });
   },
-  onEdgesChange(changes) {
-    const state = get();
-    if (state.loading) return;
-    set({
-      edges: applyEdgeChanges(changes, state.edges),
-    });
-  },
-  onConnect(connection) {
-    const state = get();
-    if (state.loading) return;
-    set({
-      edges: addEdge(connection, state.edges),
-    });
-  },
   load(uid) {
     set({ loading: true });
     loadFromDb(uid).then(([nodes, edges]) => set({ nodes, edges, loading: false, loadAutoincremented: generateAutoincremented() }));

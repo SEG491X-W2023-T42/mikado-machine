@@ -5,7 +5,7 @@ import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
-import { CONNECTION_LINE_STYLE, CONNECTION_LINE_TYPE, DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
+import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 
 /**
@@ -25,7 +25,7 @@ const selector = (state) => state;
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function DisplayLayerInternal({ uid, notifySuccessElseError }) {
-  const { nodes, edges, loadAutoincremented, onNodesChange, onEdgesChange, onConnect, load, save } = useDisplayLayerStore(selector, shallow);
+  const { nodes, edges, loadAutoincremented, onNodesChange, load, save } = useDisplayLayerStore(selector, shallow);
   const { fitView } = useReactFlow();
 
   // Assert uid will never change
@@ -48,14 +48,11 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       nodes={nodes}
       edges={edges}
       onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
+      nodesConnectable={false}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
       edgeTypes={EDGE_TYPES}
-      connectionLineStyle={CONNECTION_LINE_STYLE}
-      connectionLineType={CONNECTION_LINE_TYPE}
       connectionMode={MY_NODE_CONNECTION_MODE}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />

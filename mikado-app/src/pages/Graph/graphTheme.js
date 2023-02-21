@@ -1,4 +1,4 @@
-import { ConnectionLineType, MarkerType } from "reactflow";
+import { MarkerType } from "reactflow";
 import MyNode from "./MyNode";
 import FloatingEdge from "./FloatingEdge";
 
@@ -6,7 +6,6 @@ export const CONNECTION_LINE_STYLE = {
   strokeWidth: 3,
   stroke: "black",
 };
-export const CONNECTION_LINE_TYPE = ConnectionLineType.Straight;
 
 export const DEFAULT_EDGE_OPTIONS = {
   markerEnd: {
