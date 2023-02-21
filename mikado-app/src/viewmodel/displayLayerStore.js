@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { addEdge, applyEdgeChanges, applyNodeChanges, MarkerType } from "reactflow";
 import { loadFromDb, saveToDb } from "./serde";
+import generateAutoincremented from "./autoincrement";
 
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
@@ -12,6 +13,10 @@ const useDisplayLayerStore = create((set, get) => ({
    * This also helps with preventing other race conditions.
    */
   loading: false,
+  /**
+   * Set to a new value on load. This is used passing a callback to load() runs too early.
+   */
+  loadAutoincremented: generateAutoincremented(),
   onNodesChange(changes) {
     const state = get();
     if (state.loading) return;
@@ -35,7 +40,7 @@ const useDisplayLayerStore = create((set, get) => ({
   },
   load(uid) {
     set({ loading: true });
-    loadFromDb(uid).then(([nodes, edges]) => set({ nodes, edges, loading: false }));
+    loadFromDb(uid).then(([nodes, edges]) => set({ nodes, edges, loading: false, loadAutoincremented: generateAutoincremented() }));
   },
   save(uid, notifySuccessElseError) {
     const { nodes, edges, loading } = get();

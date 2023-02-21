@@ -15,7 +15,7 @@ function Plaza({ uid }) {
   const [snackbar, notifySuccessElseError] = useSnackbar();
 
   return <main>
-    <DisplayLayer uid={uid} notifySuccessElseError={notifySuccessElseError} />
+    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} />
     {snackbar}
   </main>
 }
