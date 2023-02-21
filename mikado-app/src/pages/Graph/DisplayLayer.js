@@ -20,7 +20,7 @@ if (USING_DEBUG_EMULATORS) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, setSuccessOpen, setErrorOpen }) {
+function DisplayLayer({ uid, notifySuccessElseError }) {
   // Flow setup
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -119,9 +119,9 @@ function DisplayLayer({ uid, setSuccessOpen, setErrorOpen }) {
         node_names: node_names,
         positions: positions
       });
-      setSuccessOpen(true);
+      notifySuccessElseError(true);
     } catch (e) {
-      setErrorOpen(true);
+      notifySuccessElseError(false);
       console.log(e.message);
     }
   };

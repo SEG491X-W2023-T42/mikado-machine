@@ -12,10 +12,10 @@ import useSnackbar from "./MySnackbar";
  * It also contains the bottom sheet.
  */
 function Plaza({ uid }) {
-  const [snackbar, setSuccessOpen, setErrorOpen] = useSnackbar();
+  const [snackbar, notifySuccessElseError] = useSnackbar();
 
   return <main>
-    <DisplayLayer uid={uid} setSuccessOpen={setSuccessOpen} setErrorOpen={setErrorOpen} />
+    <DisplayLayer uid={uid} notifySuccessElseError={notifySuccessElseError} />
     {snackbar}
   </main>
 }

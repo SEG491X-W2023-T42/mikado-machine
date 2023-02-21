@@ -1,49 +1,33 @@
 import Snackbar from "@mui/material/Snackbar";
-import { forwardRef, useState } from "react";
+import { useState } from "react";
 import MuiAlert from "@mui/material/Alert";
 
+const SUCCESS_MSG = "Graph successfully saved!";
+const ERROR_MSG = "There was a problem saving your graph. Please check console for more details.";
+const ANCHOR_ORIGIN = { vertical: "bottom", horizontal: "center" };
+const ALERT_SX = { width: '100%' };
+
 function useSnackbar() {
-  const [successOpen, setSuccessOpen] = useState(false);
-  const [errorOpen, setErrorOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const Alert = forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
-  })
-
-  const handleToastClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setSuccessOpen(false);
-    setErrorOpen(false);
+  function handleToastClose(event, reason) {
+    reason !== 'clickaway' && setOpen(false);
   }
 
-  const snackbar = <>
-    <Snackbar
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      open={successOpen}
-      autoHideDuration={6000}
-      onClose={handleToastClose}
-    >
-      <Alert onClose={handleToastClose} severity="success" sx={{ width: '100%' }}>
-        Graph sucessfully saved!
-      </Alert>
-    </Snackbar>
+  function notifySuccessElseError(success) {
+    setSuccess(success);
+    setOpen(true);
+  }
 
-    <Snackbar
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      open={errorOpen}
-      autoHideDuration={6000}
-      onClose={handleToastClose}
-    >
-      <Alert onClose={handleToastClose} severity="error" sx={{ width: '100%' }}>
-        There was a problem saving your graph. Please check console for more details.
-      </Alert>
-    </Snackbar>
-  </>;
+  // noinspection JSValidateTypes // handleToastClose
+  const snackbar = <Snackbar anchorOrigin={ANCHOR_ORIGIN} open={open} autoHideDuration={6000} onClose={handleToastClose}>
+    <MuiAlert elevation={6} variant="filled" onClose={handleToastClose} severity={success ? "success" : "error"} sx={ALERT_SX}>
+      {success ? SUCCESS_MSG : ERROR_MSG}
+    </MuiAlert>
+  </Snackbar>;
 
-  return [snackbar, setSuccessOpen, setErrorOpen];
+  return [snackbar, notifySuccessElseError];
 }
 
 export default useSnackbar;
