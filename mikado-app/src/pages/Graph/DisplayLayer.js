@@ -6,6 +6,7 @@ import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { CONNECTION_LINE_STYLE, CONNECTION_LINE_TYPE, DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_ORIGIN, NODE_TYPES } from "./graphTheme";
+import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -56,6 +57,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       connectionLineStyle={CONNECTION_LINE_STYLE}
       connectionLineType={CONNECTION_LINE_TYPE}
       nodeOrigin={NODE_ORIGIN}
+      connectionMode={MY_NODE_CONNECTION_MODE}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
       <Background />
