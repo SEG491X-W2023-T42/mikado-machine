@@ -1,4 +1,4 @@
-import { MarkerType } from "reactflow";
+import { MarkerType, StraightEdge } from "reactflow";
 
 export const DEFAULT_EDGE_OPTIONS = {
   markerStart: {
@@ -11,4 +11,11 @@ export const DEFAULT_EDGE_OPTIONS = {
     strokeWidth: 3,
     stroke: "black",
   }
+};
+
+export const EDGE_TYPES = {
+  /**
+   * Override default (and, so far, only) edge type
+   */
+  default: StraightEdge,
 };

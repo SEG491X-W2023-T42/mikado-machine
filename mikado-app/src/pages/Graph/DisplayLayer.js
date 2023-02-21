@@ -6,7 +6,7 @@ import CustomControl from '../../components/CustomControl/CustomControl';
 import 'reactflow/dist/style.css';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
-import { DEFAULT_EDGE_OPTIONS } from "./graphTheme";
+import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES } from "./graphTheme";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -52,6 +52,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError }) {
       onConnect={onConnect}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
+      edgeTypes={EDGE_TYPES}
     >
       <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
       <Background />
