@@ -5,6 +5,15 @@
     background-image: radial-gradient();
 } */
 
+#sign-in-page {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #0a021c;
+  background-image: radial-gradient(#eee 1px, transparent 0);
+  background-size: 40px 40px;
+}
+
 .sign-in-card{
     width: 400px;
     height: fit-content + 20px;

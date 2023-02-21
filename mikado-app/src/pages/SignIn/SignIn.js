@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useFirebase } from '../../context/FirebaseContext';
 import { useNavigate } from 'react-router-dom';
 import './SignIn.css';
-import {Helmet} from "react-helmet";
 
 function SignIn() {
 
@@ -28,10 +27,7 @@ function SignIn() {
   }, [user]);
 
     return (
-            <div>
-                <Helmet
-                bodyAttributes={{style: 'background-color : #0a021c; background-image : radial-gradient(#EEE 1px, transparent 0); background-size: 40px 40px;'}}>
-                </Helmet>
+            <div id="sign-in-page">
                 <div className='sign-in-card max-w-[240px] m-auto py-4'>
                     <h1>The Mikado Machine</h1>
 
