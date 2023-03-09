@@ -19,7 +19,6 @@ function MyDrawer({ displayLayerHandle }) {
     current && (current.value = displayLayerHandle.getSelectedNodeName());
   }, [displayLayerHandle]);
   const selectedNodeName = displayLayerHandle.getSelectedNodeName();
-  console.log("snn", selectedNodeName);
   return <SwipeableDrawer
     open={true}
     onClose={() => void 0}

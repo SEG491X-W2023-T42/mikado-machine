@@ -192,7 +192,6 @@ class DisplayLayerOperations {
       width: 100,
       height: 60,
     }))) {
-      console.log("dup");
       return;
     }
     // Allocate everything
@@ -208,8 +207,6 @@ class DisplayLayerOperations {
   deleteNode(id) {
     const forwardConnections = this.#forwardConnections;
     const backwardConnections = this.#backwardConnections;
-    console.log(JSON.stringify(forwardConnections), JSON.stringify(backwardConnections));
-
     // Unlink everything touching this
     for (const connection of backwardConnections[id]) {
       arrayRemoveByValueIfPresent(forwardConnections[connection], id);
@@ -226,7 +223,6 @@ class DisplayLayerOperations {
       nodes: nodes.filter(node => node.id !== id),
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
-    console.log(JSON.stringify(forwardConnections), JSON.stringify(backwardConnections));
   }
 
   /**
