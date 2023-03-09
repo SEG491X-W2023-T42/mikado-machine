@@ -306,9 +306,23 @@ class DisplayLayerOperations {
   }
 
   /**
+   * Returns the display name for a node
+   */
+  getNodeLabel(id) {
+    // This is only O(n) so no need to optimize
+    // Notably the drag operation is also at least O(n) so the user would notice that first
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return node.data.label;
+      }
+    }
+    throw new Error();
+  }
+
+  /**
    * Changes the display name for a node
    */
-  renameNode(id, name) {
+  setNodeLabel(id, name) {
     this.#set({
       nodes: this.#state.nodes.map(
         node => node.id !== id ? node : { ...node, data: { ...node.data, label: name } },

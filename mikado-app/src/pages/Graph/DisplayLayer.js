@@ -8,6 +8,7 @@ import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import { DRAG_AND_DROP_EFFECT, DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
+import DisplayLayerHandle from "./DisplayLayerHandle";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -30,13 +31,9 @@ function onDragOver(event) {
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData }) {
+function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHandle }) {
   const reactFlowWrapper = useRef(void 0);
-  const {
-    nodes, edges, loadAutoincremented, operations: {
-      onNodesChange, load, save, markNodePosition, restoreNodePosition, connectOrDisconnect, renameNode, addNode,
-    }
-  } = useDisplayLayerStore(selector, shallow);
+  const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
 
   // Assert uid will never change
@@ -47,8 +44,8 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
 
   // Load data from db
   useEffect(() => {
-    load(uid);
-  }, [load, uid]);
+    operations.load(uid);
+  }, [operations.load, uid]);
   // Workaround to run fitView on the next render after the store is updated
   useEffect(() => {
     // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
@@ -58,22 +55,12 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
 
   useOnSelectionChange({
     onChange({ nodes }) {
-      if (nodes.length !== 1) {
-        setSelectionData(void 0);
-        return;
-      }
-      const { id, data: { label: name } } = nodes[0];
-      setSelectionData({
-        name,
-        setName(name) {
-          renameNode(id, name);
-        },
-      })
+      setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
     }
   });
 
   function onNodeDragStart(_, node) {
-    markNodePosition(node.id);
+    operations.markNodePosition(node.id);
   }
 
   function onNodeDragStop(_, node) {
@@ -85,8 +72,8 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
       return !(other.id === id || r < oL || l > oR || t > oB || b < oT);
     });
     if (target) {
-      restoreNodePosition(id);
-      connectOrDisconnect(id, target.id);
+      operations.restoreNodePosition(id);
+      operations.connectOrDisconnect(id, target.id);
     }
   }
 
@@ -104,14 +91,14 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
       y: event.clientY - reactFlowBounds.top,
     });
 
-    addNode(position);
+    operations.addNode(position);
   }
 
   return <main ref={reactFlowWrapper}>
     <ReactFlow
       nodes={nodes}
       edges={edges}
-      onNodesChange={onNodesChange}
+      onNodesChange={operations.onNodesChange}
       nodesConnectable={false}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
@@ -123,7 +110,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
-      <CustomControl onClick={() => save(uid, notifySuccessElseError)} />
+      <CustomControl onClick={() => operations.save(uid, notifySuccessElseError)} />
       <Background />
     </ReactFlow>
   </main>;
@@ -135,9 +122,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setSelectionData })
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, notifySuccessElseError, setSelectionData }) {
+function DisplayLayer({ uid, notifySuccessElseError, setDisplayLayerHandle }) {
   return <ReactFlowProvider>
-    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} setSelectionData={setSelectionData} />
+    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
   </ReactFlowProvider>;
 }
 
