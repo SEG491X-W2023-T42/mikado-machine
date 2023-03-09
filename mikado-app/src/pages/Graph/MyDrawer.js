@@ -11,15 +11,14 @@ function onDragStart(event) {
   event.dataTransfer.effectAllowed = DRAG_AND_DROP_EFFECT;
 }
 
-function MyDrawer({ selectionData }) {
+function MyDrawer({ displayLayerHandle }) {
   // TODO fix the swiping on desktop
   const ref = useRef();
   useEffect(() => {
     const { current } = ref;
-    if (current) {
-      current.value = selectionData.name;
-    }
-  }, [selectionData]);
+    current && (current.value = displayLayerHandle.getSelectedNodeName());
+  }, [displayLayerHandle]);
+  const selectedNodeName = displayLayerHandle.getSelectedNodeName();
   return <SwipeableDrawer
     open={true}
     onClose={() => void 0}
@@ -29,8 +28,8 @@ function MyDrawer({ selectionData }) {
     disableSwipeToOpen={false}
   >
     <div id="puller"></div>
-    {selectionData ?
-      <input ref={ref} onChange={e => selectionData.setName(e.target.value)} />
+    {typeof selectedNodeName === "string" ?
+      <input ref={ref} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />
       :
       <div id="add-node-button" onDragStart={onDragStart} draggable>Add Node</div>
     }

@@ -3,18 +3,20 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
-const deleteNodeSelector = (state) => state.operations.deleteNode;
+const operationsSelector = (state) => state.operations;
 
 function MyNode({ id, data }) {
-  const deleteNode = useDisplayLayerStore(deleteNodeSelector);
+  const operations = useDisplayLayerStore(operationsSelector);
 
-  return <>
+  // TODO add node completion checkmark button
+  void operations.setNodeCompleted;
+  return <div className={data.completed ? "node-done" : "node-future"}>
     <NodeToolbar>
-      <button onClick={() => deleteNode(id)}>&#128465;</button>
+      <button onClick={() => operations.deleteNode(id)}>&#128465;</button>
     </NodeToolbar>
     {data.label}
     <Handle />
-  </>
+  </div>
 }
 
 export default MyNode;
