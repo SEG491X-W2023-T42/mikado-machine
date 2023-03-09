@@ -21,6 +21,8 @@
     "reactflow": "^11.5.5",
     "web-vitals": "^2.1.4",
     "zustand": "^4.3.3"
+     "eslint": "^8.35.0",
+    "eslint-plugin-react": "^7.32.2"
   },
   "scripts": {
     "start": "react-scripts start",
