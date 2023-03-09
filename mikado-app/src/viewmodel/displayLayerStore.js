@@ -331,8 +331,9 @@ class DisplayLayerOperations {
    * Sets whether the specified node is completed.
    * This also updates the highlighting of nodes without outstanding dependencies.
    */
+  // eslint-disable-next-line no-unused-vars
   setNodeCompleted(id, completed) {
-    // TODO
+    // TODO, remove eslint disable when done
   }
 }
 
