@@ -61,7 +61,8 @@ export async function loadFromDb(uid) {
     databaseKeysToNewIdsLookup[key] = id;
     forwardConnections[id] = [];
     backwardConnections[id] = []
-    return createNodeObject(id, +x, +y, label.toString());
+    const completed = false; // TODO
+    return createNodeObject(id, +x, +y, label.toString(), completed);
   });
 
   // Load edges from db
@@ -121,6 +122,7 @@ export function saveToDb(nodes, forwardConnections, uid) {
     newIdsToDatabaseKeysLookup[node.id] = index;
     // No need to coerce as we own node.data: T for Node<T>
     node_names[index] = node.data.label;
+    void node.data.completed; // TODO
     // Assuming there is no reason React Flow will change away from { x: number, y: number }
     positions[index] = node.position;
   });

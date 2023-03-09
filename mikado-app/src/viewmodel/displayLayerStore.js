@@ -326,6 +326,14 @@ class DisplayLayerOperations {
       ),
     });
   }
+
+  /**
+   * Sets whether the specified node is completed.
+   * This also updates the highlighting of nodes without outstanding dependencies.
+   */
+  setNodeCompleted(id, completed) {
+    // TODO
+  }
 }
 
 const useDisplayLayerStore = create((set, get) => ({
