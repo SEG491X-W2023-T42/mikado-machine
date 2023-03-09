@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: '**/mikado-app'
+        working-directory: '/mikado-app'
         
     strategy:
       matrix:
