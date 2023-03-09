@@ -14,15 +14,24 @@ jobs:
   run-linters:
     name: Run linters
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 'mikado-app'
+        
+    strategy:
+      matrix:
+        node-version: [18.x]
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: 'mikado-app/package-lock.json'
 
       # ESLint and Prettier must be in `package.json`
       - name: Install Node.js dependencies
