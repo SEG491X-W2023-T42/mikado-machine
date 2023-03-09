@@ -46,7 +46,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
   // Load data from db
   useEffect(() => {
     operations.load(uid);
-  }, [operations.load, uid]);
+  }, [operations.load, uid, operations]);
   // Workaround to run fitView on the next render after the store is updated
   useEffect(() => {
     // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
