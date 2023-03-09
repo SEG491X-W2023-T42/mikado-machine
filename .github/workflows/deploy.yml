@@ -31,5 +31,6 @@ jobs:
         cache-dependency-path: 'mikado-app/package-lock.json'
     
     - run: npm i
+    - run: eslint -v
     - run: npm run build --if-present
     - run: sudo systemctl restart nginx
