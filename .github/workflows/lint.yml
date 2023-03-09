@@ -38,6 +38,7 @@ jobs:
         run: npm ci
       - name: test
         run: eslint -v
+        working-directory: 'mikado-app'
 
       - name: Run linters
         uses: wearerequired/lint-action@v2
