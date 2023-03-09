@@ -110,11 +110,6 @@ class DisplayLayerOperations {
    */
   #backwardConnections = {};
 
-  /**
-   * A scratch area for depth-first search.
-   */
-  #depthFirstSearch = {};
-
   // Zustand data
 
   /**
@@ -166,15 +161,6 @@ class DisplayLayerOperations {
     loadFromDb(uid).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
-
-      // Reset depthFirstSearch
-      const depthFirstSearch = {};
-      const autoincremented = generateAutoincremented();
-      for (const key in autoincremented) {
-        depthFirstSearch[key] = autoincremented;
-      }
-      this.#depthFirstSearch = depthFirstSearch;
-
       this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
       this.#loading = false;
     });
@@ -213,7 +199,6 @@ class DisplayLayerOperations {
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#depthFirstSearch[id] = id;
     this.#set({ nodes: [...nodes, createNodeObject(id, l, t)] });
   }
 
@@ -235,7 +220,6 @@ class DisplayLayerOperations {
     // Then delete the containers for this vertex
     delete forwardConnections[id];
     delete backwardConnections[id];
-    delete this.#depthFirstSearch[id];
 
     const { nodes, edges } = this.#state;
     this.#set({
@@ -282,7 +266,7 @@ class DisplayLayerOperations {
     } else if (!forwardConnections[srcId].includes(dstId)) { // No connection found
       // Check for cycles
       const autoincremented = generateAutoincremented();
-      const depthFirstSearch = this.#depthFirstSearch;
+      const depthFirstSearch = {};
 
       function dfs(otherId) {
         // Use autoincremented as a visited boolean
