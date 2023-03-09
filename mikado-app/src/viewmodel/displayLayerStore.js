@@ -183,7 +183,7 @@ class DisplayLayerOperations {
    */
   addNode(position) {
     const { nodes } = this.#state;
-    // Reject upon intersection
+    // Avoid intersections
     if (nodes.some(createIntersectionDetectorFor({
       id: void 0,
       position,
@@ -192,6 +192,7 @@ class DisplayLayerOperations {
       width: 100,
       height: 60,
     }))) {
+      // TODO Better UX is to find a free spot instead of silently failing
       return;
     }
     // Allocate everything

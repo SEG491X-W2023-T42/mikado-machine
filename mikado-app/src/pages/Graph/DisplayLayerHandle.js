@@ -37,4 +37,12 @@ export default class DisplayLayerHandle {
     const id = this.#selectedNodeId;
     id && this.#displayLayerOperations?.setNodeLabel(id, name);
   }
+
+  /**
+   * Adds a node, preferentially in the centre of the screen
+   */
+  addNode() {
+    // TODO Pass the viewport center to the class constructor so it can be used here
+    this.#displayLayerOperations?.addNode({x: 0, y: 0});
+  }
 }
