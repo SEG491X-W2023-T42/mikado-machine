@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
+import createIntersectionDetectorFor from "./aabb";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -183,15 +184,14 @@ class DisplayLayerOperations {
   addNode(position) {
     const { nodes } = this.#state;
     // Reject upon intersection
-    // Too bad it's not possible to know the dimensions of the current node to be added
-    // So we will just hardcode some kind of size
-    const { x: l, y: t } = position;
-    const r = l + 100, b = t + 60;
-    if (nodes.some(other => {
-      const { x: oL, y: oT } = other.position;
-      const oR = oL + other.width, oB = oT + other.height;
-      return !(r < oL || l > oR || t > oB || b < oT);
-    })) {
+    if (nodes.some(createIntersectionDetectorFor({
+      id: void 0,
+      position,
+      // Too bad it's not possible to know the dimensions of the current node to be added
+      // So we will just hardcode some kind of size
+      width: 100,
+      height: 60,
+    }))) {
       console.log("dup");
       return;
     }
@@ -199,7 +199,7 @@ class DisplayLayerOperations {
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#set({ nodes: [...nodes, createNodeObject(id, l, t)] });
+    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] });
   }
 
   /**

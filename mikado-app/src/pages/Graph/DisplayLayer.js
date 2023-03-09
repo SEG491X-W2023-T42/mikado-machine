@@ -9,6 +9,7 @@ import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import { DRAG_AND_DROP_EFFECT, DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
 import DisplayLayerHandle from "./DisplayLayerHandle";
+import createIntersectionDetectorFor from "../../viewmodel/aabb";
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -64,14 +65,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
   }
 
   function onNodeDragStop(_, node) {
-    const { id, position: { x: l, y: t } } = node;
-    const r = l + node.width, b = t + node.height;
-    const target = nodes.find(other => {
-      const { x: oL, y: oT } = other.position;
-      const oR = oL + other.width, oB = oT + other.height;
-      return !(other.id === id || r < oL || l > oR || t > oB || b < oT);
-    });
+    const target = nodes.find(createIntersectionDetectorFor(node));
     if (target) {
+      const { id } = node;
       operations.restoreNodePosition(id);
       operations.connectOrDisconnect(id, target.id);
     }
