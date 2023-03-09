@@ -37,8 +37,7 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
       - name: test
-        run: eslint -v
-        working-directory: 'mikado-app'
+        run: npm eslint -v
 
       - name: Run linters
         uses: wearerequired/lint-action@v2
