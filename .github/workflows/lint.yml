@@ -41,4 +41,4 @@ jobs:
         uses: wearerequired/lint-action@v2
         with:
           eslint: true
-          eslint_command_prefix: "npm"
+          dir: 'mikado-app'
