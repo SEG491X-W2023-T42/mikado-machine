@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path='/' element={<SignIn />} />
         <Route path='/graph' element={<GraphPage />} />
-      </Routes>
+      </Routes> 
     </FirebaseContextProvider>
   );
 }
