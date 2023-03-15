@@ -1,37 +1,20 @@
-Feature: Data Submission
+Feature: Login
     As a user,
-    I want to provide feedback on the website
-    so that I can make my voice heard
+    I want to log into the app
+    so that I can use the app
 
-    Scenario: Go through the survey
-        Given I visit the page
-        Then I see the footer
-        Then I do not see section 2
-        Then I do not see section 3
-        Then I do not see section 4
-        Then I do not see section 5
-        Then I do not see section 6
-        Then I do not see section 1
-        When I click to go to section 1
-        Then I see section 1
-        Then I do not see section 2
-        When I click to go to section 2
-        Then I see section 2
-        Then I do not see section 3
-        When I click to go to section 3
-        Then I see section 3
-        Then I do not see section 4
-        When I click to go to section 4
-        Then I see section 4
-        Then I do not see section 5
-        When I click to go to section 5
-        Then I see section 5
-        Then I do not see section 6
-        When I click to go to section 6
-        Then I see section 6
-        Then I do not see section 0
-        Then I do not see section 1
-        Then I do not see section 2
-        Then I do not see section 3
-        Then I do not see section 4
-        Then I do not see section 5
+    Scenario: Log in with the emulator
+        Given I open the homepage
+        Then I see the welcome
+        Then I see the SIGN IN WITH GOOGLE button
+        When I click to sign in with Google
+        Then I see the auth emulator prompt
+        When I click to add a new account
+        Then I see an email and name form
+        When I click to auto-generate the information
+        Then I see that the emulator email is not blank
+        When I click to sign in with the new emulator account
+        Then I see a graph with edges
+        Then I see the text task1 somewhere in the graph
+        Then I see the text task2 somewhere in the graph
+        Then I see the text task3 somewhere in the graph
