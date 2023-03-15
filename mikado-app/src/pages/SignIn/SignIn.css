@@ -33,21 +33,8 @@
 }
 
 .google-sign-in-button{
-    width: fit-content;
     height: 50px;
-    background-color: #0a021c;
-    /* border: 1px solid #000; */
     box-shadow: 0 0 10px 0 rgba(0,0,0,0.3);
-    border-radius: 5px;
-    border: 1px solid #EEE;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    color: #e6e4f2;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    padding: 16px;
 }
 
 .google-button-text{
