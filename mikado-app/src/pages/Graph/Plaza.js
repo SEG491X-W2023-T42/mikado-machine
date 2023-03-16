@@ -1,7 +1,7 @@
+import MyDrawer from "./MyDrawer";
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
-import MyDrawer from "./MyDrawer";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 
@@ -23,7 +23,9 @@ function Plaza({ uid }) {
   return <main>
     <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
     {snackbar}
-    <MyDrawer displayLayerHandle={displayLayerHandle} />
+    {// remove this and the braces when needed
+      //<MyDrawer setDisplayLayerHandle={setDisplayLayerHandle} />
+    }
   </main>
 }
 

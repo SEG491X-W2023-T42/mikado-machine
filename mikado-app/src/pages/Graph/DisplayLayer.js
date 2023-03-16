@@ -7,9 +7,9 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import { DRAG_AND_DROP_EFFECT, DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
+import Overlay from "./Overlay"
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -20,11 +20,6 @@ const proOptions = { hideAttribution: true };
 
 // Not much point writing a proper selector if everything will be used
 const selector = (state) => state;
-
-function onDragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = DRAG_AND_DROP_EFFECT;
-}
 
 /**
  * @see DisplayLayer
@@ -73,13 +68,8 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
     }
   }
 
-  function onDrop(event) {
+  /*function onDrop(event) {
     event.preventDefault();
-
-    // check if the dropped element is valid
-    if (event.dataTransfer.getData(DRAG_AND_DROP_MIME) !== DRAG_AND_DROP_MAGIC) {
-      return;
-    }
 
     const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const position = project({
@@ -88,7 +78,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
     });
 
     operations.addNode(position);
-  }
+  }*/
 
   return <main ref={reactFlowWrapper}>
     <ReactFlow
@@ -103,12 +93,12 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
       connectionMode={MY_NODE_CONNECTION_MODE}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
     >
       <CustomControl onClick={() => operations.save(uid, notifySuccessElseError)} />
       <Background />
+      <Overlay displayLayerHandle={new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id)}/>
     </ReactFlow>
+    
   </main>;
 }
 
