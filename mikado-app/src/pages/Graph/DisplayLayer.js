@@ -98,7 +98,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
     >
-      <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} />
+      <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} onExportClick={() => operations.export(fitView)} />
       <Background />
       <Overlay FABonClick={addNode}/>
     </ReactFlow>

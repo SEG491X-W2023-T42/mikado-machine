@@ -6,11 +6,11 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 function CustomControl(props) {
   return (
     <Controls position="top-right">
-      <ControlButton onSaveClick={props.onSaveClick}>
+      <ControlButton onClick={props.onSaveClick}>
         <SaveIcon />
       </ControlButton>
       <ControlButton>
-        <PictureAsPdfIcon onExportClick={props.onExportClick}/>
+        <PictureAsPdfIcon onClick={props.onExportClick}/>
       </ControlButton>
     </Controls>
   );

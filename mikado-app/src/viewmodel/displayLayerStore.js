@@ -3,6 +3,7 @@ import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
+import * as htmlToImage from 'html-to-image';
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -361,7 +362,54 @@ class DisplayLayerOperations {
   setNodeCompleted(id, completed) {
     // TODO, remove eslint disable when done
   }
+
+  async export(fitView) {
+    fitView();
+
+    function filter(node) {
+      return (node.tagName !== 'i');
+    }
+
+    let elements = document.getElementsByClassName('react-flow__renderer')[0];
+    htmlToImage.toSvg(elements, { filter: filter }).then(async(svgContent) => {
+      const svgElement = await decodeURIComponent(svgContent.replace("data:image/svg+xml;charset=utf-8,","").trim());
+
+      const newWindow = open();
+      newWindow.document.write(
+        `<html>
+        <head>
+        <title>Flow.pdf</title>
+        <style>
+        @page {
+          size: A4 landscape !important;
+          margin:0 !important;
+        }
+        @media print {
+        * {
+        -webkit-print-color-adjust: exact !important;   /* Chrome, Safari */
+        color-adjust: exact !important;                 /*Firefox*/
+         }
+        }
+        </style>
+        </head>
+        <body style="margin:60px 32px 32px 32px ">
+                ${svgElement}
+        <script>
+        window.print();
+        window.close();
+        </script>
+        </body>
+        </html>`
+      )
+
+    })
+
+
+  }
+
 }
+
+
 
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
