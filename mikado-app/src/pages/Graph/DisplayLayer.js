@@ -9,7 +9,7 @@ import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
-import Overlay from "./Overlay"
+import Overlay from "./Overlays/Overlay"
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -68,17 +68,15 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
     }
   }
 
-  /*function onDrop(event) {
-    event.preventDefault();
+  const addNode = () => {
 
-    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
     const position = project({
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top,
+      x: 0,
+      y: 0,
     });
 
     operations.addNode(position);
-  }*/
+  }
 
   return <main ref={reactFlowWrapper}>
     <ReactFlow
@@ -96,7 +94,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
     >
       <CustomControl onClick={() => operations.save(uid, notifySuccessElseError)} />
       <Background />
-      <Overlay displayLayerHandle={new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id)}/>
+      <Overlay displayLayerHandle={new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id)} FABonClick={addNode}/>
     </ReactFlow>
     
   </main>;
