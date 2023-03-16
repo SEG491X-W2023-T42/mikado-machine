@@ -1,26 +1,22 @@
-import { SwipeableDrawer } from "@mui/material";
+import { SwipeableDrawer, TextField } from "@mui/material";
 import "./MyDrawer.css";
-import { useEffect, useRef } from "react";
+import { useEffect} from "react";
+import * as React from 'react';
 
-export const DRAG_AND_DROP_MIME = "application/mikado-app";
-export const DRAG_AND_DROP_MAGIC = "mikado-mikado";
-export const DRAG_AND_DROP_EFFECT = "move";
-
-function onDragStart(event) {
-  event.dataTransfer.setData(DRAG_AND_DROP_MIME, DRAG_AND_DROP_MAGIC);
-  event.dataTransfer.effectAllowed = DRAG_AND_DROP_EFFECT;
-}
 
 function MyDrawer({ displayLayerHandle }) {
-  // TODO fix the swiping on desktop
-  const ref = useRef();
+
   useEffect(() => {
-    const { current } = ref;
-    current && (current.value = displayLayerHandle.getSelectedNodeName());
   }, [displayLayerHandle]);
+  const [drawerToggle, setDrawerToggle] = React.useState(false);
+  
   const selectedNodeName = displayLayerHandle.getSelectedNodeName();
+  useEffect(() => {
+    setDrawerToggle(typeof selectedNodeName !== "undefined");
+  }, [selectedNodeName])
+  
   return <SwipeableDrawer
-    open={true}
+    open={drawerToggle}
     onClose={() => void 0}
     onOpen={() => void 0}
     anchor="bottom"
@@ -28,13 +24,9 @@ function MyDrawer({ displayLayerHandle }) {
     disableSwipeToOpen={false}
   >
     <div id="puller"></div>
-    {typeof selectedNodeName === "string" ?
-      <input ref={ref} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />
-      :
-      <div id="add-node-button" onDragStart={onDragStart} draggable>Add Node</div>
-    }
+    {drawerToggle && <TextField id="filled-basic" label="Node Name" variant="filled" defaultValue={selectedNodeName} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />}
   </SwipeableDrawer>;
-  // TODO add onclick random insertion when drag and drop is not available, and implement that in a way that doesn't cancel on intersections
+
 }
 
 export default MyDrawer;
