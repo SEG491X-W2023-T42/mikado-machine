@@ -1,9 +1,10 @@
-import MyDrawer from "./MyDrawer";
+
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
+//import MyDrawer from "./MyDrawer";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.

@@ -178,23 +178,41 @@ class DisplayLayerOperations {
     });
   }
 
+  modifyNodePosition(position, nodeDim, viewport) {
+    
+    // hacky code that checks every position starting from the specified pos
+    // and ending when a pos is found or there is no possible position in current
+    // viewport
+    
+    const { nodes } = this.#state;
+    for (let i = position.y; i < viewport.y - nodeDim.height; i+=30) {
+      for (let j = position.x; j < viewport.x - nodeDim.width; j+=92) {
+        if (!nodes.some(createIntersectionDetectorFor({
+          id: void 0,
+          position: {x: j, y: i},
+          width: nodeDim.width,
+          height: nodeDim.height
+        }))) {
+
+          position = {x: j, y: i}
+          return position;
+
+        }
+      }
+    }
+
+  }
+
   /**
    * Inserts a new node
    */
-  addNode(position) {
+  addNode(position, viewport={}) {
     const { nodes } = this.#state;
-    // Avoid intersections
-    if (nodes.some(createIntersectionDetectorFor({
-      id: void 0,
-      position,
-      // Too bad it's not possible to know the dimensions of the current node to be added
-      // So we will just hardcode some kind of size
-      width: 100,
-      height: 60,
-    }))) {
-      // TODO Better UX is to find a free spot instead of silently failing
-      return;
-    }
+    const nodeDim = {width: 100, height: 60};
+   
+    // Node interception fix
+    position = this.modifyNodePosition(position, nodeDim, viewport)
+
     // Allocate everything
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];

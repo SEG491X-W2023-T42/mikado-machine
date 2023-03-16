@@ -70,12 +70,18 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
 
   const addNode = () => {
 
+    // Looks for top left of viewport
     const position = project({
-      x: 0,
-      y: 0,
+      x: document.documentElement.clientWidth / 16,
+      y: document.documentElement.clientHeight / 16,
     });
 
-    operations.addNode(position);
+    const viewport = project({
+      x: document.documentElement.clientWidth,
+      y: document.documentElement.clientHeight,
+    })
+
+    operations.addNode(position, viewport);
   }
 
   return <main ref={reactFlowWrapper}>

@@ -1,9 +1,7 @@
 import { useEffect, useRef } from "react";
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import FAB from "./FAB.js"
 
-function Overlay({ displayLayerHandle }) {
-  // TODO fix the swiping on desktop
+function Overlay({ displayLayerHandle, FABonClick }) {
   const ref = useRef();
   useEffect(() => {
     const { current } = ref;
@@ -12,9 +10,7 @@ function Overlay({ displayLayerHandle }) {
 
   return (
 
-    <Fab color="primary">
-      <AddIcon />
-    </Fab>
+    <FAB onClick={FABonClick}/>
 
   );
 
