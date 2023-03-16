@@ -9,7 +9,7 @@ import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
-import Overlay from "./Overlays/Overlay"
+import Overlay from "../../components/Overlays/Overlay"
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -98,7 +98,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
     >
-      <CustomControl onClick={() => operations.save(uid, notifySuccessElseError)} />
+      <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} />
       <Background />
       <Overlay FABonClick={addNode}/>
     </ReactFlow>

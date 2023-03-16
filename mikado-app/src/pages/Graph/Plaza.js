@@ -4,7 +4,7 @@ import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
-import useFABSnackbar from "./Overlays/FABSnackbar";
+import useFABSnackbar from "../../components/Overlays/FABSnackbar";
 //import MyDrawer from "./MyDrawer";
 
 /**
