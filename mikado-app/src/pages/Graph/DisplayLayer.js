@@ -100,7 +100,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
     >
       <CustomControl onClick={() => operations.save(uid, notifySuccessElseError)} />
       <Background />
-      <Overlay displayLayerHandle={new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id)} FABonClick={addNode}/>
+      <Overlay FABonClick={addNode}/>
     </ReactFlow>
     
   </main>;
