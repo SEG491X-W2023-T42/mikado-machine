@@ -21,6 +21,7 @@ function Plaza({ uid }) {
   const [fabSnackbar, fabNotifySuccessElseError] = useFABSnackbar();
   // Wires the active DisplayLayer to the bottom panel
   // Any inactive DisplayLayer can receive a noop callback
+  // eslint-disable-next-line no-unused-vars
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
   return <main>
     <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
