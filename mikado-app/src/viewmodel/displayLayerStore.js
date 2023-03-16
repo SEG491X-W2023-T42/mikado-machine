@@ -363,21 +363,28 @@ class DisplayLayerOperations {
     // TODO, remove eslint disable when done
   }
 
-  async export(fitView) {
+  async export(fitView, saveNotifySuccessElseError) {
     fitView();
+    try {
+      htmlToImage.toSvg(document.querySelector('.react-flow'), {
+        filter: (node) => {
+          if (node?.classList?.contains('react-flow__controls') ||
+              node?.classList?.contains('react-flow__background') || 
+              this.checkContainsMUI(node?.classList)) {
+            return false;
+          }
 
-    htmlToImage.toSvg(document.querySelector('.react-flow'), {
-      filter: (node) => {
-        if (node?.classList?.contains('react-flow__controls') ||
-            node?.classList?.contains('react-flow__background') || 
-            this.checkContainsMUI(node?.classList)) {
-          return false;
-        }
 
-
-        return true;
-      },
-    }).then(this.downloadPDF)
+          return true;
+        },
+      }).then((dataURL) => {
+        this.downloadPDF(dataURL);
+        saveNotifySuccessElseError(true);
+      });
+    } catch (e) {
+      saveNotifySuccessElseError(false);
+      console.log(e.message);
+    }
 
   }
 
@@ -392,7 +399,7 @@ class DisplayLayerOperations {
     if (classList === undefined) {
       return false;
     }
-    
+
     for (let i = 0; i < classList.length; i++) {
       if (classList[i].startsWith("Mui")) {
         return true;
