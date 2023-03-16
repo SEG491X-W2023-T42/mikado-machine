@@ -68,7 +68,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
     }
   }
 
-  function addNode(fab) {
+  function addNode() {
 
     // Looks for top left of viewport
     const position = project({
