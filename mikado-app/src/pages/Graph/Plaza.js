@@ -4,9 +4,11 @@ import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
+
 import useFABSnackbar from "../../components/Overlays/FABSnackbar";
 import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 //import MyDrawer from "./MyDrawer";
+
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -30,9 +32,9 @@ function Plaza({ uid }) {
     {snackbar}
     {fabSnackbar}
     {exportSnackbar}
-    {// remove this and the braces when needed
-      //<MyDrawer setDisplayLayerHandle={setDisplayLayerHandle} />
-    }
+
+    <MyDrawer displayLayerHandle={displayLayerHandle} />
+
   </main>
 }
 
