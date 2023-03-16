@@ -1,5 +1,6 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
@@ -12,7 +13,9 @@ function MyNode({ id, data }) {
   void operations.setNodeCompleted;
   return <div className={data.completed ? "node-done" : "node-future"}>
     <NodeToolbar>
-      <button onClick={() => operations.deleteNode(id)}>&#128465;</button>
+      <button onClick={() => operations.deleteNode(id)}>
+        <DeleteIcon />
+      </button>
     </NodeToolbar>
     {data.label}
     <Handle />
