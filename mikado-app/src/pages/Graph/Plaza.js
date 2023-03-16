@@ -4,6 +4,7 @@ import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
+import useFABSnackbar from "./Overlays/FABSnackbar";
 //import MyDrawer from "./MyDrawer";
 
 /**
@@ -17,13 +18,14 @@ import DisplayLayerHandle from "./DisplayLayerHandle";
  */
 function Plaza({ uid }) {
   const [snackbar, notifySuccessElseError] = useSnackbar();
+  const [fabSnackbar, fabNotifySuccessElseError] = useFABSnackbar();
   // Wires the active DisplayLayer to the bottom panel
   // Any inactive DisplayLayer can receive a noop callback
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
-
   return <main>
-    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
+    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
     {snackbar}
+    {fabSnackbar}
     {// remove this and the braces when needed
       //<MyDrawer setDisplayLayerHandle={setDisplayLayerHandle} />
     }

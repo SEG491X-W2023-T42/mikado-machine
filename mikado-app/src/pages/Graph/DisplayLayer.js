@@ -27,7 +27,7 @@ const selector = (state) => state;
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHandle }) {
+function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, setDisplayLayerHandle }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -68,7 +68,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
     }
   }
 
-  const addNode = () => {
+  function addNode(fab) {
 
     // Looks for top left of viewport
     const position = project({
@@ -81,7 +81,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
       y: document.documentElement.clientHeight,
     })
 
-    operations.addNode(position, viewport);
+    fabNotifySuccessElseError(operations.addNode(position, viewport));
   }
 
   return <main ref={reactFlowWrapper}>
@@ -112,9 +112,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, notifySuccessElseError, setDisplayLayerHandle }) {
+function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, setDisplayLayerHandle }) {
   return <ReactFlowProvider>
-    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
+    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
   </ReactFlowProvider>;
 }
 

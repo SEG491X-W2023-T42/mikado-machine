@@ -200,6 +200,8 @@ class DisplayLayerOperations {
         }
       }
     }
+    
+    return null;
 
   }
 
@@ -211,13 +213,19 @@ class DisplayLayerOperations {
     const nodeDim = {width: 100, height: 60};
    
     // Node interception fix
-    position = this.modifyNodePosition(position, nodeDim, viewport)
+    position = this.modifyNodePosition(position, nodeDim, viewport);
+
+    if (position == null) {
+      return false;
+    }
 
     // Allocate everything
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
     this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] });
+    return true;
+  
   }
 
   /**
