@@ -9,8 +9,8 @@ function CustomControl(props) {
       <ControlButton onClick={props.onSaveClick}>
         <SaveIcon />
       </ControlButton>
-      <ControlButton>
-        <PictureAsPdfIcon onClick={props.onExportClick}/>
+      <ControlButton onClick={props.onExportClick}>
+        <PictureAsPdfIcon />
       </ControlButton>
     </Controls>
   );
