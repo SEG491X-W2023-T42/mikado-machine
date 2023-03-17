@@ -4,10 +4,10 @@ import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
-
 import useFABSnackbar from "../../components/Overlays/FABSnackbar";
 import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 import MyDrawer from "./MyDrawer";
+import AppMenu from "../../components/AppMenu"
 
 
 /**
@@ -28,6 +28,7 @@ function Plaza({ uid }) {
   // eslint-disable-next-line no-unused-vars
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
   return <main>
+    <AppMenu displayLayerHandle={displayLayerHandle} />
     <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
     {snackbar}
     {fabSnackbar}
