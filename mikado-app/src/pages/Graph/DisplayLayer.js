@@ -58,9 +58,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
 
   // Zoom in on graph change
   useEffect(() => {
-    if (graphTransition === true) {
+    if (graphTransition.transition === true) {
       
-      //setViewport({zoom: 5}, {duration: 800});
+      setViewport({x: graphTransition.pos.x, y: graphTransition.pos.y, zoom: 5}, {duration: 800});
     }
   }, [graphTransition])
 

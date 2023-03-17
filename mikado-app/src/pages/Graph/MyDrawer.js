@@ -1,10 +1,10 @@
-import { SwipeableDrawer, TextField } from "@mui/material";
+import { Button, SwipeableDrawer, TextField } from "@mui/material";
 import "./MyDrawer.css";
 import { useEffect } from "react";
 import * as React from 'react';
 
 
-function MyDrawer({ displayLayerHandle }) {
+function MyDrawer({ displayLayerHandle, drawerButtonClick }) {
 
   const [drawerToggle, setDrawerToggle] = React.useState(false);
   
@@ -23,6 +23,9 @@ function MyDrawer({ displayLayerHandle }) {
   >
     <div id="puller"></div>
     {drawerToggle && <TextField id="filled-basic" label="Node Name" variant="filled" defaultValue={selectedNodeName} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />}
+    <Button onClick={drawerButtonClick}>
+      Create Subgraph
+    </Button>
   </SwipeableDrawer>;
 
 }

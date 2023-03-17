@@ -366,7 +366,7 @@ class DisplayLayerOperations {
   getNodePos(id) {
     for (const node of this.#state.nodes) {
       if (node.id === id) {
-        return {x: node.data.x, y: node.data.y}
+        return {x: node.position.x, y: node.position.y}
       }
     }
   }
