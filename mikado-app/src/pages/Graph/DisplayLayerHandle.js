@@ -39,6 +39,13 @@ export default class DisplayLayerHandle {
   }
 
   /**
+   * Returns the current graph name
+   */
+  getCurrentGraph() {
+    return this.#displayLayerOperations?.getGraphName();
+  }
+
+  /**
    * Adds a node
    */
   addNode() {

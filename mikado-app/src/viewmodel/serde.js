@@ -15,7 +15,8 @@ if (USING_DEBUG_EMULATORS) {
  * For now this default graph is the only graph available until saving/multiple different files/documents is implemented.
  * Also, there is only one layer of the graph available until the subtrees feature is implemented.
  */
-const DEFAULT_GRAPH_ID = "graph-1";
+// eslint-disable-next-line no-unused-vars
+var DEFAULT_GRAPH_ID = "graph-1";
 
 /**
  * A fallback "user account" to grab initial data from to introduce the user with.
@@ -25,9 +26,9 @@ const FALLBACK_TEMPLATE_USER_ID = "user-1";
 /**
  * Loads the nodes and edges from the database.
  */
-export async function loadFromDb(uid) {
+export async function loadFromDb(uid, graphName) {
   // Grab the user's graph
-  let docSnap = await getDoc(doc(db, uid, DEFAULT_GRAPH_ID));
+  let docSnap = await getDoc(doc(db, uid, graphName));
 
   if (!docSnap.exists()) {
     // Grab fallback graph
@@ -86,7 +87,7 @@ export async function loadFromDb(uid) {
 /**
  * Saves the nodes and edges to the database.
  */
-export function saveToDb(nodes, forwardConnections, uid) {
+export function saveToDb(nodes, forwardConnections, uid, graphName) {
   // Construct objects for database
 
   /**
@@ -135,7 +136,7 @@ export function saveToDb(nodes, forwardConnections, uid) {
 
   const data = { connections, node_names, positions };
   // Update users collection
-  return setDoc(doc(db, uid, DEFAULT_GRAPH_ID), data).then(() => true).catch((e) => {
+  return setDoc(doc(db, uid, graphName), data).then(() => true).catch((e) => {
     console.log(e.message);
     return false;
   });

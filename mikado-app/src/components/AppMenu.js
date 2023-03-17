@@ -1,12 +1,18 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { AppBar, Container, Toolbar, Typography, Box, IconButton, Menu, MenuItem, Tooltip, Avatar } from '@mui/material'
 import AdbIcon from '@mui/icons-material/Adb';
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
-function AppMenu({ displayLayerHandle }) {
+function AppMenu({ graphID }) {
 
   const [anchorUser, setAnchorUser] = React.useState(null);
+  const [graphName, setGraphName] = React.useState("");
+  
+  useEffect(() => {
+    setGraphName(graphID);
+  }, [graphID])
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -64,7 +70,7 @@ function AppMenu({ displayLayerHandle }) {
               {
                 // Placeholder for now
               }
-              graph-1
+              {graphName}
             </Typography>
 
           </Box>
