@@ -4,8 +4,11 @@ import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import DisplayLayerHandle from "./DisplayLayerHandle";
-import useFABSnackbar from "./Overlays/FABSnackbar";
-import MyDrawer from "./MyDrawer";
+
+import useFABSnackbar from "../../components/Overlays/FABSnackbar";
+import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
+//import MyDrawer from "./MyDrawer";
+
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -19,14 +22,17 @@ import MyDrawer from "./MyDrawer";
 function Plaza({ uid }) {
   const [snackbar, notifySuccessElseError] = useSnackbar();
   const [fabSnackbar, fabNotifySuccessElseError] = useFABSnackbar();
+  const [exportSnackbar, exportNotifySuccessElseError] = useExportSnackbar();
   // Wires the active DisplayLayer to the bottom panel
   // Any inactive DisplayLayer can receive a noop callback
   // eslint-disable-next-line no-unused-vars
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
   return <main>
-    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
+    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
     {snackbar}
     {fabSnackbar}
+    {exportSnackbar}
+
     <MyDrawer displayLayerHandle={displayLayerHandle} />
 
   </main>

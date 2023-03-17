@@ -3,6 +3,7 @@ import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
+import * as htmlToImage from 'html-to-image';
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -361,7 +362,55 @@ class DisplayLayerOperations {
   setNodeCompleted(id, completed) {
     // TODO, remove eslint disable when done
   }
+
+  async export(fitView, saveNotifySuccessElseError) {
+    fitView();
+    try {
+      htmlToImage.toSvg(document.querySelector('.react-flow'), {
+        filter: (node) => {
+          if (node?.classList?.contains('react-flow__controls') ||
+              node?.classList?.contains('react-flow__background') || 
+              this.checkContainsMUI(node?.classList)) {
+            return false;
+          }
+
+
+          return true;
+        },
+      }).then((dataURL) => {
+        this.downloadPDF(dataURL);
+        saveNotifySuccessElseError(true);
+      });
+    } catch (e) {
+      saveNotifySuccessElseError(false);
+      console.log(e.message);
+    }
+
+  }
+
+  downloadPDF(dataURL) {
+    const a = document.createElement("a");
+    a.setAttribute('download', 'mikado.svg');
+    a.setAttribute('href', dataURL);
+    a.click();
+  }
+
+  checkContainsMUI(classList) {
+    if (classList === undefined) {
+      return false;
+    }
+
+    for (let i = 0; i < classList.length; i++) {
+      if (classList[i].startsWith("Mui")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }
+
+
 
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],
