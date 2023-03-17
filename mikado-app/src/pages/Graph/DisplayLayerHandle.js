@@ -38,6 +38,14 @@ export default class DisplayLayerHandle {
     id && this.#displayLayerOperations?.setNodeLabel(id, name);
   }
 
+
+  /**
+   * Zooms into current selected node as a transition for subgraphing
+   */
+  zoomInto() {
+    
+  }
+
   /**
    * Returns the current graph name
    */

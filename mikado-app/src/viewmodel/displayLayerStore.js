@@ -361,6 +361,18 @@ class DisplayLayerOperations {
   }
 
   /**
+   * Gets relative position of a node
+   */
+  getNodePos(id) {
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return {x: node.data.x, y: node.data.y}
+      }
+    }
+  }
+
+
+  /**
    * Sets whether the specified node is completed.
    * This also updates the highlighting of nodes without outstanding dependencies.
    */

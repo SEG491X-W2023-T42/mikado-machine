@@ -2,14 +2,14 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import useFABSnackbar from "../../components/Overlays/FABSnackbar";
 import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 import MyDrawer from "./MyDrawer";
 import AppMenu from "../../components/AppMenu"
-
+import { Button } from "@mui/material"
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -32,29 +32,55 @@ function Plaza({ uid }) {
    * Also, there is only one layer of the graph available until the subtrees feature is implemented.
    */
   // eslint-disable-next-line no-unused-vars
-  var DEFAULT_GRAPH_ID = "graph-1";
+  const DEFAULT_GRAPH_ID = "graph-1";
 
   // Wires the active DisplayLayer to the bottom panel
   // Any inactive DisplayLayer can receive a noop callback
-  // eslint-disable-next-line no-unused-vars
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
+  
   // eslint-disable-next-line no-unused-vars
   const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
+  const [fade, setFade] = useState(false);
+  const [graphTransition, setGraphTransition] = useState(false)
+
+  // Rudimentary transition. Not optimal, want to look into procedural anim based on
+  // when the db finishes loading
+  function transition(graph) {
+    setGraphTransition(true);
+    setTimeout(() => setFade(true), 1000);
+    setTimeout(() => setGraphID(graph), 2000)
+    setTimeout(() => setFade(false), 2300)
+  }
 
   return <main>
     <AppMenu graphID={graphID} />
-      <DisplayLayer key={uid} uid={uid} 
-        notifySuccessElseError={notifySuccessElseError} 
-        fabNotifySuccessElseError={fabNotifySuccessElseError}
-        exportNotifySuccessElseError={exportNotifySuccessElseError} 
-        setDisplayLayerHandle={setDisplayLayerHandle} 
-        graphName={graphID}
-      />
+    
+    <DisplayLayer key={uid} uid={uid} 
+      notifySuccessElseError={notifySuccessElseError} 
+      fabNotifySuccessElseError={fabNotifySuccessElseError}
+      exportNotifySuccessElseError={exportNotifySuccessElseError} 
+      setDisplayLayerHandle={setDisplayLayerHandle} 
+      graphName={graphID}
+      animation={{
+        animate: {
+          //opacity: fade ? [null, 0, 0, 1] : 1
+        }, 
+        transition: {
+          //duration: 1,
+          //times: [0, 0.2, 0.8, 1]
+        }
+      }}
+      graphTransition={graphTransition}
+    />
+    
     {snackbar}
     {fabSnackbar}
     {exportSnackbar}
 
     <MyDrawer displayLayerHandle={displayLayerHandle} />
+    <Button onClick={() => {transition("graph-2")}}>
+      test
+    </Button>
 
   </main>
 
