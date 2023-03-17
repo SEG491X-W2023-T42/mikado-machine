@@ -106,6 +106,11 @@ class DisplayLayerOperations {
   #forwardConnections = {};
 
   /**
+   * Current graph name
+   */
+  #graphName = "";
+
+  /**
    * Similar to forwardConnections.
    *
    * Used mainly for deletion.
@@ -158,13 +163,14 @@ class DisplayLayerOperations {
   /**
    * Loads this layer from the database
    */
-  load(uid) {
+  load(uid, graphName) {
     this.#loading = true;
-    loadFromDb(uid).then(([nodes, edges, forwardConnections, backwardConnections]) => {
+    loadFromDb(uid, graphName).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
       this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
       this.#loading = false;
+      this.#graphName = graphName;
     });
   }
 
@@ -173,7 +179,7 @@ class DisplayLayerOperations {
    */
   save(uid, notifySuccessElseError) {
     this.#loading = true;
-    saveToDb(this.#state.nodes, this.#forwardConnections, uid).then(x => {
+    saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName).then(x => {
       this.#loading = false;
       notifySuccessElseError(x);
     });
@@ -361,6 +367,14 @@ class DisplayLayerOperations {
   // eslint-disable-next-line no-unused-vars
   setNodeCompleted(id, completed) {
     // TODO, remove eslint disable when done
+  }
+
+  /**
+   * Returns the graph name
+   */
+
+  getGraphName() {
+    return this.#graphName;
   }
 
   async export(fitView, saveNotifySuccessElseError) {

@@ -5,7 +5,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 function CustomControl(props) {
   return (
-    <Controls position="top-right">
+    <Controls position="top-right" style={{marginTop:"75px"}}>
       <ControlButton onClick={props.onSaveClick}>
         <SaveIcon />
       </ControlButton>

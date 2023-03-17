@@ -1,13 +1,11 @@
 import { SwipeableDrawer, TextField } from "@mui/material";
 import "./MyDrawer.css";
-import { useEffect} from "react";
+import { useEffect } from "react";
 import * as React from 'react';
 
 
 function MyDrawer({ displayLayerHandle }) {
 
-  useEffect(() => {
-  }, [displayLayerHandle]);
   const [drawerToggle, setDrawerToggle] = React.useState(false);
   
   const selectedNodeName = displayLayerHandle.getSelectedNodeName();
