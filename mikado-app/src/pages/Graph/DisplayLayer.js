@@ -7,9 +7,9 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import { DRAG_AND_DROP_EFFECT, DRAG_AND_DROP_MAGIC, DRAG_AND_DROP_MIME } from "./MyDrawer";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
+import Overlay from "../../components/Overlays/Overlay"
 
 /**
  * Remove the React Flow attribution temporarily so the demo looks cleaner.
@@ -21,18 +21,13 @@ const proOptions = { hideAttribution: true };
 // Not much point writing a proper selector if everything will be used
 const selector = (state) => state;
 
-function onDragOver(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = DRAG_AND_DROP_EFFECT;
-}
-
 /**
  * @see DisplayLayer
  *
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHandle }) {
+function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName}) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -45,12 +40,17 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
 
   // Load data from db
   useEffect(() => {
-    operations.load(uid);
-  }, [operations.load, uid, operations]);
+    operations.load(uid, graphName);
+  }, [operations.load, uid, operations, graphName]);
   // Workaround to run fitView on the next render after the store is updated
   useEffect(() => {
     // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
-    const id = setTimeout(() => fitView(), 0);
+    const id = setTimeout(() => {
+      fitView();
+
+      // Set the display handle immediately after load
+      setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
+    }, 5); // Set to > 0 due to it not fitting sometimes, delay same as before
     return () => clearTimeout(id);
   }, [fitView, loadAutoincremented]);
 
@@ -73,21 +73,20 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
     }
   }
 
-  function onDrop(event) {
-    event.preventDefault();
+  function addNode() {
 
-    // check if the dropped element is valid
-    if (event.dataTransfer.getData(DRAG_AND_DROP_MIME) !== DRAG_AND_DROP_MAGIC) {
-      return;
-    }
-
-    const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+    // Looks for top left of viewport
     const position = project({
-      x: event.clientX - reactFlowBounds.left,
-      y: event.clientY - reactFlowBounds.top,
+      x: document.documentElement.clientWidth / 16,
+      y: document.documentElement.clientHeight / 16,
     });
 
-    operations.addNode(position);
+    const viewport = project({
+      x: document.documentElement.clientWidth,
+      y: document.documentElement.clientHeight,
+    })
+
+    fabNotifySuccessElseError(operations.addNode(position, viewport));
   }
 
   return <main ref={reactFlowWrapper}>
@@ -103,12 +102,12 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
       connectionMode={MY_NODE_CONNECTION_MODE}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
     >
-      <CustomControl onClick={() => operations.save(uid, notifySuccessElseError)} />
+      <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} onExportClick={() => operations.export(fitView, exportNotifySuccessElseError)} />
       <Background />
+      <Overlay FABonClick={addNode}/>
     </ReactFlow>
+    
   </main>;
 }
 
@@ -118,9 +117,10 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, setDisplayLayerHand
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, notifySuccessElseError, setDisplayLayerHandle }) {
+
+function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName }) {
   return <ReactFlowProvider>
-    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
+    <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} />
   </ReactFlowProvider>;
 }
 

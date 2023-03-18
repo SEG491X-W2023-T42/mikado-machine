@@ -1,9 +1,15 @@
+
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
-import MyDrawer from "./MyDrawer";
 import { useState } from "react";
+import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
+import useFABSnackbar from "../../components/Overlays/FABSnackbar";
+import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
+import MyDrawer from "./MyDrawer";
+import AppMenu from "../../components/AppMenu"
+
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -16,15 +22,43 @@ import DisplayLayerHandle from "./DisplayLayerHandle";
  */
 function Plaza({ uid }) {
   const [snackbar, notifySuccessElseError] = useSnackbar();
+  const [fabSnackbar, fabNotifySuccessElseError] = useFABSnackbar();
+  const [exportSnackbar, exportNotifySuccessElseError] = useExportSnackbar();
+
+  /**
+   * The default Mikado to open.
+   *
+   * For now this default graph is the only graph available until saving/multiple different files/documents is implemented.
+   * Also, there is only one layer of the graph available until the subtrees feature is implemented.
+   */
+  // eslint-disable-next-line no-unused-vars
+  var DEFAULT_GRAPH_ID = "graph-1";
+
   // Wires the active DisplayLayer to the bottom panel
   // Any inactive DisplayLayer can receive a noop callback
+  // eslint-disable-next-line no-unused-vars
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
+  // eslint-disable-next-line no-unused-vars
+  const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
 
   return <main>
-    <DisplayLayer key={uid} uid={uid} notifySuccessElseError={notifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} />
+    <AppMenu graphID={graphID} />
+      <DisplayLayer key={uid} uid={uid} 
+        notifySuccessElseError={notifySuccessElseError} 
+        fabNotifySuccessElseError={fabNotifySuccessElseError}
+        exportNotifySuccessElseError={exportNotifySuccessElseError} 
+        setDisplayLayerHandle={setDisplayLayerHandle} 
+        graphName={graphID}
+      />
     {snackbar}
+    {fabSnackbar}
+    {exportSnackbar}
+
     <MyDrawer displayLayerHandle={displayLayerHandle} />
+
   </main>
+
+  
 }
 
 export default Plaza;

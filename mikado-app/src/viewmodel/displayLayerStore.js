@@ -3,6 +3,7 @@ import { loadFromDb, saveToDb } from "./serde";
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
+import * as htmlToImage from 'html-to-image';
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -105,6 +106,11 @@ class DisplayLayerOperations {
   #forwardConnections = {};
 
   /**
+   * Current graph name
+   */
+  #graphName = "";
+
+  /**
    * Similar to forwardConnections.
    *
    * Used mainly for deletion.
@@ -157,13 +163,14 @@ class DisplayLayerOperations {
   /**
    * Loads this layer from the database
    */
-  load(uid) {
+  load(uid, graphName) {
     this.#loading = true;
-    loadFromDb(uid).then(([nodes, edges, forwardConnections, backwardConnections]) => {
+    loadFromDb(uid, graphName).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
       this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
       this.#loading = false;
+      this.#graphName = graphName;
     });
   }
 
@@ -172,34 +179,60 @@ class DisplayLayerOperations {
    */
   save(uid, notifySuccessElseError) {
     this.#loading = true;
-    saveToDb(this.#state.nodes, this.#forwardConnections, uid).then(x => {
+    saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName).then(x => {
       this.#loading = false;
       notifySuccessElseError(x);
     });
   }
 
+  modifyNodePosition(position, nodeDim, viewport) {
+    
+    // hacky code that checks every position starting from the specified pos
+    // and ending when a pos is found or there is no possible position in current
+    // viewport
+    
+    const { nodes } = this.#state;
+    for (let i = position.y; i < viewport.y - nodeDim.height; i+=30) {
+      for (let j = position.x; j < viewport.x - nodeDim.width; j+=92) {
+        if (!nodes.some(createIntersectionDetectorFor({
+          id: void 0,
+          position: {x: j, y: i},
+          width: nodeDim.width,
+          height: nodeDim.height
+        }))) {
+
+          position = {x: j, y: i}
+          return position;
+
+        }
+      }
+    }
+    
+    return null;
+
+  }
+
   /**
    * Inserts a new node
    */
-  addNode(position) {
+  addNode(position, viewport={}) {
     const { nodes } = this.#state;
-    // Avoid intersections
-    if (nodes.some(createIntersectionDetectorFor({
-      id: void 0,
-      position,
-      // Too bad it's not possible to know the dimensions of the current node to be added
-      // So we will just hardcode some kind of size
-      width: 100,
-      height: 60,
-    }))) {
-      // TODO Better UX is to find a free spot instead of silently failing
-      return;
+    const nodeDim = {width: 100, height: 60};
+   
+    // Node interception fix
+    position = this.modifyNodePosition(position, nodeDim, viewport);
+
+    if (position == null) {
+      return false;
     }
+
     // Allocate everything
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
     this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] });
+    return true;
+  
   }
 
   /**
@@ -335,7 +368,63 @@ class DisplayLayerOperations {
   setNodeCompleted(id, completed) {
     // TODO, remove eslint disable when done
   }
+
+  /**
+   * Returns the graph name
+   */
+
+  getGraphName() {
+    return this.#graphName;
+  }
+
+  async export(fitView, saveNotifySuccessElseError) {
+    fitView();
+    try {
+      htmlToImage.toSvg(document.querySelector('.react-flow'), {
+        filter: (node) => {
+          if (node?.classList?.contains('react-flow__controls') ||
+              node?.classList?.contains('react-flow__background') || 
+              this.checkContainsMUI(node?.classList)) {
+            return false;
+          }
+
+
+          return true;
+        },
+      }).then((dataURL) => {
+        this.downloadPDF(dataURL);
+        saveNotifySuccessElseError(true);
+      });
+    } catch (e) {
+      saveNotifySuccessElseError(false);
+      console.log(e.message);
+    }
+
+  }
+
+  downloadPDF(dataURL) {
+    const a = document.createElement("a");
+    a.setAttribute('download', 'mikado.svg');
+    a.setAttribute('href', dataURL);
+    a.click();
+  }
+
+  checkContainsMUI(classList) {
+    if (classList === undefined) {
+      return false;
+    }
+
+    for (let i = 0; i < classList.length; i++) {
+      if (classList[i].startsWith("Mui")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 }
+
+
 
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],

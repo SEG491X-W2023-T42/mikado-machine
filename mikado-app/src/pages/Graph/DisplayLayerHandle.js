@@ -39,10 +39,25 @@ export default class DisplayLayerHandle {
   }
 
   /**
-   * Adds a node, preferentially in the centre of the screen
+   * Returns the current graph name
+   */
+  getCurrentGraph() {
+    return this.#displayLayerOperations?.getGraphName();
+  }
+
+  /**
+   * Adds a node
    */
   addNode() {
     // TODO Pass the viewport center to the class constructor so it can be used here
     this.#displayLayerOperations?.addNode({x: 0, y: 0});
   }
+
+  /**
+   * Exports as pdf
+   */
+  export() {
+    this.#displayLayerOperations?.export();
+  }
+
 }
