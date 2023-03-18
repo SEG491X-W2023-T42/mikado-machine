@@ -41,14 +41,13 @@ function Plaza({ uid }) {
   // eslint-disable-next-line no-unused-vars
   const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
   const [fade, setFade] = useState(false);
-  const [graphTransition, setGraphTransition] = useState({transition: false, pos: {x: 0, y: 0}})
+  const [graphTransition, setGraphTransition] = useState({transition: false, pos: {x: 0, y: 0}, nodeID: 0})
 
   // Rudimentary transition. Not optimal, want to look into procedural anim based on
   // when the db finishes loading
   function transition(graph) {
     // Zoom in anim
-    setGraphTransition({transition: true, pos: displayLayerHandle.getSelectedNodePos()});
-    console.log({graphTransition});
+    setGraphTransition({transition: true, pos: displayLayerHandle.getSelectedNodePos(), nodeID: displayLayerHandle.getSelectedNodeID()});
 
     // Changing graph transition
     /*

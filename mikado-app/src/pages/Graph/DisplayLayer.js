@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, } from 'reactflow';
+import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
@@ -32,7 +32,7 @@ const selector = (state) => state;
 function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition}) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
-  const { project, fitView, setViewport } = useReactFlow();
+  const { project, fitView, getNodes } = useReactFlow();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -47,23 +47,20 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
   // Workaround to run fitView on the next render after the store is updated
   useEffect(() => {
     // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
-    const id = setTimeout(() => {
-      fitView();
-
-      // Set the display handle immediately after load
-      setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
-    }, 5); // Set to > 0 due to it not fitting sometimes, delay same as before
-    return () => clearTimeout(id);
-  }, [fitView, loadAutoincremented]);
+    setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
+  }, [loadAutoincremented]);
 
   // Zoom in on graph change
   useEffect(() => {
     if (graphTransition.transition === true) {
+      fitView({maxZoom: 9, duration: 800, nodes: [operations.getNode(graphTransition.nodeID)]})
+      //setTimeout((() => {fitView({maxZoom: 5, duration: 800})}), 1000);
+      //fitBounds({x: graphTransition.pos.x, y: graphTransition.pos.y, width: 100, height: 100}, {duration: 800});
       
-      setViewport({x: graphTransition.pos.x, y: graphTransition.pos.y, zoom: 5}, {duration: 800});
     }
   }, [graphTransition])
 
+  
   useOnSelectionChange({
     onChange({ nodes }) {
       setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
@@ -98,7 +95,6 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
 
     fabNotifySuccessElseError(operations.addNode(position, viewport));
   }
-
   return <main ref={reactFlowWrapper}>
     <motion.div 
       style={{display: "inline"}}
@@ -117,6 +113,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
         connectionMode={MY_NODE_CONNECTION_MODE}
         onNodeDragStart={onNodeDragStart}
         onNodeDragStop={onNodeDragStop}
+        fitView
       >
         <Background />
       </ReactFlow>

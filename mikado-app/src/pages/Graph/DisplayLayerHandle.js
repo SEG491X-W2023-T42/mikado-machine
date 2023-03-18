@@ -43,7 +43,14 @@ export default class DisplayLayerHandle {
    * Zooms into current selected node as a transition for subgraphing
    */
   getSelectedNodePos() {
-    return typeof this.#selectedNodeId !== "undefined" ? this.#displayLayerOperations?.getNodePos(this.#selectedNodeId) : {x: 0, y: 0};
+    return typeof this.#selectedNodeId !== "undefined" ? this.#displayLayerOperations?.getNodeAbsolutePos(this.#selectedNodeId) : {x: 0, y: 0};
+  }
+
+  /**
+   * Returns the selected node id
+   */
+  getSelectedNodeID() {
+    return this.#selectedNodeId
   }
 
   /**

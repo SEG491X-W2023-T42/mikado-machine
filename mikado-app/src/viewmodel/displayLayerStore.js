@@ -203,6 +203,7 @@ class DisplayLayerOperations {
 
           position = {x: j, y: i}
           return position;
+          
 
         }
       }
@@ -363,10 +364,22 @@ class DisplayLayerOperations {
   /**
    * Gets relative position of a node
    */
-  getNodePos(id) {
+  getNodeAbsolutePos(id) {
     for (const node of this.#state.nodes) {
       if (node.id === id) {
         return {x: node.position.x, y: node.position.y}
+      }
+    }
+  }
+
+  /**
+   * 
+   * Gets specified node by id
+   */
+  getNode(id) {
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return node;
       }
     }
   }
