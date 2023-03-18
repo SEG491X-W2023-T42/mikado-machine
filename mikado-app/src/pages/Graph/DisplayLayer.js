@@ -32,7 +32,7 @@ const selector = (state) => state;
 function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition}) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
-  const { project, fitView } = useReactFlow();
+  const { project, fitView, getNodes } = useReactFlow();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -56,6 +56,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       if (graphTransition.startFrom === "in") {
         fitView({maxZoom: 9, duration: 800, nodes: [operations.getNode(graphTransition.nodeID)]})
       } else {
+        fitView({maxZoom: 9})
         fitView({duration: 800})
       }
       
@@ -63,6 +64,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       if (graphTransition.startFrom === "out") {
         fitView({maxZoom: 1, duration: 800})
       } else {
+        fitView({maxZoom: 1})
         fitView({duration: 800});
       }
     }

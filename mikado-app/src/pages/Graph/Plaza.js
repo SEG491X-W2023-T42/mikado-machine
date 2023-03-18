@@ -137,7 +137,7 @@ function Plaza({ uid }) {
     {fabSnackbar}
     {exportSnackbar}
 
-    <MyDrawer displayLayerHandle={displayLayerHandle} drawerButtonClick={() => {transitionInto("graph-2")}}/>
+    <MyDrawer displayLayerHandle={displayLayerHandle} drawerButtonClick={() => {transitionOutOf("graph-2")}}/>
 
   </main>
 
