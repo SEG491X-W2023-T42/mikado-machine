@@ -2,14 +2,13 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import useSnackbar from "./MySnackbar";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import useFABSnackbar from "../../components/Overlays/FABSnackbar";
 import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 import MyDrawer from "./MyDrawer";
 import AppMenu from "../../components/AppMenu"
-import { Button } from "@mui/material"
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -41,20 +40,84 @@ function Plaza({ uid }) {
   // eslint-disable-next-line no-unused-vars
   const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
   const [fade, setFade] = useState(false);
-  const [graphTransition, setGraphTransition] = useState({transition: false, pos: {x: 0, y: 0}, nodeID: 0})
+  const [graphTransition, setGraphTransition] = useState({startFrom: "in", transitionIn: false, transitionOut: false, pos: {x: 0, y: 0}, nodeID: 0})
+  const [animation, setAnimation] = useState({});
 
   // Rudimentary transition. Not optimal, want to look into procedural anim based on
   // when the db finishes loading
-  function transition(graph) {
+  function transitionInto(graph) {
     // Zoom in anim
-    setGraphTransition({transition: true, pos: displayLayerHandle.getSelectedNodePos(), nodeID: displayLayerHandle.getSelectedNodeID()});
+    setGraphTransition({
+      startFrom: "in", 
+      transitionOut: false, transitionIn: true, 
+      pos: displayLayerHandle.getSelectedNodePos(), 
+      nodeID: displayLayerHandle.getSelectedNodeID()
+    });
 
     // Changing graph transition
-    /*
-    setTimeout(() => setFade(true), 1000);
-    setTimeout(() => setGraphID(graph), 2000)
-    setTimeout(() => setFade(false), 2300)
-    */
+    
+    setTimeout(() => setAnimation({
+      animate: {
+        opacity: [null, 0, 0, 1]
+      }, 
+      transition: {
+        duration: 2,
+        times: [0, 0.2, 0.8, 1],
+        repeat: 0
+      }
+    }), 600)
+    setTimeout(() => setGraphID(graph), 1000)
+
+    // Zoom out to fit
+    setTimeout(() => setGraphTransition({
+      startFrom: "in",
+      transitionOut: true, transitionIn: false, 
+      pos: displayLayerHandle.getSelectedNodePos(), 
+      nodeID: displayLayerHandle.getSelectedNodeID()
+    }), 1600);
+    setTimeout(() => setGraphTransition({
+      startFrom: "in",
+      transitionOut: false, transitionIn: false, 
+      pos: displayLayerHandle.getSelectedNodePos(), 
+      nodeID: displayLayerHandle.getSelectedNodeID()
+    }), 1900);
+  }
+
+  function transitionOutOf(graph) {
+    // Zoom out anim
+    setGraphTransition({
+      startFrom: "out", 
+      transitionOut: true, transitionIn: false,
+      pos: displayLayerHandle.getSelectedNodePos(), 
+      nodeID: displayLayerHandle.getSelectedNodeID()
+    });
+
+    // Changing graph transition
+    setTimeout(() => setAnimation({
+      animate: {
+        opacity: [null, 0, 0, 1]
+      }, 
+      transition: {
+        duration: 2,
+        times: [0, 0.2, 0.8, 1],
+        repeat: 0
+      }
+    }), 600)
+    setTimeout(() => setGraphID(graph), 1000)
+
+    // Zoom to fit
+    setTimeout(() => setGraphTransition({
+      startFrom: "out", 
+      transitionOut: false, transitionIn: true, 
+      pos: displayLayerHandle.getSelectedNodePos(), 
+      nodeID: displayLayerHandle.getSelectedNodeID()
+    }), 1600);
+    setTimeout(() => setGraphTransition({
+      startFrom: "out", 
+      transitionOut: false, transitionIn: false, 
+      pos: displayLayerHandle.getSelectedNodePos(), 
+      nodeID: displayLayerHandle.getSelectedNodeID()
+    }), 1900);
   }
 
   return <main>
@@ -66,15 +129,7 @@ function Plaza({ uid }) {
       exportNotifySuccessElseError={exportNotifySuccessElseError} 
       setDisplayLayerHandle={setDisplayLayerHandle} 
       graphName={graphID}
-      animation={{
-        animate: {
-          //opacity: fade ? [null, 0, 0, 1] : 1
-        }, 
-        transition: {
-          //duration: 1,
-          //times: [0, 0.2, 0.8, 1]
-        }
-      }}
+      animation={animation}
       graphTransition={graphTransition}
     />
     
@@ -82,10 +137,7 @@ function Plaza({ uid }) {
     {fabSnackbar}
     {exportSnackbar}
 
-    <MyDrawer displayLayerHandle={displayLayerHandle} drawerButtonClick={() => {transition("graph-2")}}/>
-    <Button onClick={() => {transition("graph-2")}}>
-      test
-    </Button>
+    <MyDrawer displayLayerHandle={displayLayerHandle} drawerButtonClick={() => {transitionInto("graph-2")}}/>
 
   </main>
 
