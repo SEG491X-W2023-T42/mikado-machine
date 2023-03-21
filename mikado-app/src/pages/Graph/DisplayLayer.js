@@ -135,8 +135,6 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-
-
 function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName }) {
   return (
     <ReactFlowProvider>
