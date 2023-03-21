@@ -7,7 +7,7 @@ import DisplayLayerHandle from "./DisplayLayerHandle";
 import useFABSnackbar from "../../components/Overlays/FABSnackbar";
 import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 import MyDrawer from "./MyDrawer";
-import AppMenu from "../../components/AppMenu"
+import MyAppBar from "../../components/MyAppBar/MyAppBar";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -123,7 +123,7 @@ function Plaza({ uid }) {
    */
 
   return <main>
-    <AppMenu graphID={graphID} />
+    <MyAppBar graphID={graphID} />
     <DisplayLayer key={uid} uid={uid}
                   notifySuccessElseError={notifySuccessElseError}
                   fabNotifySuccessElseError={fabNotifySuccessElseError}
