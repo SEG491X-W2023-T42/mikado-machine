@@ -186,29 +186,29 @@ class DisplayLayerOperations {
   }
 
   modifyNodePosition(position, nodeDim, viewport) {
-    
+
     // hacky code that checks every position starting from the specified pos
     // and ending when a pos is found or there is no possible position in current
     // viewport
-    
+
     const { nodes } = this.#state;
-    for (let i = position.y; i < viewport.y - nodeDim.height; i+=30) {
-      for (let j = position.x; j < viewport.x - nodeDim.width; j+=92) {
+    for (let i = position.y; i < viewport.y - nodeDim.height; i += 30) {
+      for (let j = position.x; j < viewport.x - nodeDim.width; j += 92) {
         if (!nodes.some(createIntersectionDetectorFor({
           id: void 0,
-          position: {x: j, y: i},
+          position: { x: j, y: i },
           width: nodeDim.width,
           height: nodeDim.height
         }))) {
 
-          position = {x: j, y: i}
+          position = { x: j, y: i }
           return position;
-          
+
 
         }
       }
     }
-    
+
     return null;
 
   }
@@ -216,10 +216,10 @@ class DisplayLayerOperations {
   /**
    * Inserts a new node
    */
-  addNode(position, viewport={}) {
+  addNode(position, viewport = {}) {
     const { nodes } = this.#state;
-    const nodeDim = {width: 100, height: 60};
-   
+    const nodeDim = { width: 100, height: 60 };
+
     // Node interception fix
     position = this.modifyNodePosition(position, nodeDim, viewport);
 
@@ -233,7 +233,7 @@ class DisplayLayerOperations {
     this.#backwardConnections[id] = [];
     this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] });
     return true;
-  
+
   }
 
   /**
@@ -367,13 +367,13 @@ class DisplayLayerOperations {
   getNodeAbsolutePos(id) {
     for (const node of this.#state.nodes) {
       if (node.id === id) {
-        return {x: node.position.x, y: node.position.y}
+        return { x: node.position.x, y: node.position.y }
       }
     }
   }
 
   /**
-   * 
+   *
    * Gets specified node by id
    */
   getNode(id) {
@@ -408,8 +408,8 @@ class DisplayLayerOperations {
       htmlToImage.toSvg(document.querySelector('.react-flow'), {
         filter: (node) => {
           if (node?.classList?.contains('react-flow__controls') ||
-              node?.classList?.contains('react-flow__background') || 
-              this.checkContainsMUI(node?.classList)) {
+            node?.classList?.contains('react-flow__background') ||
+            this.checkContainsMUI(node?.classList)) {
             return false;
           }
 
@@ -448,7 +448,6 @@ class DisplayLayerOperations {
   }
 
 }
-
 
 
 const useDisplayLayerStore = create((set, get) => ({

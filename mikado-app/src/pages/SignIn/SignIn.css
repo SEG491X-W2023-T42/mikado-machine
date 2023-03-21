@@ -14,33 +14,33 @@
   background-size: 40px 40px;
 }
 
-.sign-in-card{
-    width: 400px;
-    height: fit-content + 20px;
-    margin: 0 auto;
-    margin-top: 100px;
-    background-color: #e6e4f2;
-    border-radius: 10px;
-    box-shadow: 0 0 10px 0 #e7e6ea;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Inter', sans-serif !important;
-    text-align: center;
-    color: #0a021c;
+.sign-in-card {
+  width: 400px;
+  height: fit-content+20px;
+  margin: 0 auto;
+  margin-top: 100px;
+  background-color: #e6e4f2;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 #e7e6ea;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Inter', sans-serif !important;
+  text-align: center;
+  color: #0a021c;
 }
 
-.google-sign-in-button{
-    height: 50px;
-    box-shadow: 0 0 10px 0 rgba(0,0,0,0.3);
+.google-sign-in-button {
+  height: 50px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
 }
 
-.google-button-text{
-    padding-left: 8px;
+.google-button-text {
+  padding-left: 8px;
 }
 
-.footnote{
-    font-size: 10px;
+.footnote {
+  font-size: 10px;
 }

@@ -8,7 +8,7 @@ if (USING_DEBUG_EMULATORS) {
   connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true })
 }
 
-export const FirebaseContextProvider = ({children}) => {
+export const FirebaseContextProvider = ({ children }) => {
 
   // Used for auth, propogates throughout whole app
   const [user, setUser] = useState({});
@@ -29,7 +29,7 @@ export const FirebaseContextProvider = ({children}) => {
   }, [])
 
   return (
-    <ctxt.Provider value={{googleSignIn, user}}>
+    <ctxt.Provider value={{ googleSignIn, user }}>
       {children}
     </ctxt.Provider>
   );

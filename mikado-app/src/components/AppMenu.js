@@ -9,7 +9,7 @@ function AppMenu({ graphID }) {
 
   const [anchorUser, setAnchorUser] = React.useState(null);
   const [graphName, setGraphName] = React.useState("");
-  
+
   useEffect(() => {
     setGraphName(graphID);
   }, [graphID])
@@ -21,7 +21,7 @@ function AppMenu({ graphID }) {
   const handleCloseUserMenu = () => {
     setAnchorUser(null);
   };
-  
+
   return (
 
     <AppBar position="absolute">
@@ -35,7 +35,7 @@ function AppMenu({ graphID }) {
             href="/"
             sx={{
               mr: 2,
-              display: {xs: 'none', md: 'flex' },
+              display: { xs: 'none', md: 'flex' },
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
@@ -47,7 +47,7 @@ function AppMenu({ graphID }) {
             MIKADO
           </Typography>
 
-          <Box 
+          <Box
             sx={{
               justifyContent: 'center',
               alignItems: 'center',

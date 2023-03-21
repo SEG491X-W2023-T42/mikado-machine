@@ -29,7 +29,7 @@ const selector = (state) => state;
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition}) {
+function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView, getNodes } = useReactFlow();
@@ -54,23 +54,23 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
   useEffect(() => {
     if (graphTransition.transitionIn === true && graphTransition.transitionOut === false) {
       if (graphTransition.startFrom === "in") {
-        fitView({maxZoom: 9, duration: 800, nodes: [operations.getNode(graphTransition.nodeID)]})
+        fitView({ maxZoom: 9, duration: 800, nodes: [operations.getNode(graphTransition.nodeID)] })
       } else {
-        fitView({maxZoom: 9})
-        fitView({duration: 800})
+        fitView({ maxZoom: 9 })
+        fitView({ duration: 800 })
       }
-      
+
     } else if (graphTransition.transitionOut === true && graphTransition.transitionIn === false) {
       if (graphTransition.startFrom === "out") {
-        fitView({maxZoom: 1, duration: 800})
+        fitView({ maxZoom: 1, duration: 800 })
       } else {
-        fitView({maxZoom: 1})
-        fitView({duration: 800});
+        fitView({ maxZoom: 1 })
+        fitView({ duration: 800 });
       }
     }
   }, [graphTransition])
 
-  
+
   useOnSelectionChange({
     onChange({ nodes }) {
       setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
@@ -105,9 +105,10 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
 
     fabNotifySuccessElseError(operations.addNode(position, viewport));
   }
+
   return <main ref={reactFlowWrapper}>
-    <motion.div 
-      style={{display: "inline"}}
+    <motion.div
+      style={{ display: "inline" }}
       animate={animation.animate}
       transition={animation.transition}
     >
@@ -129,8 +130,8 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       </ReactFlow>
     </motion.div>
     <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} onExportClick={() => operations.export(fitView, exportNotifySuccessElseError)} />
-    <Overlay FABonClick={addNode}/>
-    
+    <Overlay FABonClick={addNode} />
+
   </main>;
 }
 
@@ -145,8 +146,9 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
 function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition }) {
   return (
     <ReactFlowProvider>
-      <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} animation={animation} graphTransition={graphTransition}/>
+      <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} animation={animation} graphTransition={graphTransition} />
     </ReactFlowProvider>
   );
 }
+
 export default DisplayLayer;

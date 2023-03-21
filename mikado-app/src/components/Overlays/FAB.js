@@ -5,16 +5,16 @@ function FAB({ onClick }) {
 
   return (
 
-    <Fab 
-        color="primary" 
-        sx={{
-            position: "absolute", 
-            bottom: 0, 
-            right: 0, 
-            margin: 5
-        }}
-        onClick={onClick}
-        >
+    <Fab
+      color="primary"
+      sx={{
+        position: "absolute",
+        bottom: 0,
+        right: 0,
+        margin: 5
+      }}
+      onClick={onClick}
+    >
       <AddIcon />
     </Fab>
 

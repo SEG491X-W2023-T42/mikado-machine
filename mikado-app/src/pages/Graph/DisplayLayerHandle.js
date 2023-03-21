@@ -43,7 +43,7 @@ export default class DisplayLayerHandle {
    * Zooms into current selected node as a transition for subgraphing
    */
   getSelectedNodePos() {
-    return typeof this.#selectedNodeId !== "undefined" ? this.#displayLayerOperations?.getNodeAbsolutePos(this.#selectedNodeId) : {x: 0, y: 0};
+    return typeof this.#selectedNodeId !== "undefined" ? this.#displayLayerOperations?.getNodeAbsolutePos(this.#selectedNodeId) : { x: 0, y: 0 };
   }
 
   /**
@@ -65,7 +65,7 @@ export default class DisplayLayerHandle {
    */
   addNode() {
     // TODO Pass the viewport center to the class constructor so it can be used here
-    this.#displayLayerOperations?.addNode({x: 0, y: 0});
+    this.#displayLayerOperations?.addNode({ x: 0, y: 0 });
   }
 
   /**

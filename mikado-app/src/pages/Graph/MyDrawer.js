@@ -7,12 +7,12 @@ import * as React from 'react';
 function MyDrawer({ displayLayerHandle, drawerButtonClick }) {
 
   const [drawerToggle, setDrawerToggle] = React.useState(false);
-  
+
   const selectedNodeName = displayLayerHandle.getSelectedNodeName();
   useEffect(() => {
     setDrawerToggle(typeof selectedNodeName !== "undefined");
   }, [selectedNodeName])
-  
+
   return <SwipeableDrawer
     open={drawerToggle}
     onClose={() => void 0}
