@@ -23,7 +23,7 @@ function MyDrawer({ displayLayerHandle }) {
   >
     <div id="puller"></div>
     {drawerToggle && <TextField id="filled-basic" label="Node Name" variant="filled" defaultValue={selectedNodeName} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />}
-    <Button>Create Subgraph</Button>
+    {/*<Button>Create Subgraph</Button>*/}
   </SwipeableDrawer>;
 }
 
