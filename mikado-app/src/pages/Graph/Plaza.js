@@ -37,6 +37,7 @@ function Plaza({ uid }) {
 
   // TODO get this from URL
   const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
+  void setGraphID;
   /*
   // TODO bring back the animations later
   const [fade, setFade] = useState(false);
