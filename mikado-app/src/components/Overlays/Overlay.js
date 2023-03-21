@@ -3,7 +3,7 @@ import FAB from "./FAB.js"
 function Overlay({ FABonClick }) {
   return (
 
-    <FAB onClick={FABonClick}/>
+    <FAB onClick={FABonClick} />
 
   );
 

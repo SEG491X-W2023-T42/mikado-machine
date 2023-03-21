@@ -3,16 +3,15 @@ import "./MyDrawer.css";
 import { useEffect } from "react";
 import * as React from 'react';
 
-
 function MyDrawer({ displayLayerHandle }) {
-
   const [drawerToggle, setDrawerToggle] = React.useState(false);
-  
+
   const selectedNodeName = displayLayerHandle.getSelectedNodeName();
   useEffect(() => {
     setDrawerToggle(typeof selectedNodeName !== "undefined");
   }, [selectedNodeName])
-  
+
+  // TODO Subgraph onclick
   return <SwipeableDrawer
     open={drawerToggle}
     onClose={() => void 0}
@@ -22,9 +21,9 @@ function MyDrawer({ displayLayerHandle }) {
     disableSwipeToOpen={false}
   >
     <div id="puller"></div>
-    {drawerToggle && <TextField id="filled-basic" label="Node Name" variant="filled" defaultValue={selectedNodeName} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />}
+    {drawerToggle && <TextField label="Node Name" variant="filled" defaultValue={selectedNodeName} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />}
+    {/*<Button>Create Subgraph</Button>*/}
   </SwipeableDrawer>;
-
 }
 
 export default MyDrawer;

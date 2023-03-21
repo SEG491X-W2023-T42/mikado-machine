@@ -38,6 +38,21 @@ export default class DisplayLayerHandle {
     id && this.#displayLayerOperations?.setNodeLabel(id, name);
   }
 
+
+  /**
+   * Zooms into current selected node as a transition for subgraphing
+   */
+  getSelectedNodePos() {
+    return typeof this.#selectedNodeId !== "undefined" ? this.#displayLayerOperations?.getNodeAbsolutePos(this.#selectedNodeId) : { x: 0, y: 0 };
+  }
+
+  /**
+   * Returns the selected node id
+   */
+  getSelectedNodeID() {
+    return this.#selectedNodeId
+  }
+
   /**
    * Returns the current graph name
    */
@@ -49,15 +64,13 @@ export default class DisplayLayerHandle {
    * Adds a node
    */
   addNode() {
-    // TODO Pass the viewport center to the class constructor so it can be used here
-    this.#displayLayerOperations?.addNode({x: 0, y: 0});
+    this.#displayLayerOperations?.addNode({ x: 0, y: 0 });
   }
 
   /**
-   * Exports as pdf
+   * Exports to file
    */
   export() {
     this.#displayLayerOperations?.export();
   }
-
 }

@@ -1,6 +1,6 @@
 export function createNodeObject(id, x, y, label = "New Node", completed = false) {
   // Not using React Flow's className as that may lead to maintainability problems
-  return  {
+  return {
     id,
     position: { x, y },
     data: { label, completed },
