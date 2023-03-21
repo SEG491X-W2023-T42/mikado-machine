@@ -29,15 +29,16 @@ function Plaza({ uid }) {
    * For now this default graph is the only graph available until saving/multiple different files/documents is implemented.
    * Also, there is only one layer of the graph available until the subtrees feature is implemented.
    */
-    // eslint-disable-next-line no-unused-vars
   const DEFAULT_GRAPH_ID = "graph-1";
 
   // Wires the active DisplayLayer to the bottom panel
   // Any inactive DisplayLayer can receive a noop callback
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
 
-  // eslint-disable-next-line no-unused-vars
+  // TODO get this from URL
   const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
+  /*
+  // TODO bring back the animations later
   const [fade, setFade] = useState(false);
   const [graphTransition, setGraphTransition] = useState({ startFrom: "in", transitionIn: false, transitionOut: false, pos: { x: 0, y: 0 }, nodeID: 0 })
   const [animation, setAnimation] = useState({});
@@ -118,31 +119,22 @@ function Plaza({ uid }) {
       nodeID: displayLayerHandle.getSelectedNodeID()
     }), 1900);
   }
+   */
 
   return <main>
     <AppMenu graphID={graphID} />
-
     <DisplayLayer key={uid} uid={uid}
                   notifySuccessElseError={notifySuccessElseError}
                   fabNotifySuccessElseError={fabNotifySuccessElseError}
                   exportNotifySuccessElseError={exportNotifySuccessElseError}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graphName={graphID}
-                  animation={animation}
-                  graphTransition={graphTransition}
     />
-
     {snackbar}
     {fabSnackbar}
     {exportSnackbar}
-
-    <MyDrawer displayLayerHandle={displayLayerHandle} drawerButtonClick={() => {
-      transitionOutOf("graph-2")
-    }} />
-
+    <MyDrawer displayLayerHandle={displayLayerHandle} />
   </main>
-
-
 }
 
 export default Plaza;

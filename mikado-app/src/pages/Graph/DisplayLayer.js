@@ -10,7 +10,6 @@ import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import Overlay from "../../components/Overlays/Overlay"
-import { motion } from "framer-motion"
 
 
 /**
@@ -29,10 +28,10 @@ const selector = (state) => state;
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition }) {
+function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
-  const { project, fitView, getNodes } = useReactFlow();
+  const { project, fitView } = useReactFlow();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -50,6 +49,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
     setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
   }, [loadAutoincremented]);
 
+  /*
   // Zoom on transition call
   useEffect(() => {
     if (graphTransition.transitionIn === true && graphTransition.transitionOut === false) {
@@ -69,7 +69,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       }
     }
   }, [graphTransition])
-
+   */
 
   useOnSelectionChange({
     onChange({ nodes }) {
@@ -91,7 +91,6 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
   }
 
   function addNode() {
-
     // Looks for top left of viewport
     const position = project({
       x: document.documentElement.clientWidth / 16,
@@ -106,29 +105,24 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
     fabNotifySuccessElseError(operations.addNode(position, viewport));
   }
 
+  // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   return <main ref={reactFlowWrapper}>
-    <motion.div
-      style={{ display: "inline" }}
-      animate={animation.animate}
-      transition={animation.transition}
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={operations.onNodesChange}
+      nodesConnectable={false}
+      proOptions={proOptions}
+      defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
+      nodeTypes={NODE_TYPES}
+      edgeTypes={EDGE_TYPES}
+      connectionMode={MY_NODE_CONNECTION_MODE}
+      onNodeDragStart={onNodeDragStart}
+      onNodeDragStop={onNodeDragStop}
+      fitView
     >
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={operations.onNodesChange}
-        nodesConnectable={false}
-        proOptions={proOptions}
-        defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
-        nodeTypes={NODE_TYPES}
-        edgeTypes={EDGE_TYPES}
-        connectionMode={MY_NODE_CONNECTION_MODE}
-        onNodeDragStart={onNodeDragStart}
-        onNodeDragStop={onNodeDragStop}
-        fitView
-      >
-        <Background />
-      </ReactFlow>
-    </motion.div>
+      <Background />
+    </ReactFlow>
     <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} onExportClick={() => operations.export(fitView, exportNotifySuccessElseError)} />
     <Overlay FABonClick={addNode} />
 
@@ -143,10 +137,10 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
  */
 
 
-function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName, animation, graphTransition }) {
+function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName }) {
   return (
     <ReactFlowProvider>
-      <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} animation={animation} graphTransition={graphTransition} />
+      <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} />
     </ReactFlowProvider>
   );
 }

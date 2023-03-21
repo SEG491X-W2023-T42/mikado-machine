@@ -370,6 +370,7 @@ class DisplayLayerOperations {
         return { x: node.position.x, y: node.position.y }
       }
     }
+    throw new Error();
   }
 
   /**
@@ -382,8 +383,8 @@ class DisplayLayerOperations {
         return node;
       }
     }
+    throw new Error();
   }
-
 
   /**
    * Sets whether the specified node is completed.
@@ -402,19 +403,15 @@ class DisplayLayerOperations {
     return this.#graphName;
   }
 
-  async export(fitView, saveNotifySuccessElseError) {
+  export(fitView, saveNotifySuccessElseError) {
     fitView();
     try {
       htmlToImage.toSvg(document.querySelector('.react-flow'), {
         filter: (node) => {
-          if (node?.classList?.contains('react-flow__controls') ||
+          // TODO simplify
+          return !(node?.classList?.contains('react-flow__controls') ||
             node?.classList?.contains('react-flow__background') ||
-            this.checkContainsMUI(node?.classList)) {
-            return false;
-          }
-
-
-          return true;
+            this.checkContainsMUI(node?.classList));
         },
       }).then((dataURL) => {
         this.downloadPDF(dataURL);
@@ -424,7 +421,6 @@ class DisplayLayerOperations {
       saveNotifySuccessElseError(false);
       console.log(e.message);
     }
-
   }
 
   downloadPDF(dataURL) {
@@ -446,9 +442,7 @@ class DisplayLayerOperations {
     }
     return false;
   }
-
 }
-
 
 const useDisplayLayerStore = create((set, get) => ({
   nodes: [],

@@ -6,7 +6,6 @@ import AdbIcon from '@mui/icons-material/Adb';
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function AppMenu({ graphID }) {
-
   const [anchorUser, setAnchorUser] = React.useState(null);
   const [graphName, setGraphName] = React.useState("");
 
@@ -23,7 +22,6 @@ function AppMenu({ graphID }) {
   };
 
   return (
-
     <AppBar position="absolute">
       <Container maxWidth="x2">
         <Toolbar disableGutters>
@@ -46,7 +44,6 @@ function AppMenu({ graphID }) {
           >
             MIKADO
           </Typography>
-
           <Box
             sx={{
               justifyContent: 'center',
@@ -110,9 +107,7 @@ function AppMenu({ graphID }) {
         </Toolbar>
       </Container>
     </AppBar>
-
   );
-
 }
 
 export default AppMenu;
