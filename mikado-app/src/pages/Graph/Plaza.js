@@ -1,6 +1,5 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
-import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
@@ -17,10 +16,6 @@ import MyAppBar from "../../components/MyAppBar/MyAppBar";
  * It also contains the bottom sheet.
  */
 function Plaza({ uid }) {
-  const [snackbar, notifyError] = useSnackbar("There was a problem saving your graph. Please check console for more details.");
-  const [fabSnackbar, fabNotifyError] = useSnackbar("No space for new node! Please zoom out and try again.");
-  const [exportSnackbar, exportNotifyError] = useSnackbar("There was an error exporting the graph. Please try again.");
-
   /**
    * The default Mikado to open.
    *
@@ -123,15 +118,9 @@ function Plaza({ uid }) {
   return <main>
     <MyAppBar graphID={graphID} />
     <DisplayLayer key={uid} uid={uid}
-                  notifyError={notifyError}
-                  fabNotifyError={fabNotifyError}
-                  exportNotifyError={exportNotifyError}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graphName={graphID}
     />
-    {snackbar}
-    {fabSnackbar}
-    {exportSnackbar}
     <MyDrawer displayLayerHandle={displayLayerHandle} />
   </main>
 }

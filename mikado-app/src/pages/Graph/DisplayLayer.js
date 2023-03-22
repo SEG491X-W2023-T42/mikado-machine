@@ -10,6 +10,7 @@ import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import Overlay from "../../components/Overlays/Overlay"
+import { notifyError } from "../../components/ToastManager";
 
 
 /**
@@ -22,13 +23,17 @@ const proOptions = { hideAttribution: true };
 // Not much point writing a proper selector if everything will be used
 const selector = (state) => state;
 
+const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
+const notifyAddError = notifyError.bind(null, "No space for new node! Please zoom out and try again.");
+const notifyExportError = notifyError.bind(null, "There was an error exporting the graph. Please try again.");
+
 /**
  * @see DisplayLayer
  *
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifyError, fabNotifyError, exportNotifyError, setDisplayLayerHandle, graphName }) {
+function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -102,7 +107,7 @@ function DisplayLayerInternal({ uid, notifyError, fabNotifyError, exportNotifyEr
       y: document.documentElement.clientHeight,
     })
 
-    operations.addNode(position, viewport) || fabNotifyError();
+    operations.addNode(position, viewport) || notifyAddError();
   }
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
@@ -123,7 +128,7 @@ function DisplayLayerInternal({ uid, notifyError, fabNotifyError, exportNotifyEr
     >
       <Background />
     </ReactFlow>
-    <CustomControl onSaveClick={() => operations.save(uid, notifyError)} onExportClick={() => operations.export(fitView, exportNotifyError)} />
+    <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
     <Overlay FABonClick={addNode} />
 
   </main>;
@@ -135,10 +140,10 @@ function DisplayLayerInternal({ uid, notifyError, fabNotifyError, exportNotifyEr
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, notifyError, fabNotifyError, exportNotifyError, setDisplayLayerHandle, graphName }) {
+function DisplayLayer({ uid, setDisplayLayerHandle, graphName }) {
   return (
     <ReactFlowProvider>
-      <DisplayLayerInternal uid={uid} notifyError={notifyError} fabNotifyError={fabNotifyError} exportNotifyError={exportNotifyError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} />
+      <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} />
     </ReactFlowProvider>
   );
 }
