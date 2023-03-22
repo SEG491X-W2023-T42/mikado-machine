@@ -1,6 +1,5 @@
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
-import { runtime_assert } from "./assert";
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 
@@ -10,20 +9,6 @@ if (USING_DEBUG_EMULATORS) {
 }
 
 /**
- * The default Mikado to open.
- *
- * For now this default graph is the only graph available until saving/multiple different files/documents is implemented.
- * Also, there is only one layer of the graph available until the subtrees feature is implemented.
- */
-// eslint-disable-next-line no-unused-vars
-var DEFAULT_GRAPH_ID = "graph-1";
-
-/**
- * A fallback "user account" to grab initial data from to introduce the user with.
- */
-const FALLBACK_TEMPLATE_USER_ID = "user-1";
-
-/**
  * Loads the nodes and edges from the database.
  */
 export async function loadFromDb(uid, graphName) {
@@ -31,11 +16,8 @@ export async function loadFromDb(uid, graphName) {
   let docSnap = await getDoc(doc(db, uid, graphName));
 
   if (!docSnap.exists()) {
-    // Grab fallback graph
-    docSnap = await getDoc(doc(db, FALLBACK_TEMPLATE_USER_ID, DEFAULT_GRAPH_ID));
+    return [[], [], {}, {}]
   }
-
-  runtime_assert(docSnap.exists());
 
   // TODO add a version key and prevent loading newer schemas
   const { node_names, positions, connections } = docSnap.data();
