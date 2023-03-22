@@ -2,12 +2,10 @@ import Snackbar from "@mui/material/Snackbar";
 import { useState } from "react";
 import MuiAlert from "@mui/material/Alert";
 
-const SUCCESS_MSG = "Graph successfully saved!";
-const ERROR_MSG = "There was a problem saving your graph. Please check console for more details.";
 const ANCHOR_ORIGIN = { vertical: "bottom", horizontal: "center" };
 const ALERT_SX = { width: '100%' };
 
-function useSnackbar() {
+function useSnackbar(success_msg, error_msg) {
   const [open, setOpen] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -23,7 +21,7 @@ function useSnackbar() {
   // noinspection JSValidateTypes // handleToastClose
   const snackbar = <Snackbar anchorOrigin={ANCHOR_ORIGIN} open={open} autoHideDuration={6000} onClose={handleToastClose}>
     <MuiAlert elevation={6} variant="filled" onClose={handleToastClose} severity={success ? "success" : "error"} sx={ALERT_SX}>
-      {success ? SUCCESS_MSG : ERROR_MSG}
+      {success ? success_msg : error_msg}
     </MuiAlert>
   </Snackbar>;
 
