@@ -10,7 +10,7 @@ import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import Overlay from "../../components/Overlays/Overlay"
-import { notifyError } from "../../components/NotificationManager";
+import { notifyError } from "../../components/ToastManager";
 
 
 /**

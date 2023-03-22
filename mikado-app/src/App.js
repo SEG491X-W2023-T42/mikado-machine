@@ -4,7 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 import GraphPage from "./pages/Graph/GraphPage";
 import SignIn from './pages/SignIn/SignIn';
 import { FirebaseContextProvider } from './context/FirebaseContext';
-import NotificationManager from "./components/NotificationManager";
+import ToastManager from "./components/ToastManager";
 
 function MyRoutes() {
   return <Routes>
@@ -16,7 +16,7 @@ function MyRoutes() {
 function App() {
   return (
     <FirebaseContextProvider>
-      <NotificationManager />
+      <ToastManager />
       <MyRoutes />
     </FirebaseContextProvider>
   );

@@ -26,7 +26,7 @@ const SNACKBAR_COMPONENTS = {
 /**
  * A component that shows the toasts and applies the settings.
  */
-export default function NotificationManager() {
+export default function ToastManager() {
   return <SnackbarProvider
     anchorOrigin={SNACKBAR_ANCHOR_ORIGIN}
     autoHideDuration={6000}
