@@ -4,8 +4,6 @@ import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
-import useFABSnackbar from "../../components/Overlays/FABSnackbar";
-import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 import MyDrawer from "./MyDrawer";
 import MyAppBar from "../../components/MyAppBar/MyAppBar";
 
@@ -19,9 +17,9 @@ import MyAppBar from "../../components/MyAppBar/MyAppBar";
  * It also contains the bottom sheet.
  */
 function Plaza({ uid }) {
-  const [snackbar, notifySuccessElseError] = useSnackbar();
-  const [fabSnackbar, fabNotifySuccessElseError] = useFABSnackbar();
-  const [exportSnackbar, exportNotifySuccessElseError] = useExportSnackbar();
+  const [snackbar, notifyError] = useSnackbar("There was a problem saving your graph. Please check console for more details.");
+  const [fabSnackbar, fabNotifyError] = useSnackbar("No space for new node! Please zoom out and try again.");
+  const [exportSnackbar, exportNotifyError] = useSnackbar("There was an error exporting the graph. Please try again.");
 
   /**
    * The default Mikado to open.
@@ -125,9 +123,9 @@ function Plaza({ uid }) {
   return <main>
     <MyAppBar graphID={graphID} />
     <DisplayLayer key={uid} uid={uid}
-                  notifySuccessElseError={notifySuccessElseError}
-                  fabNotifySuccessElseError={fabNotifySuccessElseError}
-                  exportNotifySuccessElseError={exportNotifySuccessElseError}
+                  notifyError={notifyError}
+                  fabNotifyError={fabNotifyError}
+                  exportNotifyError={exportNotifyError}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graphName={graphID}
     />

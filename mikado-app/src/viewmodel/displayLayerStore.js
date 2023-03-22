@@ -177,11 +177,11 @@ class DisplayLayerOperations {
   /**
    * Saves this layer to the database
    */
-  save(uid, notifySuccessElseError) {
+  save(uid, notifyError) {
     this.#loading = true;
     saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName).then(x => {
       this.#loading = false;
-      notifySuccessElseError(x);
+      x || notifyError();
     });
   }
 
@@ -210,7 +210,6 @@ class DisplayLayerOperations {
     }
 
     return null;
-
   }
 
   /**
@@ -398,12 +397,11 @@ class DisplayLayerOperations {
   /**
    * Returns the graph name
    */
-
   getGraphName() {
     return this.#graphName;
   }
 
-  export(fitView, saveNotifySuccessElseError) {
+  export(fitView, saveNotifyError) {
     fitView();
     try {
       htmlToImage.toSvg(document.querySelector('.react-flow'), {
@@ -415,10 +413,9 @@ class DisplayLayerOperations {
         },
       }).then((dataURL) => {
         this.downloadPDF(dataURL);
-        saveNotifySuccessElseError(true);
       });
     } catch (e) {
-      saveNotifySuccessElseError(false);
+      saveNotifyError();
       console.log(e.message);
     }
   }
