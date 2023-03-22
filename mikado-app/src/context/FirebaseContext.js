@@ -9,8 +9,8 @@ if (USING_DEBUG_EMULATORS) {
 }
 
 export const FirebaseContextProvider = ({ children }) => {
-
   // Used for auth, propogates throughout whole app
+  const [userLoaded, setUserLoaded] = useState(false);
   const [user, setUser] = useState({});
 
   const googleSignIn = () => {
@@ -22,6 +22,7 @@ export const FirebaseContextProvider = ({ children }) => {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setUserLoaded(true);
     });
     return () => {
       unsub();
@@ -29,7 +30,7 @@ export const FirebaseContextProvider = ({ children }) => {
   }, [])
 
   return (
-    <ctxt.Provider value={{ googleSignIn, user }}>
+    <ctxt.Provider value={{ googleSignIn, user, userLoaded }}>
       {children}
     </ctxt.Provider>
   );
