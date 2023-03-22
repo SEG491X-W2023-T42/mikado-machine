@@ -17,9 +17,9 @@ import MyAppBar from "../../components/MyAppBar/MyAppBar";
  * It also contains the bottom sheet.
  */
 function Plaza({ uid }) {
-  const [snackbar, notifySuccessElseError] = useSnackbar("Graph successfully saved!", "There was a problem saving your graph. Please check console for more details.");
-  const [fabSnackbar, fabNotifySuccessElseError] = useSnackbar("Node added successfully!", "No space for new node! Please zoom out and try again.");
-  const [exportSnackbar, exportNotifySuccessElseError] = useSnackbar("Graph exported successfully!", "There was an error exporting the graph. Please try again.");
+  const [snackbar, notifyError] = useSnackbar("There was a problem saving your graph. Please check console for more details.");
+  const [fabSnackbar, fabNotifyError] = useSnackbar("No space for new node! Please zoom out and try again.");
+  const [exportSnackbar, exportNotifyError] = useSnackbar("There was an error exporting the graph. Please try again.");
 
   /**
    * The default Mikado to open.
@@ -123,9 +123,9 @@ function Plaza({ uid }) {
   return <main>
     <MyAppBar graphID={graphID} />
     <DisplayLayer key={uid} uid={uid}
-                  notifySuccessElseError={notifySuccessElseError}
-                  fabNotifySuccessElseError={fabNotifySuccessElseError}
-                  exportNotifySuccessElseError={exportNotifySuccessElseError}
+                  notifyError={notifyError}
+                  fabNotifyError={fabNotifyError}
+                  exportNotifyError={exportNotifyError}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graphName={graphID}
     />

@@ -28,7 +28,7 @@ const selector = (state) => state;
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName }) {
+function DisplayLayerInternal({ uid, notifyError, fabNotifyError, exportNotifyError, setDisplayLayerHandle, graphName }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -102,7 +102,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
       y: document.documentElement.clientHeight,
     })
 
-    fabNotifySuccessElseError(operations.addNode(position, viewport));
+    operations.addNode(position, viewport) || fabNotifyError();
   }
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
@@ -123,7 +123,7 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
     >
       <Background />
     </ReactFlow>
-    <CustomControl onSaveClick={() => operations.save(uid, notifySuccessElseError)} onExportClick={() => operations.export(fitView, exportNotifySuccessElseError)} />
+    <CustomControl onSaveClick={() => operations.save(uid, notifyError)} onExportClick={() => operations.export(fitView, exportNotifyError)} />
     <Overlay FABonClick={addNode} />
 
   </main>;
@@ -135,10 +135,10 @@ function DisplayLayerInternal({ uid, notifySuccessElseError, fabNotifySuccessEls
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, notifySuccessElseError, fabNotifySuccessElseError, exportNotifySuccessElseError, setDisplayLayerHandle, graphName }) {
+function DisplayLayer({ uid, notifyError, fabNotifyError, exportNotifyError, setDisplayLayerHandle, graphName }) {
   return (
     <ReactFlowProvider>
-      <DisplayLayerInternal uid={uid} notifySuccessElseError={notifySuccessElseError} fabNotifySuccessElseError={fabNotifySuccessElseError} exportNotifySuccessElseError={exportNotifySuccessElseError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} />
+      <DisplayLayerInternal uid={uid} notifyError={notifyError} fabNotifyError={fabNotifyError} exportNotifyError={exportNotifyError} setDisplayLayerHandle={setDisplayLayerHandle} graphName={graphName} />
     </ReactFlowProvider>
   );
 }
