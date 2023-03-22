@@ -10,7 +10,7 @@ import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import Overlay from "../../components/Overlays/Overlay"
-import { enqueueSnackbar } from "notistack";
+import { notifyError } from "../../components/NotificationManager";
 
 
 /**
@@ -23,17 +23,9 @@ const proOptions = { hideAttribution: true };
 // Not much point writing a proper selector if everything will be used
 const selector = (state) => state;
 
-function notifyError() {
-  enqueueSnackbar("There was a problem saving your graph. Please check console for more details.");
-}
-
-function fabNotifyError() {
-  enqueueSnackbar("No space for new node! Please zoom out and try again.");
-}
-
-function exportNotifyError() {
-  enqueueSnackbar("There was an error exporting the graph. Please try again.");
-}
+const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
+const notifyAddError = notifyError.bind(null, "No space for new node! Please zoom out and try again.");
+const notifyExportError = notifyError.bind(null, "There was an error exporting the graph. Please try again.");
 
 /**
  * @see DisplayLayer
@@ -115,7 +107,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
       y: document.documentElement.clientHeight,
     })
 
-    operations.addNode(position, viewport) || fabNotifyError();
+    operations.addNode(position, viewport) || notifyAddError();
   }
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
@@ -136,7 +128,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
     >
       <Background />
     </ReactFlow>
-    <CustomControl onSaveClick={() => operations.save(uid, notifyError)} onExportClick={() => operations.export(fitView, exportNotifyError)} />
+    <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
     <Overlay FABonClick={addNode} />
 
   </main>;
