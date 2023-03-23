@@ -97,16 +97,16 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
 
   function addNode() {
     // Looks for top left of viewport
+    const elem = reactFlowWrapper.current;
+    const measured = {
+      x: elem.clientWidth,
+      y: elem.clientHeight,
+    };
     const position = project({
-      x: document.documentElement.clientWidth / 16,
-      y: document.documentElement.clientHeight / 16,
+      x: measured.x / 16,
+      y: measured.y / 16,
     });
-
-    const viewport = project({
-      x: document.documentElement.clientWidth,
-      y: document.documentElement.clientHeight,
-    })
-
+    const viewport = project(measured)
     operations.addNode(position, viewport) || notifyAddError();
   }
 
