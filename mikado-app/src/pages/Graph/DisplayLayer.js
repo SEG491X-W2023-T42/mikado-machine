@@ -35,7 +35,7 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  */
 function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   const reactFlowWrapper = useRef(void 0);
-  const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
+  const { nodes, edges, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
 
   // Assert uid will never change
@@ -48,11 +48,6 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   useEffect(() => {
     operations.load(uid, graphName);
   }, [operations.load, uid, operations, graphName]);
-  // Workaround to run fitView on the next render after the store is updated
-  useEffect(() => {
-    // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
-    setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
-  }, [loadAutoincremented]);
 
   /*
   // Zoom on transition call
@@ -111,6 +106,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   }
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
+  // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
   return <main ref={reactFlowWrapper}>
     <ReactFlow
       nodes={nodes}
