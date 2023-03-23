@@ -35,7 +35,7 @@ export default class DisplayLayerHandle {
     displayLayerOperations = void 0,
     selectedNodeId = void 0,
     viewportRef = { current: void 0 },
-    projectFunction = (_) => ({ x: 0, y: 0 }),
+    projectFunction = () => ({ x: 0, y: 0 }),
   ) {
     this.#displayLayerOperations = displayLayerOperations;
     this.#selectedNodeId = selectedNodeId;
