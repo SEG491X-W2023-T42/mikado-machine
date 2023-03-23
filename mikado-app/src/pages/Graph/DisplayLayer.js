@@ -9,7 +9,6 @@ import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
-import Overlay from "../../components/Overlays/Overlay"
 import { notifyError } from "../../components/ToastManager";
 
 
@@ -24,7 +23,6 @@ const proOptions = { hideAttribution: true };
 const selector = (state) => state;
 
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
-const notifyAddError = notifyError.bind(null, "No space for new node! Please zoom out and try again.");
 const notifyExportError = notifyError.bind(null, "There was an error exporting the graph. Please try again.");
 
 /**
@@ -46,7 +44,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   runtime_assert(assertUid === uid);
 
   function doSetDisplayLayerHandle() {
-    setDisplayLayerHandle(new DisplayLayerHandle(operations, selectedNodeId.current));
+    setDisplayLayerHandle(new DisplayLayerHandle(operations, selectedNodeId.current, reactFlowWrapper, project));
   }
   // Load data from db
   useEffect(() => {
@@ -96,21 +94,6 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
     }
   }
 
-  function addNode() {
-    // Looks for top left of viewport
-    const elem = reactFlowWrapper.current;
-    const measured = {
-      x: elem.clientWidth,
-      y: elem.clientHeight,
-    };
-    const position = project({
-      x: measured.x / 16,
-      y: measured.y / 16,
-    });
-    const viewport = project(measured)
-    operations.addNode(position, viewport) || notifyAddError();
-  }
-
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
   return <main ref={reactFlowWrapper}>
@@ -131,8 +114,6 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
       <Background />
     </ReactFlow>
     <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
-    <Overlay FABonClick={addNode} />
-
   </main>;
 }
 
