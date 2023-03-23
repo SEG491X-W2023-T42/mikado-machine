@@ -1,3 +1,7 @@
+import { notifyError } from "../../components/ToastManager";
+
+const notifyAddError = notifyError.bind(null, "No space for new node! Please zoom out and try again.");
+
 /**
  * Callback object for things like floating controls to interact with the viewmodel
  */
@@ -14,12 +18,29 @@ export default class DisplayLayerHandle {
   #selectedNodeId;
 
   /**
+   * A ref to the Element containing the rendered React Flow graph
+   */
+  #viewportRef;
+
+  /**
+   * A function to convert screen coordinates into viewmodel coordinates
+   */
+  #projectFunction;
+
+  /**
    * This object is to be recreated when anything relevant in the DisplayLayer changes.
    * It can be set to undefined when the DisplayLayer is gone during transitions.
    */
-  constructor(displayLayerOperations = void 0, selectedNodeId = void 0) {
+  constructor(
+    displayLayerOperations = void 0,
+    selectedNodeId = void 0,
+    viewportRef = { current: void 0 },
+    projectFunction = (_) => ({ x: 0, y: 0 }),
+  ) {
     this.#displayLayerOperations = displayLayerOperations;
     this.#selectedNodeId = selectedNodeId;
+    this.#viewportRef = viewportRef;
+    this.#projectFunction = projectFunction;
   }
 
   /**
@@ -64,7 +85,21 @@ export default class DisplayLayerHandle {
    * Adds a node
    */
   addNode() {
-    this.#displayLayerOperations?.addNode({ x: 0, y: 0 });
+    // Looks for top left of viewport
+    const elem = this.#viewportRef.current;
+    if (!elem) {
+      return;
+    }
+    const measured = {
+      x: elem.clientWidth,
+      y: elem.clientHeight,
+    };
+    const position = this.#projectFunction({
+      x: measured.x / 16,
+      y: measured.y / 16,
+    });
+    const viewport = this.#projectFunction(measured);
+    this.#displayLayerOperations.addNode(position, viewport) || notifyAddError();
   }
 
   /**

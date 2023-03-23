@@ -185,44 +185,36 @@ class DisplayLayerOperations {
     });
   }
 
-  modifyNodePosition(position, nodeDim, viewport) {
-
+  modifyNodePosition(position, range) {
     // hacky code that checks every position starting from the specified pos
     // and ending when a pos is found or there is no possible position in current
     // viewport
+    const width = 92;
+    const height = 30;
 
     const { nodes } = this.#state;
-    for (let i = position.y; i < viewport.y - nodeDim.height; i += 30) {
-      for (let j = position.x; j < viewport.x - nodeDim.width; j += 92) {
-        if (!nodes.some(createIntersectionDetectorFor({
-          id: void 0,
-          position: { x: j, y: i },
-          width: nodeDim.width,
-          height: nodeDim.height
-        }))) {
-
-          position = { x: j, y: i }
+    const max_y = range.y - height;
+    const max_x = range.x - width;
+    for (let y = position.y; y < max_y; y += height) {
+      for (let x = position.x; x < max_x; x += width) {
+        const position = { x, y };
+        if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
           return position;
-
-
         }
       }
     }
-
     return null;
   }
 
   /**
    * Inserts a new node
    */
-  addNode(position, viewport = {}) {
+  addNode(position, range = {}) {
     const { nodes } = this.#state;
-    const nodeDim = { width: 100, height: 60 };
 
     // Node interception fix
-    position = this.modifyNodePosition(position, nodeDim, viewport);
-
-    if (position == null) {
+    position = this.modifyNodePosition(position, range);
+    if (!position) {
       return false;
     }
 

@@ -4,7 +4,7 @@ import AppBarProfileOverflowMenu from "./AppBarProfileOverflowMenu";
 
 export default function MyAppBar({ graphID }) {
   return (
-    <AppBar position="absolute">
+    <AppBar position="static">
       <Container maxWidth="x2">
         <Toolbar disableGutters>
           <Box

@@ -4,8 +4,15 @@
  */
 @import "reactflow/dist/base.css";
 
-main {
+#root > main {
   height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main > main {
+  flex-grow: 1;
   width: 100%;
 }
 

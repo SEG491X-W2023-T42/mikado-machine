@@ -9,7 +9,6 @@ import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
-import Overlay from "../../components/Overlays/Overlay"
 import { notifyError } from "../../components/ToastManager";
 
 
@@ -24,7 +23,6 @@ const proOptions = { hideAttribution: true };
 const selector = (state) => state;
 
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
-const notifyAddError = notifyError.bind(null, "No space for new node! Please zoom out and try again.");
 const notifyExportError = notifyError.bind(null, "There was an error exporting the graph. Please try again.");
 
 /**
@@ -35,8 +33,9 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  */
 function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   const reactFlowWrapper = useRef(void 0);
-  const { nodes, edges, loadAutoincremented, operations } = useDisplayLayerStore(selector, shallow);
+  const { nodes, edges, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
+  const selectedNodeId = useRef(void 0);
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -44,15 +43,14 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   const [assertUid] = useState(uid);
   runtime_assert(assertUid === uid);
 
+  function doSetDisplayLayerHandle() {
+    setDisplayLayerHandle(new DisplayLayerHandle(operations, selectedNodeId.current, reactFlowWrapper, project));
+  }
   // Load data from db
   useEffect(() => {
     operations.load(uid, graphName);
-  }, [operations.load, uid, operations, graphName]);
-  // Workaround to run fitView on the next render after the store is updated
-  useEffect(() => {
-    // Yield the event loop so that React Flow can receive the nodes before telling it to fit them.
-    setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
-  }, [loadAutoincremented]);
+    doSetDisplayLayerHandle();
+  }, [uid, operations, graphName]);
 
   /*
   // Zoom on transition call
@@ -78,7 +76,8 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
 
   useOnSelectionChange({
     onChange({ nodes }) {
-      setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
+      selectedNodeId.current = nodes.length !== 1 ? void 0 : nodes[0].id;
+      doSetDisplayLayerHandle();
     }
   });
 
@@ -95,22 +94,8 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
     }
   }
 
-  function addNode() {
-    // Looks for top left of viewport
-    const position = project({
-      x: document.documentElement.clientWidth / 16,
-      y: document.documentElement.clientHeight / 16,
-    });
-
-    const viewport = project({
-      x: document.documentElement.clientWidth,
-      y: document.documentElement.clientHeight,
-    })
-
-    operations.addNode(position, viewport) || notifyAddError();
-  }
-
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
+  // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
   return <main ref={reactFlowWrapper}>
     <ReactFlow
       nodes={nodes}
@@ -129,8 +114,6 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
       <Background />
     </ReactFlow>
     <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
-    <Overlay FABonClick={addNode} />
-
   </main>;
 }
 

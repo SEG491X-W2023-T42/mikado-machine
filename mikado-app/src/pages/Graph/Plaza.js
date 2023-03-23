@@ -5,6 +5,7 @@ import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import MyDrawer from "./MyDrawer";
 import MyAppBar from "../../components/MyAppBar/MyAppBar";
+import AddNodeFAB from "../../components/Overlays/AddNodeFAB";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -121,6 +122,7 @@ function Plaza({ uid }) {
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graphName={graphID}
     />
+    <AddNodeFAB displayLayerHandle={displayLayerHandle} />
     <MyDrawer displayLayerHandle={displayLayerHandle} />
   </main>
 }
