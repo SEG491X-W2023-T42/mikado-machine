@@ -37,6 +37,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations } = useDisplayLayerStore(selector, shallow);
   const { project, fitView } = useReactFlow();
+  const selectedNodeId = useRef(void 0);
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -44,10 +45,14 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
   const [assertUid] = useState(uid);
   runtime_assert(assertUid === uid);
 
+  function doSetDisplayLayerHandle() {
+    setDisplayLayerHandle(new DisplayLayerHandle(operations, selectedNodeId.current));
+  }
   // Load data from db
   useEffect(() => {
     operations.load(uid, graphName);
-  }, [operations.load, uid, operations, graphName]);
+    doSetDisplayLayerHandle();
+  }, [uid, operations, graphName]);
 
   /*
   // Zoom on transition call
@@ -73,7 +78,8 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
 
   useOnSelectionChange({
     onChange({ nodes }) {
-      setDisplayLayerHandle(new DisplayLayerHandle(operations, nodes.length !== 1 ? void 0 : nodes[0].id));
+      selectedNodeId.current = nodes.length !== 1 ? void 0 : nodes[0].id;
+      doSetDisplayLayerHandle();
     }
   });
 
