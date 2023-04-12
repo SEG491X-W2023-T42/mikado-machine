@@ -1,5 +1,12 @@
 import { useContext, createContext, useState, useEffect } from 'react';
-import { connectAuthEmulator, getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
+import { 
+  connectAuthEmulator, 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  onAuthStateChanged, 
+  signOut } 
+from 'firebase/auth';
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 
 const ctxt = createContext(void 0);
@@ -9,8 +16,8 @@ if (USING_DEBUG_EMULATORS) {
 }
 
 export const FirebaseContextProvider = ({ children }) => {
-
   // Used for auth, propogates throughout whole app
+  const [userLoaded, setUserLoaded] = useState(false);
   const [user, setUser] = useState({});
 
   const googleSignIn = () => {
@@ -18,10 +25,15 @@ export const FirebaseContextProvider = ({ children }) => {
     signInWithPopup(auth, provider)
   }
 
+  const logOut = () => {
+    signOut(auth);
+  }
+
   // If auth is approved, yeet the user value
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setUserLoaded(true);
     });
     return () => {
       unsub();
@@ -29,7 +41,7 @@ export const FirebaseContextProvider = ({ children }) => {
   }, [])
 
   return (
-    <ctxt.Provider value={{ googleSignIn, user }}>
+    <ctxt.Provider value={{ googleSignIn, logOut, user, userLoaded }}>
       {children}
     </ctxt.Provider>
   );

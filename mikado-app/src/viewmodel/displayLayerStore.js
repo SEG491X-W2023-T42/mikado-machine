@@ -168,7 +168,7 @@ class DisplayLayerOperations {
     loadFromDb(uid, graphName).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
-      this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
+      this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
     });
@@ -177,53 +177,44 @@ class DisplayLayerOperations {
   /**
    * Saves this layer to the database
    */
-  save(uid, notifySuccessElseError) {
+  save(uid, notifyError) {
     this.#loading = true;
     saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName).then(x => {
       this.#loading = false;
-      notifySuccessElseError(x);
+      x || notifyError();
     });
   }
 
-  modifyNodePosition(position, nodeDim, viewport) {
-
+  modifyNodePosition(position, range) {
     // hacky code that checks every position starting from the specified pos
     // and ending when a pos is found or there is no possible position in current
     // viewport
+    const width = 92;
+    const height = 30;
 
     const { nodes } = this.#state;
-    for (let i = position.y; i < viewport.y - nodeDim.height; i += 30) {
-      for (let j = position.x; j < viewport.x - nodeDim.width; j += 92) {
-        if (!nodes.some(createIntersectionDetectorFor({
-          id: void 0,
-          position: { x: j, y: i },
-          width: nodeDim.width,
-          height: nodeDim.height
-        }))) {
-
-          position = { x: j, y: i }
+    const max_y = range.y - height;
+    const max_x = range.x - width;
+    for (let y = position.y; y < max_y; y += height) {
+      for (let x = position.x; x < max_x; x += width) {
+        const position = { x, y };
+        if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
           return position;
-
-
         }
       }
     }
-
     return null;
-
   }
 
   /**
    * Inserts a new node
    */
-  addNode(position, viewport = {}) {
+  addNode(position, range = {}) {
     const { nodes } = this.#state;
-    const nodeDim = { width: 100, height: 60 };
 
     // Node interception fix
-    position = this.modifyNodePosition(position, nodeDim, viewport);
-
-    if (position == null) {
+    position = this.modifyNodePosition(position, range);
+    if (!position) {
       return false;
     }
 
@@ -231,7 +222,7 @@ class DisplayLayerOperations {
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] });
+    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
     return true;
 
   }
@@ -242,6 +233,7 @@ class DisplayLayerOperations {
   deleteNode(id) {
     const forwardConnections = this.#forwardConnections;
     const backwardConnections = this.#backwardConnections;
+
     // Unlink everything touching this
     for (const connection of backwardConnections[id]) {
       arrayRemoveByValueIfPresent(forwardConnections[connection], id);
@@ -249,6 +241,11 @@ class DisplayLayerOperations {
     for (const connection of forwardConnections[id]) {
       arrayRemoveByValueIfPresent(backwardConnections[connection], id);
     }
+
+    backwardConnections[id].forEach(id => {
+      this.updateNodeType(id)
+    })
+
     // Then delete the containers for this vertex
     delete forwardConnections[id];
     delete backwardConnections[id];
@@ -323,6 +320,7 @@ class DisplayLayerOperations {
       forwardConnections[srcId].push(dstId);
       backwardConnections[dstId].push(srcId);
       this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId)] });
+      this.updateNodeType(srcId)
       return;
     } // else forward connection found, so will delete it
     const forward = forwardConnections[srcId];
@@ -334,6 +332,53 @@ class DisplayLayerOperations {
         edge => edge.source !== srcId || edge.target !== dstId,
       ),
     });
+    this.updateNodeType(srcId)
+    
+  }
+
+  /**
+   * Updates the type of the node based on the connected nodes.
+   */
+  updateNodeType(id) {
+
+    const forwardConnections = this.#forwardConnections[id];
+    var allComplete = true;
+
+    if (this.getNode(id).type === "goal") {
+      return;
+    }
+
+    if (forwardConnections.length === 0) {
+      this.setNodeType(id, "ready")
+    }
+    
+    for (var i = 0; i < forwardConnections.length; i++) {
+      const node = this.getNode(forwardConnections[i])
+
+      if (node.type !== "complete") {
+        allComplete = false;
+      }
+
+      if (node.type === "ready") {
+        this.setNodeType(id, "locked")
+        return;
+      }
+    }
+
+    if (allComplete) {
+      this.setNodeType(id, "ready")
+    }
+
+  }
+
+  setNodeCompleted(id, completed) {
+    const backwardConnections = this.#backwardConnections[id]
+
+    this.setNodeType(id, completed ? "complete" : "ready");
+
+    backwardConnections.forEach(id => {
+      this.updateNodeType(id)
+    })
   }
 
   /**
@@ -357,6 +402,17 @@ class DisplayLayerOperations {
     this.#set({
       nodes: this.#state.nodes.map(
         node => node.id !== id ? node : { ...node, data: { ...node.data, label: name } },
+      ),
+    });
+  }
+
+  /**
+   * Changes node type
+   */
+  setNodeType(id, type) {
+    this.#set({
+      nodes: this.#state.nodes.map(
+        node => node.id !== id ? node : {... node, type: type},
       ),
     });
   }
@@ -387,23 +443,13 @@ class DisplayLayerOperations {
   }
 
   /**
-   * Sets whether the specified node is completed.
-   * This also updates the highlighting of nodes without outstanding dependencies.
-   */
-  // eslint-disable-next-line no-unused-vars
-  setNodeCompleted(id, completed) {
-    // TODO, remove eslint disable when done
-  }
-
-  /**
    * Returns the graph name
    */
-
   getGraphName() {
     return this.#graphName;
   }
 
-  export(fitView, saveNotifySuccessElseError) {
+  export(fitView, saveNotifyError) {
     fitView();
     try {
       htmlToImage.toSvg(document.querySelector('.react-flow'), {
@@ -415,10 +461,9 @@ class DisplayLayerOperations {
         },
       }).then((dataURL) => {
         this.downloadPDF(dataURL);
-        saveNotifySuccessElseError(true);
       });
     } catch (e) {
-      saveNotifySuccessElseError(false);
+      saveNotifyError();
       console.log(e.message);
     }
   }
@@ -450,7 +495,7 @@ const useDisplayLayerStore = create((set, get) => ({
   /**
    * Set to a new value on load. This is used as passing a callback to load() runs too early.
    */
-  loadAutoincremented: generateAutoincremented(),
+  loadAutoincremented: generateAutoincremented,
   /**
    * The actual operations
    */

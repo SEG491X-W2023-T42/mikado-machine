@@ -1,13 +1,11 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
-import useSnackbar from "./MySnackbar";
 import { useState } from "react";
 import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
-import useFABSnackbar from "../../components/Overlays/FABSnackbar";
-import useExportSnackbar from "../../components/Overlays/ExportSnackbar";
 import MyDrawer from "./MyDrawer";
 import MyAppBar from "../../components/MyAppBar/MyAppBar";
+import AddNodeFAB from "../../components/Overlays/AddNodeFAB";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -19,10 +17,6 @@ import MyAppBar from "../../components/MyAppBar/MyAppBar";
  * It also contains the bottom sheet.
  */
 function Plaza({ uid }) {
-  const [snackbar, notifySuccessElseError] = useSnackbar();
-  const [fabSnackbar, fabNotifySuccessElseError] = useFABSnackbar();
-  const [exportSnackbar, exportNotifySuccessElseError] = useExportSnackbar();
-
   /**
    * The default Mikado to open.
    *
@@ -125,15 +119,10 @@ function Plaza({ uid }) {
   return <main>
     <MyAppBar graphID={graphID} />
     <DisplayLayer key={uid} uid={uid}
-                  notifySuccessElseError={notifySuccessElseError}
-                  fabNotifySuccessElseError={fabNotifySuccessElseError}
-                  exportNotifySuccessElseError={exportNotifySuccessElseError}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graphName={graphID}
     />
-    {snackbar}
-    {fabSnackbar}
-    {exportSnackbar}
+    <AddNodeFAB displayLayerHandle={displayLayerHandle} />
     <MyDrawer displayLayerHandle={displayLayerHandle} />
   </main>
 }

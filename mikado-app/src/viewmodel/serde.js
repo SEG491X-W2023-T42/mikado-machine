@@ -1,6 +1,5 @@
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
-import { runtime_assert } from "./assert";
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 
@@ -10,35 +9,19 @@ if (USING_DEBUG_EMULATORS) {
 }
 
 /**
- * The default Mikado to open.
- *
- * For now this default graph is the only graph available until saving/multiple different files/documents is implemented.
- * Also, there is only one layer of the graph available until the subtrees feature is implemented.
- */
-// eslint-disable-next-line no-unused-vars
-var DEFAULT_GRAPH_ID = "graph-1";
-
-/**
- * A fallback "user account" to grab initial data from to introduce the user with.
- */
-const FALLBACK_TEMPLATE_USER_ID = "user-1";
-
-/**
  * Loads the nodes and edges from the database.
  */
 export async function loadFromDb(uid, graphName) {
   // Grab the user's graph
   let docSnap = await getDoc(doc(db, uid, graphName));
 
-  if (!docSnap.exists()) {
-    // Grab fallback graph
-    docSnap = await getDoc(doc(db, FALLBACK_TEMPLATE_USER_ID, DEFAULT_GRAPH_ID));
+  if (!docSnap.exists()) { 
+    const id = generateAutoincremented().toString()
+    return [[createNodeObject(id, 0, 0, "goal", "My First Goal", false)], [], {[id]: []}, {[id]: []}]
   }
 
-  runtime_assert(docSnap.exists());
-
   // TODO add a version key and prevent loading newer schemas
-  const { node_names, positions, connections } = docSnap.data();
+  const { node_names, positions, connections, type } = docSnap.data();
 
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.
@@ -63,7 +46,7 @@ export async function loadFromDb(uid, graphName) {
     forwardConnections[id] = [];
     backwardConnections[id] = []
     const completed = false; // TODO
-    return createNodeObject(id, +x, +y, label.toString(), completed);
+    return createNodeObject(id, +x, +y, type[key], label.toString(), completed);
   });
 
   // Load edges from db
@@ -119,10 +102,12 @@ export function saveToDb(nodes, forwardConnections, uid, graphName) {
   // For some reason, the database is in Struct-Of-Arrays layout even though it's NoSQL
   const node_names = {};
   const positions = {};
+  const type = {};
   nodes.forEach((node, index) => {
     newIdsToDatabaseKeysLookup[node.id] = index;
     // No need to coerce as we own node.data: T for Node<T>
     node_names[index] = node.data.label;
+    type[index] = node.type;
     void node.data.completed; // TODO
     // Assuming there is no reason React Flow will change away from { x: number, y: number }
     positions[index] = node.position;
@@ -134,7 +119,7 @@ export function saveToDb(nodes, forwardConnections, uid, graphName) {
     connections[newIdsToDatabaseKeysLookup[key]] = values.map(x => newIdsToDatabaseKeysLookup[x]);
   }
 
-  const data = { connections, node_names, positions };
+  const data = { connections, node_names, positions, type };
   // Update users collection
   return setDoc(doc(db, uid, graphName), data).then(() => true).catch((e) => {
     console.log(e.message);
