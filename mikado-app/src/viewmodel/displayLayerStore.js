@@ -4,7 +4,6 @@ import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
 import * as htmlToImage from 'html-to-image';
-import { connectFirestoreEmulator } from "firebase/firestore";
 
 /**
  * Subset of React Flow's onNodesChange.
