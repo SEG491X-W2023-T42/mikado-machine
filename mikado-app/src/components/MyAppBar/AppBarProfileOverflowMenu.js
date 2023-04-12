@@ -1,10 +1,12 @@
 import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import * as React from "react";
+import { useFirebase } from '../../context/FirebaseContext';
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export default function AppBarProfileOverflowMenu() {
   const [anchorUser, setAnchorUser] = React.useState(null);
+  const { logOut } = useFirebase();
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -13,6 +15,16 @@ export default function AppBarProfileOverflowMenu() {
   const handleCloseUserMenu = () => {
     setAnchorUser(null);
   };
+
+  const handleSignOut = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const settingsFunctions = [handleCloseUserMenu, handleCloseUserMenu, handleCloseUserMenu, handleSignOut];
 
   return <Box sx={{ flexGrow: 0 }}>
     <Tooltip title="Open settings">
@@ -39,8 +51,8 @@ export default function AppBarProfileOverflowMenu() {
       open={!!anchorUser}
       onClose={handleCloseUserMenu}
     >
-      {settings.map((setting) => (
-        <MenuItem key={setting} onClick={handleCloseUserMenu}>
+      {settings.map((setting, index) => (
+        <MenuItem key={setting} onClick={settingsFunctions[index]}>
           <Typography textAlign="center">{setting}</Typography>
         </MenuItem>
       ))}
