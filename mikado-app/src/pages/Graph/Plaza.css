@@ -3,6 +3,7 @@
  * This is now needed as we are reusing the default node name for our own styles.
  */
 @import "reactflow/dist/base.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
 #root > main {
   height: 100%;
@@ -16,33 +17,100 @@ main > main {
   width: 100%;
 }
 
-.react-flow__node-default {
-  border-radius: 2px;
-  border: 1px solid transparent;
+.react-flow__node {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 8px;
+  gap: 4px;
+  
+
+  width: 186px; /* fixed */
+  min-height: 20px; /* hugs contents */
+
+  background: #FFF9C1; /* #DAEFFF for ready task, #DDF9E8 for complete task, #F5FBFF for locked */
+  border: 1px solid rgba(105, 105, 105, 0.7);
+  border-radius: 8px;
+
+  /* Inside auto layout */
+
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+
 }
 
-.react-flow__node-default > div {
+.react-flow__node > div {
+  
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+
+  padding-right: 18px;
+
+  width: 186px; /* fixed */
+  min-height: 20px; /* hugs contents */
+  inline-size: 10px;
+  word-break: break-all;
   padding: 2px 5px;
-  font-weight: 700;
+  
+  color: #000000;
+  
+  /* Inside auto layout */
+  
+  flex: none;
+  order: 0;
+  flex-grow: 1;
 }
 
-.react-flow__node-default > div.node-future {
-  /*
-   * TODO
-   */
-  background: #f6ad55;
+.react-flow__node .MuiSvgIcon-root {
+  color:rgba(105, 105, 105, 0.7);
+  position: absolute;
+  font-size: large;
+  right: 5px;
+  top: 5px;
 }
+
+.react-flow__node-goal {
+  outline: 1px solid rgba(105, 105, 105, 0.7);
+  outline-offset: 3px;
+}
+
+.react-flow__node-goal > div {
+  padding-right: 15px;
+}
+
+.react-flow__node-goal.selected {
+
+  /* For Goal Node: */
+  outline: 1px solid #555;
+  outline-offset: 3px;
+  border: 1px solid #555;
+}
+
+.react-flow__node-ready {
+   background: #DAEFFF;
+}
+
+
+.react-flow__node-locked {
+  background: #F5FBFF
+}
+
+
+.react-flow__node-complete {
+  background: #DDF9E8;
+}
+
+
+
 
 .react-flow__node-default > div.node-done {
   /*
    * TODO
-   */
-  background: #f6ad55;
-}
-
-.react-flow__node-default > div.node-ready {
-  /*
-   * TODO this is for the completion part 2
    */
 }
 
