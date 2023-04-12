@@ -223,7 +223,7 @@ class DisplayLayerOperations {
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] }); // defaults to ready since new node is always ready with no dependencies
+    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
     return true;
 
   }
