@@ -233,6 +233,7 @@ class DisplayLayerOperations {
   deleteNode(id) {
     const forwardConnections = this.#forwardConnections;
     const backwardConnections = this.#backwardConnections;
+
     // Unlink everything touching this
     for (const connection of backwardConnections[id]) {
       arrayRemoveByValueIfPresent(forwardConnections[connection], id);
@@ -240,6 +241,11 @@ class DisplayLayerOperations {
     for (const connection of forwardConnections[id]) {
       arrayRemoveByValueIfPresent(backwardConnections[connection], id);
     }
+
+    backwardConnections[id].forEach(id => {
+      this.updateNodeType(id)
+    })
+
     // Then delete the containers for this vertex
     delete forwardConnections[id];
     delete backwardConnections[id];
