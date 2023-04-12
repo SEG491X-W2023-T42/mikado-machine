@@ -17,22 +17,13 @@ main > main {
   width: 100%;
 }
 
-.react-flow__node-default {
-  border-radius: 2px;
-  border: 1px solid transparent;
-}
-
-.react-flow__node-default > div {
-  padding: 2px 5px;
-  font-weight: 700;
-}
-
-.react-flow__node-goal {
+.react-flow__node {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   padding: 8px;
   gap: 4px;
+  
 
   width: 186px; /* fixed */
   min-height: 20px; /* hugs contents */
@@ -48,11 +39,9 @@ main > main {
   align-self: stretch;
   flex-grow: 0;
 
-  outline: 1px solid rgba(105, 105, 105, 0.7);
-  outline-offset: 3px;
 }
 
-.react-flow__node-goal > div {
+.react-flow__node > div {
   
   font-family: 'Inter', sans-serif;
   font-style: normal;
@@ -65,6 +54,7 @@ main > main {
   inline-size: 10px;
   padding-right: 15px;
   word-break: break-all;
+  padding: 2px 5px;
   
   color: #000000;
   
@@ -75,6 +65,11 @@ main > main {
   flex-grow: 1;
 }
 
+.react-flow__node-goal {
+  outline: 1px solid rgba(105, 105, 105, 0.7);
+  outline-offset: 3px;
+}
+
 .react-flow__node-goal.selected {
 
   /* For Goal Node: */
@@ -83,31 +78,24 @@ main > main {
   border: 1px solid #555;
 }
 
-.react-flow__node-goal .MuiSvgIcon-root {
+.react-flow__node .MuiSvgIcon-root {
   position: absolute;
   font-size: large;
   right: 5px;
   top: 5px;
 }
 
-.react-flow__node-default > div.node-future {
+.react-flow__node-ready {
   /*
    * TODO
    */
-   background: #f6ad55;
+   background: #DAEFFF;
 }
 
 .react-flow__node-default > div.node-done {
   /*
    * TODO
    */
-}
-
-.react-flow__node-default > div.node-ready {
-  /*
-   * TODO this is for the completion part 2
-   */
-   background: #f6ad55;
 }
 
 .react-flow__handle.source {

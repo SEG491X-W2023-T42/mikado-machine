@@ -90,6 +90,8 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graphName }) {
     if (target) {
       const { id } = node;
       operations.restoreNodePosition(id);
+      console.log(id)
+      console.log(target.id)
       operations.connectOrDisconnect(id, target.id);
     }
   }

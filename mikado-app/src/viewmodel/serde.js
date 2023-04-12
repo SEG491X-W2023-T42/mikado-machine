@@ -15,9 +15,9 @@ export async function loadFromDb(uid, graphName) {
   // Grab the user's graph
   let docSnap = await getDoc(doc(db, uid, graphName));
 
-  if (!docSnap.exists()) {
-    console.log("a")
-    return [[createNodeObject(generateAutoincremented().toString(), 0, 0, "goal", "My First Goal", false)], [], {}, {}]
+  if (!docSnap.exists()) { 
+    const id = generateAutoincremented().toString()
+    return [[createNodeObject(id, 0, 0, "goal", "My First Goal", false)], [], {[id]: []}, {[id]: []}]
   }
 
   // TODO add a version key and prevent loading newer schemas

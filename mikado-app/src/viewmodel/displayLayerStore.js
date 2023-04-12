@@ -4,6 +4,7 @@ import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
 import * as htmlToImage from 'html-to-image';
+import { connectFirestoreEmulator } from "firebase/firestore";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -168,7 +169,7 @@ class DisplayLayerOperations {
     loadFromDb(uid, graphName).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
-      this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented() });
+      this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
     });
@@ -222,7 +223,7 @@ class DisplayLayerOperations {
     const id = generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] });
+    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y)] }); // defaults to ready since new node is always ready with no dependencies
     return true;
 
   }
@@ -353,6 +354,17 @@ class DisplayLayerOperations {
   }
 
   /**
+   * Changes node type
+   */
+  setNodeType(id, type) {
+    this.#set({
+      nodes: this.#state.nodes.map(
+        node => node.id !== id ? node : {... node, type: type},
+      ),
+    });
+  }
+
+  /**
    * Gets relative position of a node
    */
   getNodeAbsolutePos(id) {
@@ -439,7 +451,7 @@ const useDisplayLayerStore = create((set, get) => ({
   /**
    * Set to a new value on load. This is used as passing a callback to load() runs too early.
    */
-  loadAutoincremented: generateAutoincremented(),
+  loadAutoincremented: generateAutoincremented,
   /**
    * The actual operations
    */
