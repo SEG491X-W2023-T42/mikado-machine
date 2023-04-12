@@ -314,6 +314,7 @@ class DisplayLayerOperations {
       forwardConnections[srcId].push(dstId);
       backwardConnections[dstId].push(srcId);
       this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId)] });
+      this.updateNodeType(srcId)
       return;
     } // else forward connection found, so will delete it
     const forward = forwardConnections[srcId];
@@ -325,6 +326,53 @@ class DisplayLayerOperations {
         edge => edge.source !== srcId || edge.target !== dstId,
       ),
     });
+    this.updateNodeType(srcId)
+    
+  }
+
+  /**
+   * Updates the type of the node based on the connected nodes.
+   */
+  updateNodeType(id) {
+
+    const forwardConnections = this.#forwardConnections[id];
+    var allComplete = true;
+
+    if (this.getNode(id).type === "goal") {
+      return;
+    }
+
+    if (forwardConnections.length === 0) {
+      this.setNodeType(id, "ready")
+    }
+    
+    for (var i = 0; i < forwardConnections.length; i++) {
+      const node = this.getNode(forwardConnections[i])
+
+      if (node.type !== "complete") {
+        allComplete = false;
+      }
+
+      if (node.type === "ready") {
+        this.setNodeType(id, "locked")
+        return;
+      }
+    }
+
+    if (allComplete) {
+      this.setNodeType(id, "ready")
+    }
+
+  }
+
+  setNodeCompleted(id) {
+    const backwardConnections = this.#backwardConnections[id]
+
+    this.setNodeType(id, "complete");
+
+    backwardConnections.forEach(id => {
+      this.updateNodeType(id)
+    })
   }
 
   /**
@@ -386,15 +434,6 @@ class DisplayLayerOperations {
       }
     }
     throw new Error();
-  }
-
-  /**
-   * Sets whether the specified node is completed.
-   * This also updates the highlighting of nodes without outstanding dependencies.
-   */
-  // eslint-disable-next-line no-unused-vars
-  setNodeCompleted(id, completed) {
-    // TODO, remove eslint disable when done
   }
 
   /**
