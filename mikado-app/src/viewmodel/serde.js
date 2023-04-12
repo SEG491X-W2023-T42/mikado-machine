@@ -20,7 +20,7 @@ export async function loadFromDb(uid, graphName) {
   }
 
   // TODO add a version key and prevent loading newer schemas
-  const { node_names, positions, connections } = docSnap.data();
+  const { node_names, positions, connections, type } = docSnap.data();
 
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.
@@ -45,7 +45,7 @@ export async function loadFromDb(uid, graphName) {
     forwardConnections[id] = [];
     backwardConnections[id] = []
     const completed = false; // TODO
-    return createNodeObject(id, +x, +y, label.toString(), completed);
+    return createNodeObject(id, +x, +y, type[key], label.toString(), completed);
   });
 
   // Load edges from db
@@ -101,10 +101,12 @@ export function saveToDb(nodes, forwardConnections, uid, graphName) {
   // For some reason, the database is in Struct-Of-Arrays layout even though it's NoSQL
   const node_names = {};
   const positions = {};
+  const type = {};
   nodes.forEach((node, index) => {
     newIdsToDatabaseKeysLookup[node.id] = index;
     // No need to coerce as we own node.data: T for Node<T>
     node_names[index] = node.data.label;
+    type[index] = node.type;
     void node.data.completed; // TODO
     // Assuming there is no reason React Flow will change away from { x: number, y: number }
     positions[index] = node.position;
@@ -116,7 +118,7 @@ export function saveToDb(nodes, forwardConnections, uid, graphName) {
     connections[newIdsToDatabaseKeysLookup[key]] = values.map(x => newIdsToDatabaseKeysLookup[x]);
   }
 
-  const data = { connections, node_names, positions };
+  const data = { connections, node_names, positions, type };
   // Update users collection
   return setDoc(doc(db, uid, graphName), data).then(() => true).catch((e) => {
     console.log(e.message);

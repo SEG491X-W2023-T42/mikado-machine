@@ -1,5 +1,6 @@
 import { MarkerType } from "reactflow";
 import MyNode from "./MyNode";
+import GoalNode from "./GoalNode";
 import FloatingEdge from "./FloatingEdge";
 
 export const CONNECTION_LINE_STYLE = {
@@ -29,4 +30,5 @@ export const NODE_TYPES = {
    * Override default (and, so far, only) node type
    */
   default: MyNode,
+  goal: GoalNode,
 }
