@@ -18,7 +18,7 @@ function ReadyNode({ id, data }) {
         <button onClick={() => operations.deleteNode(id)}>
           <DeleteIcon />
         </button>
-        <button onClick={() => operations.setNodeCompleted(id)}>
+        <button onClick={() => operations.setNodeCompleted(id, true)}>
             <CheckIcon />
         </button>
       </NodeToolbar>

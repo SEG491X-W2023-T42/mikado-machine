@@ -371,10 +371,10 @@ class DisplayLayerOperations {
 
   }
 
-  setNodeCompleted(id) {
+  setNodeCompleted(id, completed) {
     const backwardConnections = this.#backwardConnections[id]
 
-    this.setNodeType(id, "complete");
+    this.setNodeType(id, completed ? "complete" : "ready");
 
     backwardConnections.forEach(id => {
       this.updateNodeType(id)
