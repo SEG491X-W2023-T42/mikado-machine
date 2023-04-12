@@ -52,7 +52,6 @@ main > main {
   width: 186px; /* fixed */
   min-height: 20px; /* hugs contents */
   inline-size: 10px;
-  padding-right: 15px;
   word-break: break-all;
   padding: 2px 5px;
   
@@ -65,9 +64,20 @@ main > main {
   flex-grow: 1;
 }
 
+.react-flow__node .MuiSvgIcon-root {
+  position: absolute;
+  font-size: large;
+  right: 5px;
+  top: 5px;
+}
+
 .react-flow__node-goal {
   outline: 1px solid rgba(105, 105, 105, 0.7);
   outline-offset: 3px;
+}
+
+.react-flow__node-goal > div {
+  padding-right: 15px;
 }
 
 .react-flow__node-goal.selected {
@@ -78,19 +88,14 @@ main > main {
   border: 1px solid #555;
 }
 
-.react-flow__node .MuiSvgIcon-root {
-  position: absolute;
-  font-size: large;
-  right: 5px;
-  top: 5px;
-}
-
 .react-flow__node-ready {
-  /*
-   * TODO
-   */
    background: #DAEFFF;
 }
+
+.react-flow__node-ready > div {
+  padding-right: 18px;
+}
+
 
 .react-flow__node-default > div.node-done {
   /*

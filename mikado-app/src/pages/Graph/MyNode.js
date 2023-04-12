@@ -13,7 +13,7 @@ function MyNode({ id, data }) {
   void operations.setNodeCompleted;
   return (
 
-    <div className={data.completed ? "node-done" : "node-ready"}>
+    <div>
       <NodeToolbar>
         <button onClick={() => operations.deleteNode(id)}>
           <DeleteIcon />
