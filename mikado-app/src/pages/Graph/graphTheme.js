@@ -3,6 +3,8 @@ import MyNode from "./MyNode";
 import GoalNode from "./GoalNode";
 import ReadyNode from "./ReadyNode";
 import FloatingEdge from "./FloatingEdge";
+import LockedNode from "./LockedNode";
+import CompleteNode from "./CompleteNode"
 
 export const CONNECTION_LINE_STYLE = {
   strokeWidth: 3,
@@ -33,4 +35,6 @@ export const NODE_TYPES = {
   default: MyNode,
   goal: GoalNode,
   ready: ReadyNode,
+  locked: LockedNode,
+  complete: CompleteNode,
 }

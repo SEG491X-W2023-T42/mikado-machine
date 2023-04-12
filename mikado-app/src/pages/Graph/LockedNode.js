@@ -1,13 +1,13 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import DeleteIcon from '@mui/icons-material/Delete';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import LockIcon from '@mui/icons-material/Lock';
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
 const operationsSelector = (state) => state.operations;
 
-function ReadyNode({ id, data }) {
+function LockedNode({ id, data }) {
   const operations = useDisplayLayerStore(operationsSelector);
 
   // TODO add node completion checkmark button
@@ -22,11 +22,11 @@ function ReadyNode({ id, data }) {
       </NodeToolbar>
         {data.label}
       <Handle />
-      <AutoAwesomeIcon />
+      <LockIcon />
     </div>
 
     
   )
 }
 
-export default ReadyNode;
+export default LockedNode;
