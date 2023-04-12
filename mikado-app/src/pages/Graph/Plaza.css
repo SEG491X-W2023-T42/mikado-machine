@@ -49,8 +49,6 @@ main > main {
   font-size: 12px;
   line-height: 15px;
 
-  padding-right: 18px;
-
   width: 186px; /* fixed */
   min-height: 20px; /* hugs contents */
   inline-size: 10px;
@@ -95,9 +93,17 @@ main > main {
    background: #DAEFFF;
 }
 
+.react-flow__node-ready > div {
+  padding-right: 20px;
+}
+
 
 .react-flow__node-locked {
   background: #F5FBFF
+}
+
+.react-flow__node-locked > div {
+  padding-right: 20px;
 }
 
 
@@ -105,14 +111,10 @@ main > main {
   background: #DDF9E8;
 }
 
-
-
-
-.react-flow__node-default > div.node-done {
-  /*
-   * TODO
-   */
+.react-flow__node-complete > div {
+  padding-right: 20px;
 }
+
 
 .react-flow__handle.source {
   top: 50%;
