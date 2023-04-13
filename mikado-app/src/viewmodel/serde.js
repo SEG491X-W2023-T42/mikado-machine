@@ -1,4 +1,4 @@
-import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc , collection, getDocs} from "firebase/firestore";
+import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
