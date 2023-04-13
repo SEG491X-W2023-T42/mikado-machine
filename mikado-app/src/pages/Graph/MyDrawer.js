@@ -3,7 +3,7 @@ import "./MyDrawer.css";
 import { useEffect } from "react";
 import * as React from 'react';
 
-function MyDrawer({ displayLayerHandle, graphHandle }) {
+function MyDrawer({ displayLayerHandle, enterGraph }) {
   const [drawerToggle, setDrawerToggle] = React.useState(false);
 
   const selectedNodeName = displayLayerHandle.getSelectedNodeName();
@@ -12,10 +12,7 @@ function MyDrawer({ displayLayerHandle, graphHandle }) {
   }, [selectedNodeName])
 
   const handleOnClick = () => {
-    graphHandle({
-      id: displayLayerHandle.getCurrentGraph(), 
-      subgraph: displayLayerHandle.getSelectedNodeID().toString()
-    })
+    enterGraph(displayLayerHandle.prepareCreateSubgraphAndSaveIfNotExists());
   }
 
   // TODO Subgraph onclick
@@ -29,11 +26,11 @@ function MyDrawer({ displayLayerHandle, graphHandle }) {
   >
     <div id="puller"></div>
     {drawerToggle && <TextField label="Node Name" variant="filled" defaultValue={selectedNodeName} onChange={e => displayLayerHandle.setSelectedNodeName(e.target.value)} />}
-    {displayLayerHandle.isSubgraphNode() && 
+    {displayLayerHandle.isSubgraphNode() &&
     <Button onClick={handleOnClick}>
       Enter Subgraph
     </Button>}
-    {(displayLayerHandle.isNotGoalNode() && !displayLayerHandle.isSubgraphNode()) ? 
+    {(displayLayerHandle.isNotGoalNode() && !displayLayerHandle.isSubgraphNode()) ?
     <Button onClick={handleOnClick}>
       Create Subgraph
     </Button> : null}

@@ -114,15 +114,25 @@ function Plaza({ uid }) {
     }), 1900);
   }
    */
+  function enterGraph(lambda) {
+    const subgraph = lambda(uid);
+    console.debug("trying to enter subgraph", subgraph);
+    setGraph({
+      id: graph.id,
+      subgraph,
+    });
+  }
 
+  const  key = uid + graph.subgraph;
+  console.debug("plaza graph", graph, "key", key);
   return <main>
     <MyAppBar graph={graph} graphHandle={setGraph} />
-    <DisplayLayer key={uid} uid={uid}
+    <DisplayLayer key={key} uid={uid}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graph={graph}
     />
     <AddNodeFAB displayLayerHandle={displayLayerHandle} />
-    <MyDrawer displayLayerHandle={displayLayerHandle} graphHandle={setGraph}/>
+    <MyDrawer displayLayerHandle={displayLayerHandle} enterGraph={enterGraph}/>
   </main>
 }
 

@@ -24,7 +24,6 @@ export function generateAutoincremented() {
 }
 
 export function resetCounter() {
-  counter = 1;
 }
 
 

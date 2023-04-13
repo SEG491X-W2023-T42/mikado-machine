@@ -10,23 +10,17 @@ if (USING_DEBUG_EMULATORS) {
 
 /**
  * Loads the nodes and edges from the database.
- */ 
+ */
 export async function loadFromDb(uid, graphName, subgraphName) {
   // Grab the user's graph
   let docSnap;
-  let subgraphSnap = await getDocs(collection(db, uid, graphName, "subgraph"));
-  let subgraphs = []
-  Counter.resetCounter();
-  subgraphSnap.forEach((doc) => {
-    subgraphs.push(doc.id)
-  })
   if (subgraphName !== "") {
     docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
   } else {
     docSnap = await getDoc(doc(db, uid, graphName));
   }
 
-  if (!docSnap.exists()) { 
+  if (!docSnap.exists()) {
     return [[createNodeObject("0", 0, 0, "goal", "My First Goal", false)], [], {0: []}, {0: []}, []]
   }
 
@@ -48,7 +42,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
   const backwardConnections = {};
   // Load nodes from db
   const newNodes = Object.entries(node_names).map(([key, label]) => {
-    const { x, y } = positions[key];
+    const { x, y, subgraph } = positions[key];
     // Construct object for React Flow
     // Coerce everything to the expected types to ignore potential database schema changes
     const id = Counter.generateAutoincremented().toString();
@@ -56,7 +50,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
     forwardConnections[id] = [];
     backwardConnections[id] = []
     const completed = false; // TODO
-    return createNodeObject(id, +x, +y, type[key], label.toString(), completed);
+    return createNodeObject(id, +x, +y, type[key], label.toString(), completed, (subgraph ?? "").toString());
   });
 
   // Load edges from db
@@ -74,7 +68,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
   });
   // TODO verify acyclic (#41)
 
-  return [newNodes, newEdges, forwardConnections, backwardConnections, subgraphs];
+  return [newNodes, newEdges, forwardConnections, backwardConnections];
 }
 
 /**
@@ -120,7 +114,8 @@ export function saveToDb(nodes, forwardConnections, uid, graphName, subgraphNode
     type[index] = node.type;
     void node.data.completed; // TODO
     // Assuming there is no reason React Flow will change away from { x: number, y: number }
-    positions[index] = node.position;
+    const pos = positions[index] = node.position;
+    pos.subgraph = node.subgraph;
   });
 
   const connections = {};
@@ -131,7 +126,7 @@ export function saveToDb(nodes, forwardConnections, uid, graphName, subgraphNode
 
   const data = { connections, node_names, positions, type };
   // Update users collection
-  
+
   if (subgraphNodeID !== "") {
     return setDoc(doc(db, uid, graphName, "subgraph", subgraphNodeID), data).then(() => true).catch((e) => {
       console.log(e.message);

@@ -35,7 +35,7 @@ function myOnNodesChange(changes, nodes, set) {
       node = { ...node };
       for (const change of myChanges) {
         switch (change.type) {
-          
+
           case "select":
             node.selected = change.selected;
             break;
@@ -123,11 +123,6 @@ class DisplayLayerOperations {
    */
   #backwardConnections = {};
 
-  /**
-   * Node ID's that contain subgraphs.
-   */
-  #subgraphs = [];
-
   // Zustand data
 
   /**
@@ -157,6 +152,7 @@ class DisplayLayerOperations {
       this[name] = (...args) => {
         // Refresh the cached state
         this.#state = this.#get();
+        //console.debug(this.#state);
         if (this.#loading) return; // Ignore everything while loading
         // Call function normally, while also binding it
         return wrapped.apply(this, args);
@@ -176,10 +172,9 @@ class DisplayLayerOperations {
    */
   load(uid, graphName, subgraphID) {
     this.#loading = true;
-    loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections, subgraphs]) => {
+    loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
-      this.#subgraphs = subgraphs;
       this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
@@ -346,7 +341,7 @@ class DisplayLayerOperations {
       ),
     });
     this.updateNodeType(srcId)
-    
+
   }
 
   /**
@@ -364,7 +359,7 @@ class DisplayLayerOperations {
     if (forwardConnections.length === 0) {
       this.setNodeType(id, "ready")
     }
-    
+
     for (var i = 0; i < forwardConnections.length; i++) {
       const node = this.getNode(forwardConnections[i])
 
@@ -474,7 +469,12 @@ class DisplayLayerOperations {
    * Returns if the node has a subgraph.
    */
   isNodeSubgraph(id) {
-    return this.#subgraphs.includes(id)
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return !!node.subgraph;
+      }
+    }
+    return false; // throw new Error(); // TODO
   }
 
   export(fitView, saveNotifyError) {
@@ -515,9 +515,34 @@ class DisplayLayerOperations {
     }
     return false;
   }
+
+  createSubgraphAndSaveIfNotExists(uid, id) {
+    let result = "";
+    let created = false;
+    this.#set({
+      nodes: this.#state.nodes.map(
+        node => {
+          if (node.id !== id) return node;
+          if (result) throw new Error();
+          let { subgraph } = node;
+          if (!subgraph) {
+            subgraph = new Date().getTime().toString();
+            created = true;
+          }
+          result = subgraph;
+          return {...node, subgraph: result};
+        }
+      ),
+    });
+    if (!result) throw new Error();
+    if (created) {
+      this.save(uid, () => {});
+    }
+    return result;
+  }
 }
 
-const useDisplayLayerStore = create((set, get) => ({
+const useDisplayLayerStore = () => create((set, get) => ({ // TODO
   nodes: [],
   edges: [],
   /**
