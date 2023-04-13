@@ -117,6 +117,11 @@ class DisplayLayerOperations {
    */
   #backwardConnections = {};
 
+  /**
+   * Node ID's that contain subgraphs.
+   */
+  #subgraphs = [];
+
   // Zustand data
 
   /**
@@ -163,11 +168,12 @@ class DisplayLayerOperations {
   /**
    * Loads this layer from the database
    */
-  load(uid, graphName) {
+  load(uid, graphName, subgraphID) {
     this.#loading = true;
-    loadFromDb(uid, graphName).then(([nodes, edges, forwardConnections, backwardConnections]) => {
+    loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections, subgraphs]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
+      this.#subgraphs = subgraphs;
       this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
@@ -406,6 +412,15 @@ class DisplayLayerOperations {
     });
   }
 
+  getNodeType(id) {
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return node.type;
+      }
+    }
+    throw new Error();
+  }
+
   /**
    * Changes node type
    */
@@ -430,7 +445,6 @@ class DisplayLayerOperations {
   }
 
   /**
-   *
    * Gets specified node by id
    */
   getNode(id) {
@@ -447,6 +461,13 @@ class DisplayLayerOperations {
    */
   getGraphName() {
     return this.#graphName;
+  }
+
+  /**
+   * Returns if the node has a subgraph.
+   */
+  isNodeSubgraph(id) {
+    return this.#subgraphs.includes(id)
   }
 
   export(fitView, saveNotifyError) {

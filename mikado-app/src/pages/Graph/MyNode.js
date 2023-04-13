@@ -9,8 +9,6 @@ const operationsSelector = (state) => state.operations;
 function MyNode({ id, data }) {
   const operations = useDisplayLayerStore(operationsSelector);
 
-  // TODO add node completion checkmark button
-  void operations.setNodeCompleted;
   return (
 
     <div>

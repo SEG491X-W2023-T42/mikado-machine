@@ -1,4 +1,4 @@
-import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc , collection, getDocs} from "firebase/firestore";
 import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 import generateAutoincremented from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
@@ -11,13 +11,25 @@ if (USING_DEBUG_EMULATORS) {
 /**
  * Loads the nodes and edges from the database.
  */
-export async function loadFromDb(uid, graphName) {
+export async function loadFromDb(uid, graphName, subgraphName) {
   // Grab the user's graph
-  let docSnap = await getDoc(doc(db, uid, graphName));
+  let docSnap;
+  let subgraphSnap = await getDocs(collection(db, uid, graphName, "subgraph"));
+  let subgraphs = []
+
+  subgraphSnap.forEach((doc) => {
+    subgraphs.push(doc.id)
+  })
+  if (subgraphName !== "") {
+    docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
+    
+  } else {
+    docSnap = await getDoc(doc(db, uid, graphName));
+  }
 
   if (!docSnap.exists()) { 
     const id = generateAutoincremented().toString()
-    return [[createNodeObject(id, 0, 0, "goal", "My First Goal", false)], [], {[id]: []}, {[id]: []}]
+    return [[createNodeObject(id, 0, 0, "goal", "My First Goal", false)], [], {[id]: []}, {[id]: []}, []]
   }
 
   // TODO add a version key and prevent loading newer schemas
@@ -64,7 +76,7 @@ export async function loadFromDb(uid, graphName) {
   });
   // TODO verify acyclic (#41)
 
-  return [newNodes, newEdges, forwardConnections, backwardConnections];
+  return [newNodes, newEdges, forwardConnections, backwardConnections, subgraphs];
 }
 
 /**
@@ -121,6 +133,12 @@ export function saveToDb(nodes, forwardConnections, uid, graphName) {
 
   const data = { connections, node_names, positions, type };
   // Update users collection
+
+  /*return setDoc(doc(db, uid, graphName, "subgraph", "1"), data).then(() => true).catch((e) => {
+    console.log(e.message);
+    return false;
+  });*/
+
   return setDoc(doc(db, uid, graphName), data).then(() => true).catch((e) => {
     console.log(e.message);
     return false;

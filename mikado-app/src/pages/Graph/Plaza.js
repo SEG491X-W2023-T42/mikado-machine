@@ -30,8 +30,7 @@ function Plaza({ uid }) {
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
 
   // TODO get this from URL
-  const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
-  void setGraphID;
+  const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
   /*
   // TODO bring back the animations later
   const [fade, setFade] = useState(false);
@@ -117,13 +116,13 @@ function Plaza({ uid }) {
    */
 
   return <main>
-    <MyAppBar graphID={graphID} />
+    <MyAppBar graphID={graph.id} />
     <DisplayLayer key={uid} uid={uid}
                   setDisplayLayerHandle={setDisplayLayerHandle}
-                  graphName={graphID}
+                  graph={graph}
     />
     <AddNodeFAB displayLayerHandle={displayLayerHandle} />
-    <MyDrawer displayLayerHandle={displayLayerHandle} />
+    <MyDrawer displayLayerHandle={displayLayerHandle} graphHandle={setGraph}/>
   </main>
 }
 

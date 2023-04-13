@@ -82,6 +82,25 @@ export default class DisplayLayerHandle {
   }
 
   /**
+   * Returns true if node has subgraph
+   */
+  isSubgraphNode() {
+    return this.#displayLayerOperations?.isNodeSubgraph(this.#selectedNodeId)
+  }
+
+  /**
+   * Gets current node type
+   */
+  isNotGoalNode() {
+    if (this.#selectedNodeId !== undefined) {
+      return this.#displayLayerOperations?.getNodeType(this.#selectedNodeId) !== "goal"
+    } else {
+      return false
+    }
+    
+  }
+
+  /**
    * Adds a node
    */
   addNode() {
