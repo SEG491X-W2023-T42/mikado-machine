@@ -116,7 +116,7 @@ function Plaza({ uid }) {
    */
 
   return <main>
-    <MyAppBar graphID={graph.id} />
+    <MyAppBar graph={graph} graphHandle={setGraph} />
     <DisplayLayer key={uid} uid={uid}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graph={graph}
