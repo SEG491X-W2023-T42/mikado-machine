@@ -10,6 +10,7 @@ import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import { notifyError } from "../../components/ToastManager";
+import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
 
 
 /**
@@ -33,8 +34,7 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  */
 function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
   const reactFlowWrapper = useRef(void 0);
-  const [useStore] = useState(() => useDisplayLayerStore());
-  const { nodes, edges, operations } = useStore(selector, shallow);
+  const { nodes, edges, operations } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
 
@@ -55,7 +55,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
 
   const [testCount, setTestCount] = useState(0);
   useEffect(() => {
-    console.log("displaylayer mount", testCount, "nodes", nodes);
+    console.log("displaylayer mount", testCount, "nodes", nodes, edges, operations);
     setTestCount(testCount + 1);
     return () => console.debug("displaylayer unmount");
   }, []);
@@ -133,9 +133,12 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
 function DisplayLayer({ uid, setDisplayLayerHandle, graph }) {
+  const [useStore] = useState(() => useDisplayLayerStore());
   return (
     <ReactFlowProvider>
-      <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graph={graph} />
+      <StoreHackContext.Provider value={useStore}>
+        <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graph={graph} />
+      </StoreHackContext.Provider>
     </ReactFlowProvider>
   );
 }

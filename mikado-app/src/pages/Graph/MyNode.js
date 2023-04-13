@@ -1,5 +1,5 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
-import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
+import { useStoreHack } from "../../StoreHackContext.js";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
@@ -7,7 +7,7 @@ export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 const operationsSelector = (state) => state.operations;
 
 function MyNode({ id, data }) {
-  const operations = useDisplayLayerStore(operationsSelector);
+  const operations = useStoreHack()(operationsSelector);
 
   return (
 
@@ -21,7 +21,7 @@ function MyNode({ id, data }) {
       <Handle />
     </div>
 
-    
+
   )
 }
 

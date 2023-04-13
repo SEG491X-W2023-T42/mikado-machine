@@ -1,5 +1,5 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
-import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
+import { useStoreHack } from "../../StoreHackContext.js";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -9,7 +9,7 @@ export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 const operationsSelector = (state) => state.operations;
 
 function LockedNode({ id, data }) {
-  const operations = useDisplayLayerStore(operationsSelector);
+  const operations = useStoreHack()(operationsSelector);
 
   return (
 
@@ -27,7 +27,7 @@ function LockedNode({ id, data }) {
       <CheckIcon />
     </div>
 
-    
+
   )
 }
 
