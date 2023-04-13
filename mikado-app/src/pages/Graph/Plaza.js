@@ -30,8 +30,7 @@ function Plaza({ uid }) {
   const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
 
   // TODO get this from URL
-  const [graphID, setGraphID] = useState(DEFAULT_GRAPH_ID);
-  void setGraphID;
+  const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
   /*
   // TODO bring back the animations later
   const [fade, setFade] = useState(false);
@@ -115,15 +114,25 @@ function Plaza({ uid }) {
     }), 1900);
   }
    */
+  function enterGraph(lambda) {
+    const subgraph = lambda(uid);
+    console.debug("trying to enter subgraph", subgraph);
+    setGraph({
+      id: graph.id,
+      subgraph,
+    });
+  }
 
+  const  key = uid + graph.subgraph;
+  console.debug("plaza graph", graph, "key", key);
   return <main>
-    <MyAppBar graphID={graphID} />
-    <DisplayLayer key={uid} uid={uid}
+    <MyAppBar graph={graph} graphHandle={setGraph} />
+    <DisplayLayer key={key} uid={uid}
                   setDisplayLayerHandle={setDisplayLayerHandle}
-                  graphName={graphID}
+                  graph={graph}
     />
     <AddNodeFAB displayLayerHandle={displayLayerHandle} />
-    <MyDrawer displayLayerHandle={displayLayerHandle} />
+    <MyDrawer displayLayerHandle={displayLayerHandle} enterGraph={enterGraph}/>
   </main>
 }
 

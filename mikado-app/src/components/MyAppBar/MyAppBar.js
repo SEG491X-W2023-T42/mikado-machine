@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { AppBar, Box, Container, Toolbar, Typography } from '@mui/material'
+import { AppBar, Box, Button, Container, Toolbar, Typography } from '@mui/material'
 import AppBarProfileOverflowMenu from "./AppBarProfileOverflowMenu";
 
-export default function MyAppBar({ graphID }) {
+export default function MyAppBar({ graph, graphHandle }) {
   return (
     <AppBar position="static">
       <Container maxWidth="x2">
@@ -30,10 +30,14 @@ export default function MyAppBar({ graphID }) {
               {
                 // Placeholder for now, TODO replace with name
               }
-              {graphID}
+              {graph.id}
             </Typography>
 
           </Box>
+          {(graph.subgraph !== "") && 
+          <Button sx={{color: "white"}} onClick={() => {graphHandle({id: graph.id, subgraph: ""})}}>
+            Back
+          </Button>}
           <AppBarProfileOverflowMenu></AppBarProfileOverflowMenu>
         </Toolbar>
       </Container>

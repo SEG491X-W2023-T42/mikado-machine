@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { loadFromDb, saveToDb } from "./serde";
-import generateAutoincremented from "./autoincrement";
+import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
 import * as htmlToImage from 'html-to-image';
@@ -35,6 +35,7 @@ function myOnNodesChange(changes, nodes, set) {
       node = { ...node };
       for (const change of myChanges) {
         switch (change.type) {
+
           case "select":
             node.selected = change.selected;
             break;
@@ -111,6 +112,11 @@ class DisplayLayerOperations {
   #graphName = "";
 
   /**
+   * If the current graph is a subgraph, the node its linked to
+   */
+  #subgraphNodeID = ""
+
+  /**
    * Similar to forwardConnections.
    *
    * Used mainly for deletion.
@@ -146,6 +152,7 @@ class DisplayLayerOperations {
       this[name] = (...args) => {
         // Refresh the cached state
         this.#state = this.#get();
+        //console.debug(this.#state);
         if (this.#loading) return; // Ignore everything while loading
         // Call function normally, while also binding it
         return wrapped.apply(this, args);
@@ -163,14 +170,15 @@ class DisplayLayerOperations {
   /**
    * Loads this layer from the database
    */
-  load(uid, graphName) {
+  load(uid, graphName, subgraphID) {
     this.#loading = true;
-    loadFromDb(uid, graphName).then(([nodes, edges, forwardConnections, backwardConnections]) => {
+    loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
-      this.#set({ nodes, edges, loadAutoincremented: generateAutoincremented });
+      this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
+      this.#subgraphNodeID = subgraphID;
     });
   }
 
@@ -179,7 +187,7 @@ class DisplayLayerOperations {
    */
   save(uid, notifyError) {
     this.#loading = true;
-    saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName).then(x => {
+    saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName, this.#subgraphNodeID).then(x => {
       this.#loading = false;
       x || notifyError();
     });
@@ -219,7 +227,7 @@ class DisplayLayerOperations {
     }
 
     // Allocate everything
-    const id = generateAutoincremented().toString();
+    const id = Counter.generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
     this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
@@ -293,7 +301,7 @@ class DisplayLayerOperations {
       srcId = tmp;
     } else if (!forwardConnections[srcId].includes(dstId)) { // No connection found
       // Check for cycles
-      const autoincremented = generateAutoincremented();
+      const autoincremented = Counter.generateAutoincremented();
       const depthFirstSearch = {};
 
       function dfs(otherId) {
@@ -333,7 +341,7 @@ class DisplayLayerOperations {
       ),
     });
     this.updateNodeType(srcId)
-    
+
   }
 
   /**
@@ -351,7 +359,7 @@ class DisplayLayerOperations {
     if (forwardConnections.length === 0) {
       this.setNodeType(id, "ready")
     }
-    
+
     for (var i = 0; i < forwardConnections.length; i++) {
       const node = this.getNode(forwardConnections[i])
 
@@ -406,6 +414,15 @@ class DisplayLayerOperations {
     });
   }
 
+  getNodeType(id) {
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return node.type;
+      }
+    }
+    throw new Error();
+  }
+
   /**
    * Changes node type
    */
@@ -430,7 +447,6 @@ class DisplayLayerOperations {
   }
 
   /**
-   *
    * Gets specified node by id
    */
   getNode(id) {
@@ -447,6 +463,18 @@ class DisplayLayerOperations {
    */
   getGraphName() {
     return this.#graphName;
+  }
+
+  /**
+   * Returns if the node has a subgraph.
+   */
+  isNodeSubgraph(id) {
+    for (const node of this.#state.nodes) {
+      if (node.id === id) {
+        return !!node.subgraph;
+      }
+    }
+    return false; // throw new Error(); // TODO
   }
 
   export(fitView, saveNotifyError) {
@@ -487,15 +515,40 @@ class DisplayLayerOperations {
     }
     return false;
   }
+
+  createSubgraphAndSaveIfNotExists(uid, id) {
+    let result = "";
+    let created = false;
+    this.#set({
+      nodes: this.#state.nodes.map(
+        node => {
+          if (node.id !== id) return node;
+          if (result) throw new Error();
+          let { subgraph } = node;
+          if (!subgraph) {
+            subgraph = new Date().getTime().toString();
+            created = true;
+          }
+          result = subgraph;
+          return {...node, subgraph: result};
+        }
+      ),
+    });
+    if (!result) throw new Error();
+    if (created) {
+      this.save(uid, () => {});
+    }
+    return result;
+  }
 }
 
-const useDisplayLayerStore = create((set, get) => ({
+const useDisplayLayerStore = () => create((set, get) => ({ // TODO
   nodes: [],
   edges: [],
   /**
    * Set to a new value on load. This is used as passing a callback to load() runs too early.
    */
-  loadAutoincremented: generateAutoincremented,
+  loadAutoincremented: Counter.generateAutoincremented,
   /**
    * The actual operations
    */

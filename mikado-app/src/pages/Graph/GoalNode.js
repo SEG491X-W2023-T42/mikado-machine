@@ -1,5 +1,5 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
-import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
+import { useStoreHack } from "../../StoreHackContext.js";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmojiFlagsIcon from '@mui/icons-material/EmojiFlags';
 
@@ -8,7 +8,7 @@ export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 const operationsSelector = (state) => state.operations;
 
 function GoalNode({ id, data }) {
-  const operations = useDisplayLayerStore(operationsSelector);
+  const operations = useStoreHack()(operationsSelector);
 
   // TODO add node completion checkmark button
   void operations.setNodeCompleted;
@@ -25,7 +25,7 @@ function GoalNode({ id, data }) {
       <EmojiFlagsIcon />
     </div>
 
-    
+
   )
 }
 

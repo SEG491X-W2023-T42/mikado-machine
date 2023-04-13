@@ -11,12 +11,19 @@
  * id to identify the search call instance, generate an autoincremented, and now the old false is !== and the true is ===. Now we eliminate
  * the first pass i.e. clearing the flags. This technique also generalizes to other places.
  */
-let counter = 0;
+let counter = 1;
+
 
 /**
  * Generates an autoincremented value. The type must not be relied on, only the fact that values from different calls to this function are different,
  * and that .toString() exists and is different iff the value is different.
  */
-export default function generateAutoincremented() {
+export function generateAutoincremented() {
+  //console.trace()
   return counter++;
 }
+
+export function resetCounter() {
+}
+
+
