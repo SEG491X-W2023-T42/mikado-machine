@@ -26,7 +26,11 @@ More to come later.
 | [Project Management Gantt Chart](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=07b4afb81ea1b485dbaec7906683c5016&authkey=AVBAN_1w6hmBHhqfMNYwbdc&e=glD2qx) | Gantt chart for tracking tasks and planning over time |
 | [Formal Time Sheet](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=0290cd280943547d2b1fbee27c9330d13&authkey=AUHJjRQIY8Rv-EkD2LFu7u4&e=mEpMRc) | Time tracking |
 
+## License
 
+See the license [here](mikado-app/public/LICENSE.txt). The license applies to all files in this repository unless stated otherwise.
+
+This project is currently intended to be visible-source and not open-contribution like SQLite. This is currently in place to make it possible for our professor to evaluate our team project without outside interference. Derivative works are strongly discouraged, and the license will automatically assign us more rights than it gives you. At the end of 2023, we may decide to release it as open-source with/without a premium version. In the meantime, early testers are welcome to play with the beta version hosted on the cloud, though major breaking changing may occur regularly, including those affecting data.
 
 ## References
 
