@@ -118,6 +118,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       connectionMode={MY_NODE_CONNECTION_MODE}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      zoomOnDoubleClick={false}
       fitView
     >
       <Background />
