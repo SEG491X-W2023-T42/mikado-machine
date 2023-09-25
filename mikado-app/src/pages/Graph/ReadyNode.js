@@ -1,7 +1,7 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
 import { useStoreHack } from "../../StoreHackContext.js";
 import DeleteIcon from '@mui/icons-material/Delete';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import GrassIcon from '@mui/icons-material/Grass';
 import CheckIcon from '@mui/icons-material/Check';
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
@@ -24,7 +24,7 @@ function ReadyNode({ id, data }) {
       </NodeToolbar>
         {data.label}
       <Handle />
-      <AutoAwesomeIcon />
+      <GrassIcon />
     </div>
 
 
