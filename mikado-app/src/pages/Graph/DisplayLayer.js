@@ -35,7 +35,7 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  */
 function DisplayLayerInternal({ uid, graph }) {
   const reactFlowWrapper = useRef(void 0);
-  const { nodes, edges, operations, editNode } = useStoreHack()(selector, shallow);
+  const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
 
@@ -180,6 +180,8 @@ function DisplayLayerInternal({ uid, graph }) {
       edges={edges}
       onNodesChange={operations.onNodesChange}
       nodesConnectable={false}
+      nodesDraggable={!editingNodeId}
+      panOnDrag={!editingNodeId}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
