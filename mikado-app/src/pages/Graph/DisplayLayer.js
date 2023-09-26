@@ -134,8 +134,39 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
     }
 
 
-
   }
+
+  function startEditingNode(id, isBackspace) {
+    // TODO replace with text field
+    const defaultText = isBackspace ? "" : operations.getNodeLabel(id);
+    operations.setNodeLabel(id, prompt("Node Name", defaultText) ?? defaultText);
+  }
+
+  function onNodeDoubleClick(e, node) {
+    void e;
+    console.log(node);
+    startEditingNode(node.id, false);
+  }
+
+  useEffect(() => {
+    function pressListener() {
+      if ("maxLength" in document.activeElement) return; // Ignore when already in text field
+      // Not bothering to try adding the key to the text field, whether appending or replacing
+      // That would break accessibility, keyboard layouts, and IMEs
+      selectedNodeId.current && startEditingNode(selectedNodeId.current, false);
+    }
+    function backspaceListener(e) {
+      if (e.key !== "Backspace") return;
+      selectedNodeId.current && startEditingNode(selectedNodeId.current, true);
+    }
+    // keypress is deprecated but it is used to filter out CTRL, ALT, etc.
+    document.addEventListener('keypress', pressListener);
+    document.addEventListener('keyup', backspaceListener);
+    return () => {
+      document.removeEventListener('keypress', pressListener);
+      document.removeEventListener('keyup', backspaceListener);
+    }
+  }, []);
 
   console.debug("displaylayer graph", graph);
 
@@ -152,6 +183,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       nodeTypes={NODE_TYPES}
       edgeTypes={EDGE_TYPES}
       connectionMode={MY_NODE_CONNECTION_MODE}
+      onNodeDoubleClick={onNodeDoubleClick}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
       zoomOnDoubleClick={false}
