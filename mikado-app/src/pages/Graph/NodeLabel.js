@@ -19,6 +19,14 @@ export default function NodeLabel({ id, label }) {
       ref.current?.select();
     }
   }, [editing]);
+  useEffect(() => {
+    const { current } = ref;
+    if (!current) return;
+    const { style } = current;
+    // Shrink and grow based on content
+    style.height = 0;
+    style.height = current.scrollHeight + "px";
+  }, [text]);
   if (!editing && text !== label) {
     setText(label);
   }
@@ -28,11 +36,13 @@ export default function NodeLabel({ id, label }) {
     operations.setNodeLabel(id, filteredText);
     setText(filteredText);
   }
-  return <input
-    type="text"
+  // <input> is single link
+  // <div contenteditable> is an accessibility and security problem
+  return <textarea
     autoFocus={editing}
     disabled={!editing}
     value={text}
+    rows={1}
     onChange={(e) => {setText(e.target.value)}}
     onKeyDown={(e) => {
       // Don't break IMEs

@@ -74,22 +74,23 @@ main > main {
   top: 5px;
 }
 
-.react-flow__node input {
+.react-flow__node textarea {
   appearance: none;
   background: none;
   border: none;
-  border-bottom: 1px solid dimgrey;
-  /* color: initial; this turns input text font grey on Apple devices, -webkit-text-fill-color is the workaround*/ 
-  -webkit-text-fill-color: rgba(0, 0, 0, 1); 
+  /* outline is all 4 sides, and border makes the element grow by 1 pixel when editing */
+  box-shadow: 0 1px 0 dimgrey;
+  /* color: initial; this turns input text font grey on Apple devices, -webkit-text-fill-color is the workaround*/
+  -webkit-text-fill-color: rgba(0, 0, 0, 1);
   color: rgba(0, 0, 0, 1);
   outline: none;
   padding: 0;
-  text-overflow: ellipsis;
+  resize: none;
   width: 100%;
 
   &:disabled {
     pointer-events: none;
-    border-bottom: none;
+    box-shadow: none;
   }
 }
 
