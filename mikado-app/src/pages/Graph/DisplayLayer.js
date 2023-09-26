@@ -115,8 +115,8 @@ function DisplayLayerInternal({ uid, graph }) {
             });
 
             // Adjusting so that the node is in center of mouse
-            position.x = position.x - dimensions.width
-            position.y = position.y - dimensions.height
+            position.x = position.x - dimensions.width / 2
+            position.y = position.y - dimensions.height / 2
 
             const viewport = project({
                 x: elem.clientWidth,
