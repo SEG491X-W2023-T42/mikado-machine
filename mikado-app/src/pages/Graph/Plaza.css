@@ -17,6 +17,11 @@ main > main {
   width: 100%;
 }
 
+.react-flow {
+  /* Fix double click to add node */
+  touch-action: manipulation;
+}
+
 .react-flow__node {
   display: flex;
   flex-direction: row;
