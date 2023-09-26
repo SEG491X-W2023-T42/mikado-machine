@@ -101,6 +101,40 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       operations.connectOrDisconnect(id, target.id);
     }
   }
+
+  function onDoubleClick(e) {
+
+    // Adds node if on background pane
+    if ('DIV' === e.target.tagName) {
+        // Background double click
+        if (e.target.className.includes('react-flow__pane')) {
+            const elem = reactFlowWrapper.current;
+            if (!elem) {
+                return;
+            }
+        
+            const position = project({
+                x: e.clientX,
+                y: e.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
+            });
+        
+            // Adjusting so that the node is in center of mouse
+            position.x = position.x - 92
+            position.y = position.y - 28
+        
+            const viewport = project({
+                x: elem.clientWidth,
+                y: elem.clientHeight,
+            });
+        
+            operations.addNode(position, viewport) || notifyError("No space for new node! Please try adding elsewhere.");
+        }
+    }
+
+   
+    
+  }
+
   console.debug("displaylayer graph", graph);
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
@@ -119,6 +153,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
       zoomOnDoubleClick={false}
+      onDoubleClick={onDoubleClick}
       fitView
     >
       <Background />
