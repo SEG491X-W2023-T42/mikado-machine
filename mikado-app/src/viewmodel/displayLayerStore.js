@@ -4,6 +4,7 @@ import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./aabb";
 import * as htmlToImage from 'html-to-image';
+import { dimensions } from "../helpers/NodeConstants";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -79,6 +80,7 @@ function arrayRemoveByValueIfPresent(array, value) {
  * Its fields are modified directly to avoid getting in the way of the shallow comparison.
  * It is also here to skip shallow compare of all those methods.
  */
+
 class DisplayLayerOperations {
   /*
    * DisplayLayer cache data.
@@ -197,14 +199,17 @@ class DisplayLayerOperations {
     // hacky code that checks every position starting from the specified pos
     // and ending when a pos is found or there is no possible position in current
     // viewport
-    const width = 92;
-    const height = 30;
 
     const { nodes } = this.#state;
-    const max_y = range.y - height;
-    const max_x = range.x - width;
-    for (let y = position.y; y < max_y; y += height) {
-      for (let x = position.x; x < max_x; x += width) {
+	const height = dimensions.height;
+	const width = dimensions.width;
+
+	if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
+		return position;
+	}
+
+    for (let y = position.y - (dimensions.height * 2); y < position.y + (dimensions.height * 4); y += height) {
+      for (let x = position.x - dimensions.width; x < position.x + dimensions.width; x += width) {
         const position = { x, y };
         if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
           return position;
@@ -231,7 +236,7 @@ class DisplayLayerOperations {
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
     this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
-    return true;
+	return true;
 
   }
 

@@ -11,6 +11,7 @@ import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
+import { dimensions } from '../../helpers/NodeConstants';
 
 
 /**
@@ -101,6 +102,40 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       operations.connectOrDisconnect(target.id, id);
     }
   }
+
+  function onDoubleClick(e) {
+
+    // Adds node if on background pane
+    if ('DIV' === e.target.tagName) {
+        // Background double click
+        if (e.target.className.includes('react-flow__pane')) {
+            const elem = reactFlowWrapper.current;
+            if (!elem) {
+                return;
+            }
+        
+            const position = project({
+                x: e.clientX,
+                y: e.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
+            });
+        
+            // Adjusting so that the node is in center of mouse
+            position.x = position.x - dimensions.width
+            position.y = position.y - dimensions.height
+        
+            const viewport = project({
+                x: elem.clientWidth,
+                y: elem.clientHeight,
+            });
+        
+            operations.addNode(position, viewport) || notifyError("No space for new node! Please try adding elsewhere.");
+        }
+    }
+
+   
+    
+  }
+
   console.debug("displaylayer graph", graph);
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
@@ -118,6 +153,8 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       connectionMode={MY_NODE_CONNECTION_MODE}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      zoomOnDoubleClick={false}
+      onDoubleClick={onDoubleClick}
       fitView
     >
       <Background />
