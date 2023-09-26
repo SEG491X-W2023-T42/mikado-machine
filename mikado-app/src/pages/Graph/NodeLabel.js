@@ -10,6 +10,7 @@ export default function NodeLabel({ id, label }) {
   const {editingNodeId, editingNodeInitialValue, editNode, operations} = useStoreHack()(selector);
   const [text, setText] = useState(label);
   const ref = useRef(void 0);
+  const wasComposingRef = useRef(false);
   const editing = editingNodeId === id;
   useEffect(() => {
     if (editing) {
@@ -23,7 +24,9 @@ export default function NodeLabel({ id, label }) {
   }
   function finishEditing() {
     editNode("", "");
-    operations.setNodeLabel(id, text);
+    const filteredText = text.replaceAll('\n', ' ');
+    operations.setNodeLabel(id, filteredText);
+    setText(filteredText);
   }
   return <input
     type="text"
@@ -31,8 +34,13 @@ export default function NodeLabel({ id, label }) {
     disabled={!editing}
     value={text}
     onChange={(e) => {setText(e.target.value)}}
+    onKeyDown={(e) => {
+      // Don't break IMEs
+      wasComposingRef.current = e.nativeEvent.isComposing;
+    }}
     onKeyUp={(e) => {
       if (e.key !== "Enter") return;
+      if (wasComposingRef.current) return;
       finishEditing();
     }}
     onBlur={finishEditing}
