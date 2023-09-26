@@ -1,31 +1,17 @@
-import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
-import { useStoreHack } from "../../StoreHackContext.js";
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Handle, NodeToolbar } from "reactflow";
 import EmojiFlagsIcon from '@mui/icons-material/EmojiFlags';
-
-export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
-
-const operationsSelector = (state) => state.operations;
+import NodeToolbarCommon from "./NodeToolbarCommon";
 
 function GoalNode({ id, data }) {
-  const operations = useStoreHack()(operationsSelector);
-
-  // TODO add node completion checkmark button
-  void operations.setNodeCompleted;
   return (
-
     <div>
       <NodeToolbar>
-        <button onClick={() => operations.deleteNode(id)}>
-          <DeleteIcon />
-        </button>
+        <NodeToolbarCommon id={id}/>
       </NodeToolbar>
         {data.label}
       <Handle />
       <EmojiFlagsIcon />
     </div>
-
-
   )
 }
 

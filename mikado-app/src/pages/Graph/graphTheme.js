@@ -28,11 +28,15 @@ export const EDGE_TYPES = {
   default: FloatingEdge,
 };
 
+function AssertFalseNode() {
+  throw new TypeError("Unreachable node type");
+}
+
 export const NODE_TYPES = {
   /**
    * Override default (and, so far, only) node type
    */
-  default: MyNode,
+  default: AssertFalseNode,
   goal: GoalNode,
   ready: ReadyNode,
   locked: LockedNode,
