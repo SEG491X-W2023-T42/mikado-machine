@@ -84,7 +84,9 @@ main > main {
   background: none;
   border: none;
   border-bottom: 1px solid dimgrey;
-  color: initial;
+  /* color: initial; this turns input text font grey on Apple devices, -webkit-text-fill-color is the workaround*/ 
+  -webkit-text-fill-color: rgba(0, 0, 0, 1); 
+  color: rgba(0, 0, 0, 1);
   outline: none;
   padding: 0;
   text-overflow: ellipsis;
