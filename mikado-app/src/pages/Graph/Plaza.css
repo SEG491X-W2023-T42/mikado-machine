@@ -29,7 +29,7 @@ main > main {
   min-height: 20px; /* hugs contents */
 
   background: #FFF9C1; /* #DAEFFF for ready task, #DDF9E8 for complete task, #F5FBFF for locked */
-  border: 1px solid rgba(105, 105, 105, 0.7);
+  border: 1px solid dimgrey;
   border-radius: 8px;
 
   /* Inside auto layout */
@@ -39,6 +39,9 @@ main > main {
   align-self: stretch;
   flex-grow: 0;
 
+  &:focus-within {
+    outline: 1px solid dimgrey;
+  }
 }
 
 .react-flow__node > div {
@@ -71,6 +74,22 @@ main > main {
   top: 5px;
 }
 
+.react-flow__node input {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 1px solid dimgrey;
+  color: initial;
+  padding: 0;
+  text-overflow: ellipsis;
+  width: 100%;
+
+  &:disabled {
+    pointer-events: none;
+    border-bottom: none;
+  }
+}
+
 .react-flow__node-goal {
   outline: 1px solid rgba(105, 105, 105, 0.7);
   outline-offset: 3px;
@@ -80,8 +99,7 @@ main > main {
   padding-right: 15px;
 }
 
-.react-flow__node-goal:focus-visible {
-
+.react-flow__node-goal:focus-within {
   /* For Goal Node: */
   outline: 2px solid #555;
   outline-offset: 3px;

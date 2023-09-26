@@ -2,6 +2,7 @@ import { Handle, NodeToolbar } from "reactflow";
 import CheckIcon from '@mui/icons-material/Check';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import NodeToolbarCommon, { useNodeToolbarCommonOperations } from "./NodeToolbarCommon";
+import NodeLabel from "./NodeLabel";
 
 export default function LockedNode({ id, data }) {
   const operations = useNodeToolbarCommonOperations();
@@ -14,7 +15,7 @@ export default function LockedNode({ id, data }) {
             <HighlightOffIcon />
         </button>
       </NodeToolbar>
-        {data.label}
+      <NodeLabel id={id} label={data.label} />
       <Handle />
       <CheckIcon />
     </div>

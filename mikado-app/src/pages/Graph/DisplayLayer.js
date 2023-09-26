@@ -152,6 +152,7 @@ function DisplayLayerInternal({ uid, graph }) {
     }
     function backspaceListener(e) {
       if (e.key !== "Backspace") return;
+      if ("maxLength" in document.activeElement) return; // Ignore when already in text field
       selectedNodeId.current && startEditingNode(selectedNodeId.current, true);
     }
     // keypress is deprecated but it is used to filter out CTRL, ALT, etc.

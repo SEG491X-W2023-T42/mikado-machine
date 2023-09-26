@@ -2,6 +2,7 @@ import { Handle, NodeToolbar } from "reactflow";
 import GrassIcon from '@mui/icons-material/Grass';
 import CheckIcon from '@mui/icons-material/Check';
 import NodeToolbarCommon, { useNodeToolbarCommonOperations } from "./NodeToolbarCommon";
+import NodeLabel from "./NodeLabel";
 
 export default function ReadyNode({ id, data }) {
   const operations = useNodeToolbarCommonOperations();
@@ -14,7 +15,7 @@ export default function ReadyNode({ id, data }) {
             <CheckIcon />
         </button>
       </NodeToolbar>
-        {data.label}
+      <NodeLabel id={id} label={data.label} />
       <Handle />
       <GrassIcon />
     </div>
