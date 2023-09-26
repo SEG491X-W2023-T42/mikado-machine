@@ -98,7 +98,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
     if (target) {
       const { id } = node;
       operations.restoreNodePosition(id);
-      operations.connectOrDisconnect(id, target.id);
+      operations.connectOrDisconnect(target.id, id);
     }
   }
   console.debug("displaylayer graph", graph);
