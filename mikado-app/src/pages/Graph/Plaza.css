@@ -23,7 +23,7 @@ main > main {
   align-items: flex-start;
   padding: 8px;
   gap: 4px;
-  
+
 
   width: 186px; /* fixed */
   min-height: 20px; /* hugs contents */
@@ -42,7 +42,7 @@ main > main {
 }
 
 .react-flow__node > div {
-  
+
   font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
@@ -53,11 +53,11 @@ main > main {
   inline-size: 10px;
   word-break: break-all;
   padding: 2px 5px;
-  
+
   color: #000000;
-  
+
   /* Inside auto layout */
-  
+
   flex: none;
   order: 0;
   flex-grow: 1;
@@ -80,10 +80,10 @@ main > main {
   padding-right: 15px;
 }
 
-.react-flow__node-goal.selected {
+.react-flow__node-goal:focus-visible {
 
   /* For Goal Node: */
-  outline: 1px solid #555;
+  outline: 2px solid #555;
   outline-offset: 3px;
   border: 1px solid #555;
 }
