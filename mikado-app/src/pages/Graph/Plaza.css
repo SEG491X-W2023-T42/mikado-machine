@@ -45,19 +45,10 @@ main > main {
 }
 
 .react-flow__node > div {
-
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 15px;
-
   min-height: 20px; /* hugs contents */
   inline-size: 10px;
   word-break: break-all;
   padding: 2px 5px;
-
-  color: #000000;
 
   /* Inside auto layout */
 
@@ -74,7 +65,15 @@ main > main {
   top: 5px;
 }
 
-.react-flow__node textarea {
+.seamless-editor, .react-flow__node > div {
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.seamless-editor {
   appearance: none;
   background: none;
   border: none;
