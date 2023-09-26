@@ -9,7 +9,7 @@ export default function ReadyNode({ id, data }) {
   return (
     <div>
       <NodeToolbar>
-        <NodeToolbarCommon id={id} />
+        <NodeToolbarCommon id={id} allowSubgraph={true} />
         <button onClick={() => operations.setNodeCompleted(id, true)}>
             <CheckIcon />
         </button>

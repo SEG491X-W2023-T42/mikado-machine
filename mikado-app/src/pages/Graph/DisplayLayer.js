@@ -12,6 +12,7 @@ import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
 import { dimensions } from '../../helpers/NodeConstants';
+import { EnterGraphHackContext } from "./EnterGraphHackContext";
 
 
 /**
@@ -113,27 +114,27 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
             if (!elem) {
                 return;
             }
-        
+
             const position = project({
                 x: e.clientX,
                 y: e.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
             });
-        
+
             // Adjusting so that the node is in center of mouse
             position.x = position.x - dimensions.width
             position.y = position.y - dimensions.height
-        
+
             const viewport = project({
                 x: elem.clientWidth,
                 y: elem.clientHeight,
             });
-        
+
             operations.addNode(position, viewport) || notifyError("No space for new node! Please try adding elsewhere.");
         }
     }
 
-   
-    
+
+
   }
 
   console.debug("displaylayer graph", graph);
@@ -169,12 +170,14 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, setDisplayLayerHandle, graph }) {
+function DisplayLayer({ uid, setDisplayLayerHandle, graph, enterGraph }) {
   const [useStore] = useState(() => useDisplayLayerStore());
   return (
     <ReactFlowProvider>
       <StoreHackContext.Provider value={useStore}>
-        <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graph={graph} />
+        <EnterGraphHackContext.Provider value={enterGraph}>
+          <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graph={graph} />
+        </EnterGraphHackContext.Provider>
       </StoreHackContext.Provider>
     </ReactFlowProvider>
   );

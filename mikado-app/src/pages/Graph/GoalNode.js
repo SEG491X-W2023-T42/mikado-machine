@@ -6,7 +6,7 @@ function GoalNode({ id, data }) {
   return (
     <div>
       <NodeToolbar>
-        <NodeToolbarCommon id={id}/>
+        <NodeToolbarCommon id={id} allowSubgraph={false} />
       </NodeToolbar>
         {data.label}
       <Handle />

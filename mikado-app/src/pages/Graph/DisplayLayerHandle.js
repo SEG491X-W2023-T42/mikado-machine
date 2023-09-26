@@ -126,9 +126,4 @@ export default class DisplayLayerHandle {
   export() {
     this.#displayLayerOperations?.export();
   }
-
-  prepareCreateSubgraphAndSaveIfNotExists() {
-    const id = this.#selectedNodeId;
-    return (uid) => id && this.#displayLayerOperations?.createSubgraphAndSaveIfNotExists(uid, id);
-  }
 }

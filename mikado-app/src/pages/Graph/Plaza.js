@@ -130,9 +130,10 @@ function Plaza({ uid }) {
     <DisplayLayer key={key} uid={uid}
                   setDisplayLayerHandle={setDisplayLayerHandle}
                   graph={graph}
+                  enterGraph={enterGraph}
     />
     <AddNodeFAB displayLayerHandle={displayLayerHandle} />
-    <MyDrawer displayLayerHandle={displayLayerHandle} enterGraph={enterGraph}/>
+    <MyDrawer displayLayerHandle={displayLayerHandle} />
   </main>
 }
 
