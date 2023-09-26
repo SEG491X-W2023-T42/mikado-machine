@@ -2,10 +2,7 @@ import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
 import { useState } from "react";
 import * as React from 'react';
-import DisplayLayerHandle from "./DisplayLayerHandle";
-import MyDrawer from "./MyDrawer";
 import MyAppBar from "../../components/MyAppBar/MyAppBar";
-import AddNodeFAB from "../../components/Overlays/AddNodeFAB";
 
 /**
  * The Plaza component is the main page that users view and edit graphs.
@@ -24,10 +21,6 @@ function Plaza({ uid }) {
    * Also, there is only one layer of the graph available until the subtrees feature is implemented.
    */
   const DEFAULT_GRAPH_ID = "graph-1";
-
-  // Wires the active DisplayLayer to the bottom panel
-  // Any inactive DisplayLayer can receive a noop callback
-  const [displayLayerHandle, setDisplayLayerHandle] = useState(new DisplayLayerHandle());
 
   // TODO get this from URL
   const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
@@ -128,11 +121,9 @@ function Plaza({ uid }) {
   return <main>
     <MyAppBar graph={graph} graphHandle={setGraph} />
     <DisplayLayer key={key} uid={uid}
-                  setDisplayLayerHandle={setDisplayLayerHandle}
                   graph={graph}
+                  enterGraph={enterGraph}
     />
-    <AddNodeFAB displayLayerHandle={displayLayerHandle} />
-    <MyDrawer displayLayerHandle={displayLayerHandle} enterGraph={enterGraph}/>
   </main>
 }
 

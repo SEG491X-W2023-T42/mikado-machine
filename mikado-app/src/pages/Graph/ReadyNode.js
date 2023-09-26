@@ -1,23 +1,15 @@
-import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
-import { useStoreHack } from "../../StoreHackContext.js";
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Handle, NodeToolbar } from "reactflow";
 import GrassIcon from '@mui/icons-material/Grass';
 import CheckIcon from '@mui/icons-material/Check';
+import NodeToolbarCommon, { useNodeToolbarCommonOperations } from "./NodeToolbarCommon";
 
-export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
-
-const operationsSelector = (state) => state.operations;
-
-function ReadyNode({ id, data }) {
-  const operations = useStoreHack()(operationsSelector);
+export default function ReadyNode({ id, data }) {
+  const operations = useNodeToolbarCommonOperations();
 
   return (
-
     <div>
       <NodeToolbar>
-        <button onClick={() => operations.deleteNode(id)}>
-          <DeleteIcon />
-        </button>
+        <NodeToolbarCommon id={id} allowSubgraph={true} />
         <button onClick={() => operations.setNodeCompleted(id, true)}>
             <CheckIcon />
         </button>
@@ -26,9 +18,5 @@ function ReadyNode({ id, data }) {
       <Handle />
       <GrassIcon />
     </div>
-
-
   )
 }
-
-export default ReadyNode;
