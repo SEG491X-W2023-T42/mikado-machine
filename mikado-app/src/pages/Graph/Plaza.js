@@ -3,7 +3,6 @@ import "./Plaza.css";
 import { useState } from "react";
 import * as React from 'react';
 import DisplayLayerHandle from "./DisplayLayerHandle";
-import MyDrawer from "./MyDrawer";
 import MyAppBar from "../../components/MyAppBar/MyAppBar";
 import AddNodeFAB from "../../components/Overlays/AddNodeFAB";
 
@@ -133,7 +132,6 @@ function Plaza({ uid }) {
                   enterGraph={enterGraph}
     />
     <AddNodeFAB displayLayerHandle={displayLayerHandle} />
-    <MyDrawer displayLayerHandle={displayLayerHandle} />
   </main>
 }
 
