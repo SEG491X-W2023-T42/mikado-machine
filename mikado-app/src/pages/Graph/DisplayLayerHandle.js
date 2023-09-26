@@ -117,8 +117,7 @@ export default class DisplayLayerHandle {
       x: measured.x / 16,
       y: measured.y / 16,
     });
-    const viewport = this.#projectFunction(measured);
-    this.#displayLayerOperations.addNode(position, viewport) || notifyAddError();
+    this.#displayLayerOperations.addNode(position) || notifyAddError();
   }
 
   /**

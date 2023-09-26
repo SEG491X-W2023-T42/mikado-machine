@@ -195,7 +195,7 @@ class DisplayLayerOperations {
     });
   }
 
-  modifyNodePosition(position, range) {
+  modifyNodePosition(position) {
     // hacky code that checks every position starting from the specified pos
     // and ending when a pos is found or there is no possible position in current
     // viewport
@@ -222,11 +222,11 @@ class DisplayLayerOperations {
   /**
    * Inserts a new node
    */
-  addNode(position, range = {}) {
+  addNode(position) {
     const { nodes } = this.#state;
 
     // Node interception fix
-    position = this.modifyNodePosition(position, range);
+    position = this.modifyNodePosition(position);
     if (!position) {
       return false;
     }
