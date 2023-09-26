@@ -11,6 +11,7 @@ import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
+import { dimensions } from '../../helpers/NodeConstants';
 
 
 /**
@@ -119,8 +120,8 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
             });
         
             // Adjusting so that the node is in center of mouse
-            position.x = position.x - 92
-            position.y = position.y - 28
+            position.x = position.x - dimensions.width
+            position.y = position.y - dimensions.height
         
             const viewport = project({
                 x: elem.clientWidth,

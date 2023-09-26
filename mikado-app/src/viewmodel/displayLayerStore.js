@@ -208,8 +208,8 @@ class DisplayLayerOperations {
 		return position;
 	}
 
-    for (let y = position.y - 100; y < position.y + 200; y += height) {
-      for (let x = position.x - 100; x < position.x + 100; x += width) {
+    for (let y = position.y - (dimensions.height * 2); y < position.y + (dimensions.height * 4); y += height) {
+      for (let x = position.x - dimensions.width; x < position.x + dimensions.width; x += width) {
         const position = { x, y };
         if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
           return position;
