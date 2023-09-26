@@ -136,8 +136,9 @@ function DisplayLayerInternal({ uid, graph }) {
     operations.setNodeLabel(id, prompt("Node Name", defaultText) ?? defaultText);
   }
 
-  function onNodeDoubleClick(e, node) {
-    void e;
+  // TODO verify onNodeContextMenu works on iOS
+  function onNodeStartEditingEventListener(e, node) {
+    e.preventDefault();
     console.log(node);
     startEditingNode(node.id, false);
   }
@@ -177,7 +178,8 @@ function DisplayLayerInternal({ uid, graph }) {
       nodeTypes={NODE_TYPES}
       edgeTypes={EDGE_TYPES}
       connectionMode={MY_NODE_CONNECTION_MODE}
-      onNodeDoubleClick={onNodeDoubleClick}
+      onNodeContextMenu={onNodeStartEditingEventListener}
+      onNodeDoubleClick={onNodeStartEditingEventListener}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
       zoomOnDoubleClick={false}
