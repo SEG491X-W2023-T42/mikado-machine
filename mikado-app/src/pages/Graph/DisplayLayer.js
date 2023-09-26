@@ -7,7 +7,6 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/aabb";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
@@ -34,7 +33,7 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
+function DisplayLayerInternal({ uid, graph }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -46,13 +45,9 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
   const [assertUid] = useState(uid);
   runtime_assert(assertUid === uid);
 
-  function doSetDisplayLayerHandle() {
-    setDisplayLayerHandle(new DisplayLayerHandle(operations, selectedNodeId.current, reactFlowWrapper, project));
-  }
   // Load data from db
   useEffect(() => {
     operations.load(uid, graph.id, graph.subgraph)
-    doSetDisplayLayerHandle();
   }, [uid, operations, graph]);
 
   const [testCount, setTestCount] = useState(0);
@@ -87,7 +82,6 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
   useOnSelectionChange({
     onChange({ nodes }) {
       selectedNodeId.current = nodes.length !== 1 ? void 0 : nodes[0].id;
-      doSetDisplayLayerHandle();
     }
   });
 
@@ -202,13 +196,13 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, setDisplayLayerHandle, graph, enterGraph }) {
+function DisplayLayer({ uid, graph, enterGraph }) {
   const [useStore] = useState(() => useDisplayLayerStore());
   return (
     <ReactFlowProvider>
       <StoreHackContext.Provider value={useStore}>
         <EnterGraphHackContext.Provider value={enterGraph}>
-          <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graph={graph} />
+          <DisplayLayerInternal uid={uid} graph={graph} />
         </EnterGraphHackContext.Provider>
       </StoreHackContext.Provider>
     </ReactFlowProvider>
