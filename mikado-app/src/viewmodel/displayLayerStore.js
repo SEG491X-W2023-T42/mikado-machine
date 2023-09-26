@@ -558,6 +558,14 @@ const useDisplayLayerStore = () => create((set, get) => ({ // TODO
    * The actual operations
    */
   operations: new DisplayLayerOperations(set, get),
+  /**
+   * The node being edited
+   */
+  editingNodeId: "",
+  editingNodeInitialValue: "",
+  editNode(id, initialValue) {
+    set({...get(), editingNodeId: id, editingNodeInitialValue: initialValue})
+  },
 }));
 
 export default useDisplayLayerStore;

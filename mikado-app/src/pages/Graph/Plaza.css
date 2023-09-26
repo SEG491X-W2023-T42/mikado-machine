@@ -80,6 +80,7 @@ main > main {
   border: none;
   border-bottom: 1px solid dimgrey;
   color: initial;
+  outline: none;
   padding: 0;
   text-overflow: ellipsis;
   width: 100%;
