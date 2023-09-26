@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow } from 'reactflow';
+import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, useStoreApi as useReactFlowStoreApi } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
@@ -161,6 +161,13 @@ function DisplayLayerInternal({ uid, graph }) {
       document.removeEventListener('keypress', pressListener);
       document.removeEventListener('keyup', backspaceListener);
     }
+  }, []);
+
+  const reactFlowStore = useReactFlowStoreApi();
+  useEffect(() => {
+    // TODO upstream to react flow
+    const { d3Selection } = reactFlowStore.getState();
+    d3Selection.on('dblclick.zoom', null);
   }, []);
 
   console.debug("displaylayer graph", graph);
