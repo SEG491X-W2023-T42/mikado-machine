@@ -1,0 +1,14 @@
+div.MuiToolbar-root > input.seamless-editor {
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  font-size: 16pt;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: .3rem;
+  text-align: center;
+  box-shadow: 0 1px 0 lightgrey;
+
+  &:disabled {
+    box-shadow: none;
+  }
+}
