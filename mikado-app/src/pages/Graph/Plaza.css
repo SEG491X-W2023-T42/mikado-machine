@@ -65,6 +65,14 @@ main > main {
   top: 5px;
 }
 
+/* .react-flow__node.selected {
+  border: 1px solid #555;
+} */
+
+.react-flow__node:hover {
+  filter: brightness(95%);
+}
+
 .seamless-editor, .react-flow__node > div {
   font-family: 'Inter', sans-serif;
   font-style: normal;

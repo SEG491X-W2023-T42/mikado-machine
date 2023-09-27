@@ -7,7 +7,7 @@ import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import createIntersectionDetectorFor from "../../viewmodel/aabb";
+import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
 import { dimensions } from '../../helpers/NodeConstants';
@@ -95,6 +95,16 @@ function DisplayLayerInternal({ uid, graph }) {
       const { id } = node;
       operations.restoreNodePosition(id);
       operations.connectOrDisconnect(target.id, id);
+    }
+    operations.highlightOrUnhighlightNode(null); //reset highlights
+  }
+
+  function onNodeDrag(_, node) { // continually check if nodes are intersecting and highlight them to show impending connection
+    const target = nodes.find(createIntersectionDetectorFor(node));
+    if(target) {
+      operations.highlightOrUnhighlightNode(target);
+    } else {
+      operations.highlightOrUnhighlightNode(null);
     }
   }
 
@@ -191,6 +201,7 @@ function DisplayLayerInternal({ uid, graph }) {
       onNodeDoubleClick={onNodeStartEditingEventListener}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      onNodeDrag={onNodeDrag}
       zoomOnDoubleClick={false}
       onDoubleClick={onDoubleClick}
       fitView
