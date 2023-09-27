@@ -23,13 +23,13 @@ main > main {
   align-items: flex-start;
   padding: 8px;
   gap: 4px;
-  
+
 
   width: 186px; /* fixed */
   min-height: 20px; /* hugs contents */
 
   background: #FFF9C1; /* #DAEFFF for ready task, #DDF9E8 for complete task, #F5FBFF for locked */
-  border: 1px solid rgba(105, 105, 105, 0.7);
+  border: 1px solid dimgrey;
   border-radius: 8px;
 
   /* Inside auto layout */
@@ -39,25 +39,19 @@ main > main {
   align-self: stretch;
   flex-grow: 0;
 
+  &:focus-within {
+    outline: 1px solid dimgrey;
+  }
 }
 
 .react-flow__node > div {
-  
-  font-family: 'Inter', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 15px;
-
   min-height: 20px; /* hugs contents */
   inline-size: 10px;
   word-break: break-all;
   padding: 2px 5px;
-  
-  color: #000000;
-  
+
   /* Inside auto layout */
-  
+
   flex: none;
   order: 0;
   flex-grow: 1;
@@ -71,12 +65,40 @@ main > main {
   top: 5px;
 }
 
-.react-flow__node.selected {
+/* .react-flow__node.selected {
   border: 1px solid #555;
-}
+} */
 
 .react-flow__node:hover {
-  filter: brightness(90%);
+  filter: brightness(95%);
+}
+
+.seamless-editor, .react-flow__node > div {
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.seamless-editor {
+  appearance: none;
+  background: none;
+  border: none;
+  /* outline is all 4 sides, and border makes the element grow by 1 pixel when editing */
+  box-shadow: 0 1px 0 dimgrey;
+  /* color: initial; this turns input text font grey on Apple devices, -webkit-text-fill-color is the workaround*/
+  -webkit-text-fill-color: rgba(0, 0, 0, 1);
+  color: rgba(0, 0, 0, 1);
+  outline: none;
+  padding: 0;
+  resize: none;
+  width: 100%;
+
+  &:disabled {
+    pointer-events: none;
+    box-shadow: none;
+  }
 }
 
 .react-flow__node-goal {
@@ -88,10 +110,9 @@ main > main {
   padding-right: 15px;
 }
 
-.react-flow__node-goal.selected {
-
+.react-flow__node-goal:focus-within {
   /* For Goal Node: */
-  outline: 1px solid #555;
+  outline: 2px solid #555;
   outline-offset: 3px;
   border: 1px solid #555;
 }

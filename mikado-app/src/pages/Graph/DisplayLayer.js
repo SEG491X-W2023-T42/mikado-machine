@@ -1,16 +1,17 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow } from 'reactflow';
+import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, useStoreApi as useReactFlowStoreApi } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import DisplayLayerHandle from "./DisplayLayerHandle";
 import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
+import { dimensions } from '../../helpers/NodeConstants';
+import { EnterGraphHackContext } from "./EnterGraphHackContext";
 
 
 /**
@@ -32,9 +33,9 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
+function DisplayLayerInternal({ uid, graph }) {
   const reactFlowWrapper = useRef(void 0);
-  const { nodes, edges, operations } = useStoreHack()(selector, shallow);
+  const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
 
@@ -44,13 +45,9 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
   const [assertUid] = useState(uid);
   runtime_assert(assertUid === uid);
 
-  function doSetDisplayLayerHandle() {
-    setDisplayLayerHandle(new DisplayLayerHandle(operations, selectedNodeId.current, reactFlowWrapper, project));
-  }
   // Load data from db
   useEffect(() => {
     operations.load(uid, graph.id, graph.subgraph)
-    doSetDisplayLayerHandle();
   }, [uid, operations, graph]);
 
   const [testCount, setTestCount] = useState(0);
@@ -85,7 +82,6 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
   useOnSelectionChange({
     onChange({ nodes }) {
       selectedNodeId.current = nodes.length !== 1 ? void 0 : nodes[0].id;
-      doSetDisplayLayerHandle();
     }
   });
 
@@ -98,7 +94,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
     if (target) {
       const { id } = node;
       operations.restoreNodePosition(id);
-      operations.connectOrDisconnect(id, target.id);
+      operations.connectOrDisconnect(target.id, id);
     }
     operations.highlightOrUnhighlightNode(null); //reset highlights
   }
@@ -112,6 +108,80 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
     }
   }
 
+  function onDoubleClick(e) {
+
+    // Adds node if on background pane
+    if ('DIV' === e.target.tagName) {
+        // Background double click
+        if (e.target.className.includes('react-flow__pane')) {
+            const elem = reactFlowWrapper.current;
+            if (!elem) {
+                return;
+            }
+
+            const position = project({
+                x: e.clientX,
+                y: e.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
+            });
+
+            // Adjusting so that the node is in center of mouse
+            position.x = position.x - dimensions.width / 2
+            position.y = position.y - dimensions.height / 2
+
+            const viewport = project({
+                x: elem.clientWidth,
+                y: elem.clientHeight,
+            });
+
+            operations.addNode(position, viewport) || notifyError("No space for new node! Please try adding elsewhere.");
+        }
+    }
+
+
+  }
+
+  function startEditingNode(id, isBackspace) {
+    // TODO replace with text field
+    const defaultText = isBackspace ? "" : operations.getNodeLabel(id);
+    editNode(id, defaultText);
+  }
+
+  // TODO verify onNodeContextMenu works on iOS
+  function onNodeStartEditingEventListener(e, node) {
+    e.preventDefault();
+    startEditingNode(node.id, false);
+  }
+
+  useEffect(() => {
+    function pressListener() {
+      if ("maxLength" in document.activeElement) return; // Ignore when already in text field
+      // Not bothering to try adding the key to the text field, whether appending or replacing
+      // That would break accessibility, keyboard layouts, and IMEs
+      selectedNodeId.current && startEditingNode(selectedNodeId.current, false);
+    }
+    function backspaceListener(e) {
+      if (e.key !== "Backspace") return;
+      if ("maxLength" in document.activeElement) return; // Ignore when already in text field
+      selectedNodeId.current && startEditingNode(selectedNodeId.current, true);
+    }
+    // keypress is deprecated but it is used to filter out CTRL, ALT, etc.
+    document.addEventListener('keypress', pressListener);
+    document.addEventListener('keyup', backspaceListener);
+    return () => {
+      document.removeEventListener('keypress', pressListener);
+      document.removeEventListener('keyup', backspaceListener);
+    }
+  }, []);
+
+  const reactFlowStore = useReactFlowStoreApi();
+  useEffect(() => {
+    // TODO upstream to react flow
+    const { d3Selection } = reactFlowStore.getState();
+    d3Selection.on('dblclick.zoom', null);
+  }, []);
+
+  console.debug("displaylayer graph", graph);
+
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
   return <main ref={reactFlowWrapper}>
@@ -120,14 +190,20 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       edges={edges}
       onNodesChange={operations.onNodesChange}
       nodesConnectable={false}
+      nodesDraggable={!editingNodeId}
+      panOnDrag={!editingNodeId}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
       edgeTypes={EDGE_TYPES}
       connectionMode={MY_NODE_CONNECTION_MODE}
+      onNodeContextMenu={onNodeStartEditingEventListener}
+      onNodeDoubleClick={onNodeStartEditingEventListener}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
       onNodeDrag={onNodeDrag}
+      zoomOnDoubleClick={false}
+      onDoubleClick={onDoubleClick}
       fitView
     >
       <Background />
@@ -142,12 +218,14 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
  * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, setDisplayLayerHandle, graph }) {
+function DisplayLayer({ uid, graph, enterGraph }) {
   const [useStore] = useState(() => useDisplayLayerStore());
   return (
     <ReactFlowProvider>
       <StoreHackContext.Provider value={useStore}>
-        <DisplayLayerInternal uid={uid} setDisplayLayerHandle={setDisplayLayerHandle} graph={graph} />
+        <EnterGraphHackContext.Provider value={enterGraph}>
+          <DisplayLayerInternal uid={uid} graph={graph} />
+        </EnterGraphHackContext.Provider>
       </StoreHackContext.Provider>
     </ReactFlowProvider>
   );

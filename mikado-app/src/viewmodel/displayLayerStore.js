@@ -4,6 +4,7 @@ import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./collisionDetection";
 import * as htmlToImage from 'html-to-image';
+import { dimensions } from "../helpers/NodeConstants";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -79,6 +80,7 @@ function arrayRemoveByValueIfPresent(array, value) {
  * Its fields are modified directly to avoid getting in the way of the shallow comparison.
  * It is also here to skip shallow compare of all those methods.
  */
+
 class DisplayLayerOperations {
   /*
    * DisplayLayer cache data.
@@ -198,18 +200,21 @@ class DisplayLayerOperations {
     });
   }
 
-  modifyNodePosition(position, range) {
+  modifyNodePosition(position) {
     // hacky code that checks every position starting from the specified pos
     // and ending when a pos is found or there is no possible position in current
     // viewport
-    const width = 92;
-    const height = 30;
 
     const { nodes } = this.#state;
-    const max_y = range.y - height;
-    const max_x = range.x - width;
-    for (let y = position.y; y < max_y; y += height) {
-      for (let x = position.x; x < max_x; x += width) {
+	const height = dimensions.height;
+	const width = dimensions.width;
+
+	if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
+		return position;
+	}
+
+    for (let y = position.y - (dimensions.height * 2); y < position.y + (dimensions.height * 4); y += height) {
+      for (let x = position.x - dimensions.width; x < position.x + dimensions.width; x += width) {
         const position = { x, y };
         if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
           return position;
@@ -222,11 +227,11 @@ class DisplayLayerOperations {
   /**
    * Inserts a new node
    */
-  addNode(position, range = {}) {
+  addNode(position) {
     const { nodes } = this.#state;
 
     // Node interception fix
-    position = this.modifyNodePosition(position, range);
+    position = this.modifyNodePosition(position);
     if (!position) {
       return false;
     }
@@ -236,7 +241,7 @@ class DisplayLayerOperations {
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
     this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
-    return true;
+	return true;
 
   }
 
@@ -429,7 +434,7 @@ class DisplayLayerOperations {
         if (node.id != target.id){
           document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
         } else {
-          document.querySelector(`[data-id="${target.id}"]`).style.border = "3px solid #FF00FF";
+          document.querySelector(`[data-id="${target.id}"]`).style.border = "2px solid rgba(105, 105, 105, 0.7)";
         }
       }
     } 
@@ -574,6 +579,14 @@ const useDisplayLayerStore = () => create((set, get) => ({ // TODO
    * The actual operations
    */
   operations: new DisplayLayerOperations(set, get),
+  /**
+   * The node being edited
+   */
+  editingNodeId: "",
+  editingNodeInitialValue: "",
+  editNode(id, initialValue) {
+    set({...get(), editingNodeId: id, editingNodeInitialValue: initialValue})
+  },
 }));
 
 export default useDisplayLayerStore;
