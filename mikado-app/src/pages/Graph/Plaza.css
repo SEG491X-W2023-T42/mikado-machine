@@ -71,6 +71,14 @@ main > main {
   top: 5px;
 }
 
+.react-flow__node.selected {
+  border: 1px solid #555;
+}
+
+.react-flow__node:hover {
+  filter: brightness(90%);
+}
+
 .react-flow__node-goal {
   outline: 1px solid rgba(105, 105, 105, 0.7);
   outline-offset: 3px;
