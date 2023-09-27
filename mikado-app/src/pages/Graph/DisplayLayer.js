@@ -8,7 +8,7 @@ import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import DisplayLayerHandle from "./DisplayLayerHandle";
-import createIntersectionDetectorFor from "../../viewmodel/aabb";
+import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
 
@@ -100,8 +100,17 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       operations.restoreNodePosition(id);
       operations.connectOrDisconnect(id, target.id);
     }
+    operations.highlightOrUnhighlightNode(null); //reset highlights
   }
-  console.debug("displaylayer graph", graph);
+
+  function onNodeDrag(_, node) { // continually check if nodes are intersecting and highlight them to show impending connection
+    const target = nodes.find(createIntersectionDetectorFor(node));
+    if(target) {
+      operations.highlightOrUnhighlightNode(target);
+    } else {
+      operations.highlightOrUnhighlightNode(null);
+    }
+  }
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
@@ -118,6 +127,7 @@ function DisplayLayerInternal({ uid, setDisplayLayerHandle, graph }) {
       connectionMode={MY_NODE_CONNECTION_MODE}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      onNodeDrag={onNodeDrag}
       fitView
     >
       <Background />
