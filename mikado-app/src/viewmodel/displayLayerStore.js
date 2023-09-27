@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { loadFromDb, saveToDb } from "./serde";
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-import createIntersectionDetectorFor from "./aabb";
+import createIntersectionDetectorFor from "./collisionDetection";
 import * as htmlToImage from 'html-to-image';
 
 /**
@@ -122,6 +122,11 @@ class DisplayLayerOperations {
    * Used mainly for deletion.
    */
   #backwardConnections = {};
+
+  /**
+   * ID of the node that is currently impending connection, or that was most recently impending connection.
+   */
+  #impendingConnectionNodeID = null;
 
   // Zustand data
 
@@ -413,6 +418,22 @@ class DisplayLayerOperations {
       ),
     });
   }
+
+  highlightOrUnhighlightNode(target) {
+    if (target == null) { // if no target, unhighlight all nodes
+      for (const node of this.#state.nodes) { 
+        document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+      }
+    } else {
+      for (const node of this.#state.nodes) { // highlight target and unhighlight all other nodes
+        if (node.id != target.id){
+          document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+        } else {
+          document.querySelector(`[data-id="${target.id}"]`).style.border = "3px solid #FF00FF";
+        }
+      }
+    } 
+  } 
 
   getNodeType(id) {
     for (const node of this.#state.nodes) {
