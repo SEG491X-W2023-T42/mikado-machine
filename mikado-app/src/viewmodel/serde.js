@@ -3,7 +3,7 @@ import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 
-const db = getFirestore(firebase);
+export const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
   connectFirestoreEmulator(db, "localhost", 8080);
 }

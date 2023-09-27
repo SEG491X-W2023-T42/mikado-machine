@@ -3,12 +3,61 @@ import * as React from 'react';
 import { AppBar, Button, Container, Toolbar } from '@mui/material'
 import AppBarProfileOverflowMenu from "./AppBarProfileOverflowMenu";
 import SeamlessEditor from "../SeamlessEditor";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { db } from "../../viewmodel/serde";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
-export default function MyAppBar({ graph, graphHandle }) {
+function serializeGraphWithTitle(title) {
+  return {
+    name: title,
+    version: 0,
+    // "root" and "sublayers" properties will be implemented once the db migration actually starts
+  }
+}
+
+export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) {
+  const [savedTitle, setSavedTitle] = useState(void 0);
+  const [title, setTitle] = useState("");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  function startEditingTitle() {
+  useEffect(() => {
+    // TODO move this to a separate provider
+    setSavedTitle(void 0);
+    setTitle("Loading...");
+    setIsEditingTitle(false);
+    let cancelled = false;
+    (async function()  {
+      const docSnap = await getDoc(doc(db, "user", uid, "graphs", id));
+      if (!docSnap.exists()) {
+        return id;
+      }
+      const { name } = docSnap.data();
+      return name;
+    })().then(newTitle => {
+      if (!cancelled) {
+        setTitle(newTitle);
+        setSavedTitle(newTitle);
+      }
+    });
+    // TODO catch
+    return () => void (cancelled = true);
+  }, [id]);
+  useEffect(() => {
+    if (!savedTitle || title === savedTitle) return;
+    let cancelled = false;
+    setDoc(doc(db, "user", uid, "graphs", id), serializeGraphWithTitle(title)).then(() => {
+      if (!cancelled) {
+        setSavedTitle(title);
+      }
+    });
+    // TODO catch
+    return () => void (cancelled = true);
+  }, [title, savedTitle]);
+  function startEditingTitle(e) {
+    if (title !== savedTitle) return;
+    if (isEditingTitle) return;
+    e.preventDefault();
     setIsEditingTitle(true);
+    // Not including key handlers because no other app starts editing titles that way
   }
   return (
     <AppBar position="static">
@@ -19,17 +68,18 @@ export default function MyAppBar({ graph, graphHandle }) {
           onContextMenu={startEditingTitle}
         >
           <SeamlessEditor
-            label={graph.id}
+            label={title}
             editing={isEditingTitle}
-            initialValue={graph.id}
+            initialValue={title}
             onFinishEditing={(filteredText) => {
-              void filteredText; // TODO
+              if (title !== savedTitle) return;
               setIsEditingTitle(false);
+              setTitle(filteredText);
             }}
             singleLine={true}
           />
-          {(graph.subgraph !== "") &&
-          <Button sx={{color: "white"}} onClick={() => {graphHandle({id: graph.id, subgraph: ""})}}>
+          {(subgraph !== "") &&
+          <Button sx={{color: "white"}} onClick={() => {graphHandle({id, subgraph: ""})}}>
             Back
           </Button>}
           <AppBarProfileOverflowMenu></AppBarProfileOverflowMenu>
