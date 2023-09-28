@@ -1,4 +1,4 @@
-div.MuiToolbar-root > input.seamless-editor {
+div.MuiToolbar-root > .seamless-editor {
   -webkit-text-fill-color: #fff;
   color: #fff;
   font-size: 16pt;
@@ -8,7 +8,7 @@ div.MuiToolbar-root > input.seamless-editor {
   text-align: center;
   box-shadow: 0 1px 0 lightgrey;
 
-  &:disabled {
+  &[disabled] {
     box-shadow: none;
   }
 }
