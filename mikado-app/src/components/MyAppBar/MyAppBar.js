@@ -16,12 +16,12 @@ function serializeGraphWithTitle(title) {
 }
 
 export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) {
-  const [savedTitle, setSavedTitle] = useState(void 0);
+  const [savedTitle, setSavedTitle] = useState(null);
   const [title, setTitle] = useState("");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   useEffect(() => {
     // TODO move this to a separate provider
-    setSavedTitle(void 0);
+    setSavedTitle(null);
     setTitle("Loading...");
     setIsEditingTitle(false);
     let cancelled = false;
@@ -42,7 +42,7 @@ export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) 
     return () => void (cancelled = true);
   }, [id]);
   useEffect(() => {
-    if (!savedTitle || title === savedTitle) return;
+    if (savedTitle === null || title === savedTitle) return;
     let cancelled = false;
     setDoc(doc(db, "user", uid, "graphs", id), serializeGraphWithTitle(title)).then(() => {
       if (!cancelled) {
