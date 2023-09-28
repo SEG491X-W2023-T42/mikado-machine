@@ -2,11 +2,6 @@ import { MarkerType } from "reactflow";
 import FloatingEdge from "./FloatingEdge";
 import MyNode from "./MyNode";
 
-export const CONNECTION_LINE_STYLE = {
-  strokeWidth: 3,
-  stroke: "black",
-};
-
 export const DEFAULT_EDGE_OPTIONS = {
   markerEnd: {
     type: MarkerType.ArrowClosed,
@@ -14,7 +9,6 @@ export const DEFAULT_EDGE_OPTIONS = {
     height: 10,
     color: "black",
   },
-  style: CONNECTION_LINE_STYLE,
 };
 
 export const EDGE_TYPES = {
