@@ -10,7 +10,6 @@ import { MY_NODE_CONNECTION_MODE } from "./MyNode";
 import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
-import { dimensions } from '../../helpers/NodeConstants';
 import { EnterGraphHackContext } from "./EnterGraphHackContext";
 import AddNodeFab from '../../components/Overlays/AddNodeFAB';
 
@@ -110,43 +109,26 @@ function DisplayLayerInternal({ uid, graph }) {
     }
   }
 
-  function onDoubleClick(e) {
+  function addNode(paneClickOrUndef) {
+    const elem = reactFlowWrapper.current;
+    runtime_assert(elem);
+    const { x, y, width, height } = elem.getBoundingClientRect();
 
     // Adds node if on background pane
-    if ('DIV' === e.target.tagName) {
-        // Background double click
-        if (e.target.className.includes('react-flow__pane')) {
-
-            const position = project({
-                x: e.clientX,
-                y: e.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
-            });
-
-            // Adjusting so that the node is in center of mouse
-            position.x = position.x - dimensions.width / 2
-            position.y = position.y - dimensions.height / 2
-
-            operations.addNode(position) || notifyError("No space for new node! Please try adding elsewhere.");
-        }
+    let position = {
+      x: width / 2,
+      y: height / 2,
+    };
+    if (paneClickOrUndef) {
+      // Background double clicks only
+      if (paneClickOrUndef.target.tagName !== "DIV" || !paneClickOrUndef.target.className.includes("react-flow__pane")) return;
+      position = {
+        x: paneClickOrUndef.clientX - x,
+        y: paneClickOrUndef.clientY - y,
+      };
     }
-
-  }
-
-  function mobileAddNode() {
-	const elem = reactFlowWrapper.current;
-	if (!elem) {
-		return;
-	}
-
-	const measured = {
-		x: elem.clientWidth,
-		y: elem.clientHeight,
-	};
-	const position = project({
-		x: measured.x / 16,
-		y: measured.y / 16,
-	});
-	operations.addNode(position, project(measured)) || notifyError("No space for new node! Please zoom out and try again.");
+    position = project(position);
+    operations.addNode(position) || notifyError("No space for new node! Please try adding elsewhere.");
   }
 
   function startEditingNode(id, isBackspace) {
@@ -212,13 +194,13 @@ function DisplayLayerInternal({ uid, graph }) {
       onNodeDragStop={onNodeDragStop}
       onNodeDrag={onNodeDrag}
       zoomOnDoubleClick={false}
-      onDoubleClick={isTouchscreen ? undefined : onDoubleClick}
+      onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
       <Background />
     </ReactFlow>
     <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
-	{ isTouchscreen && <AddNodeFab onClick={() => mobileAddNode()}/> }
+	{ isTouchscreen && <AddNodeFab onClick={() => void addNode()}/> }
   </main>;
 }
 
