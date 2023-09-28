@@ -21,6 +21,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 
   // TODO add a version key and prevent loading newer schemas
   const { node_names, positions, connections, type } = docSnap.data();
+  console.log(docSnap.data());
 
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.
@@ -44,8 +45,8 @@ export async function loadFromDb(uid, graphName, subgraphName) {
     databaseKeysToNewIdsLookup[key] = id;
     forwardConnections[id] = [];
     backwardConnections[id] = []
-    const completed = false; // TODO
-    return createNodeObject(id, +x, +y, type[key], label.toString(), completed, (subgraph ?? "").toString());
+    const completed = false; // TODO unify
+    return createNodeObject(id, +x, +y, type?.[key] ?? "ready", label.toString(), completed, (subgraph ?? "").toString());
   });
 
   // Load edges from db
@@ -58,7 +59,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
       forwardConnections[source].push(target);
       backwardConnections[target].push(source);
       // Construct JSON for edges, each has a unique ID
-      return createEdgeObject(source, target, newNodes[key].data.label, newNodes[value].data.label);
+      return createEdgeObject(source, target, node_names[key], node_names[value]);
     });
   });
   // TODO verify acyclic (#41)
