@@ -79,7 +79,7 @@ export function startGatekeeperFlagFetch() {
     }
     try {
       // Store the sanitized values
-      localStorage.setItem("gatekeeper", flags);
+      localStorage.setItem("gatekeeper", JSON.stringify(flags));
     } catch (e) {
       console.error(e);
     }

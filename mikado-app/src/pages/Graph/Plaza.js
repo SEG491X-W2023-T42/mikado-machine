@@ -1,6 +1,6 @@
 import DisplayLayer from "./DisplayLayer";
 import "./Plaza.css";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import * as React from 'react';
 import MyAppBar from "../../components/MyAppBar/MyAppBar";
 
@@ -24,6 +24,21 @@ function Plaza({ uid }) {
 
   // TODO get this from URL
   const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
+  const impersonateUid = useMemo(() => {
+    try {
+      const result = localStorage.getItem("impersonateUid");
+      if (!result) return "";
+      if (!/^[a-zA-Z0-9]{28}$/.test(result)) return "";
+      console.warn("Impersonating", result);
+      return result;
+    } catch (e) {
+      // ignore
+    }
+    return "";
+  }, [uid]);
+  if (impersonateUid) {
+    uid = impersonateUid;
+  }
   /*
   // TODO bring back the animations later
   const [fade, setFade] = useState(false);
