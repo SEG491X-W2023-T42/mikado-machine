@@ -4,7 +4,7 @@ import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./collisionDetection";
 import * as htmlToImage from 'html-to-image';
-import { dimensions } from "../helpers/NodeConstants";
+import { dimensions, searchRadius } from "../helpers/NodeConstants";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -196,45 +196,105 @@ class DisplayLayerOperations {
     });
   }
 
-  modifyNodePosition(position, range) {
-    // hacky code that checks every position starting from the specified pos
-    // and ending when a pos is found or there is no possible position in current
-    // viewport
+  /**
+   * Returns the new node position closest to the clicked position while not intersecting any existing nodes, or null
+   */
+  modifyNodePosition(position) {
+    /*
+     * O(w*h+n) algorithm instead of O(n**2).
+     * This takes 2ms JITed on one computer with a screen full of nodes.
+     * If it were slow, WebGL or WASM SIMD would have been used, but there is no need now.
+     * Importantly, the time is consistent and bounded.
+     * This was designed as GPU-friendly to make it easier to understand. Just think in terms of shaders.
+     */
+    console.time("modifyNodePosition");
 
     const { nodes } = this.#state;
-	const height = dimensions.height;
-	const width = dimensions.width;
-    let initialVars = {x: position.x - dimensions.width, y: position.x - (dimensions.height * 2)};
-    let conditionVars = {x: position.x + dimensions.width, y: position.y + (dimensions.height * 4)};
+    const { width, height } = dimensions;
+    const halfWidth = (width / 2) | 0;
+    const halfHeight = (height / 2) | 0;
 
-	if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
-		return position;
-	}
+    // Fast path when there is space where the user wants to put it
+    const centeredPosition = {x: (position.x - halfWidth) | 0, y: (position.y - halfHeight) | 0};
+    if (!nodes.some(createIntersectionDetectorFor({
+      id: void 0,
+      position: centeredPosition,
+      width: width + 1,
+      height: height + 1,
+    }))) {
+      console.timeEnd("modifyNodePosition");
+      return centeredPosition;
+    }
 
-	if (Object.keys(range).length !== 0) {
-        initialVars = {x: position.x, y: position.y};
-        conditionVars = {x: range.x - dimensions.width, y: range.y - dimensions.height};
-	}
+    // Virtual viewport sized to searchRadius
+    const viewportX = (position.x - width / 2 - searchRadius) | 0;
+    const viewportY = (position.y - height / 2 - searchRadius) | 0;
+    const viewportWidth = width + 2 * searchRadius;
+    const viewportHeight = height + 2 * searchRadius;
+    const frustum = createIntersectionDetectorFor({
+      id: void 0,
+      position: {x: viewportX - halfWidth, y: viewportY - halfHeight},
+      width: viewportWidth + halfWidth,
+      height: viewportHeight + halfHeight,
+    });
+    const occupancyTexture = new Int8Array(viewportWidth * viewportHeight);
 
-    for (let y = initialVars.y; y < conditionVars.y; y += height) {
-      for (let x = initialVars.x; x < conditionVars.x; x += width) {
-        const position = { x, y };
-        if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
-          return position;
+    // Part 1: Rasterize all existing nodes onto the texture to mark their areas as off-limits
+    for (const node of nodes) {
+      if (!frustum(node)) continue;
+      const { x, y } = node.position;
+      // Pathfinding with a character with a size is the same thing as pathfinding with
+      // second character with no size but all world objects expanded by half of the first character's size
+      const screenLeft = (x | 0) - viewportX - halfWidth;
+      const screenTop = (y | 0) - viewportY - halfHeight;
+      const fillLeft = Math.max(0, screenLeft);
+      const fillTop = Math.max(0, screenTop);
+      // There was an off-by-one for some reason
+      const fillRight = Math.min(viewportWidth, screenLeft + (node.width | 0) + 2 * halfWidth + 1);
+      const fillBottom = Math.min(viewportHeight, screenTop + (node.height | 0) + 2 * halfHeight + 1);
+      for (let i = fillTop; i < fillBottom; ++i) {
+        const textureRowOffset = i * viewportWidth;
+        for (let j = fillLeft; j < fillRight; ++j) {
+          occupancyTexture[textureRowOffset + j] = 1;
         }
       }
     }
-    return null;
+
+    // Part 2: Read the texture looking for the closest available position to the cursor
+    const centerX = viewportWidth / 2;
+    const centerY = viewportHeight / 2;
+    const infiniteDistance = viewportWidth * viewportHeight + 1;
+    let best = infiniteDistance;
+    let bestX = 0;
+    let bestY = 0;
+    for (let y = 0; y < viewportHeight; ++y) {
+      const textureRowOffset = y * viewportWidth;
+      const yDist = y - centerY;
+      const yDistSquared = yDist * yDist;
+      for (let x = 0; x < viewportWidth; ++x) {
+        if (occupancyTexture[textureRowOffset + x]) continue;
+        const xDist = x - centerX;
+        const dist = xDist * xDist + yDistSquared;
+        if (dist >= best) continue;
+        best = dist;
+        bestX = x;
+        bestY = y;
+      }
+    }
+
+    console.timeEnd("modifyNodePosition");
+    if (best === infiniteDistance) return null;
+    return {x: bestX + viewportX - halfWidth, y: bestY + viewportY - halfHeight};
   }
 
   /**
    * Inserts a new node
    */
-  addNode(position, viewport = {}) {
+  addNode(position) {
     const { nodes } = this.#state;
 
     // Node interception fix
-    position = this.modifyNodePosition(position, viewport);
+    position = this.modifyNodePosition(position);
     if (!position) {
       return false;
     }
@@ -429,7 +489,7 @@ class DisplayLayerOperations {
 
   highlightOrUnhighlightNode(target) {
     if (target === null) { // if no target, unhighlight all nodes
-      for (const node of this.#state.nodes) { 
+      for (const node of this.#state.nodes) {
         document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
       }
     } else {
@@ -440,8 +500,8 @@ class DisplayLayerOperations {
           document.querySelector(`[data-id="${target.id}"]`).style.border = "2px solid rgba(105, 105, 105, 0.7)";
         }
       }
-    } 
-  } 
+    }
+  }
 
   getNodeType(id) {
     for (const node of this.#state.nodes) {
