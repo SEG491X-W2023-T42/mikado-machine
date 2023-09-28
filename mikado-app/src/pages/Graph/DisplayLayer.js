@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow } from 'reactflow';
+import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, useStoreApi as useReactFlowStoreApi } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import createIntersectionDetectorFor from "../../viewmodel/aabb";
+import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
 import { dimensions } from '../../helpers/NodeConstants';
@@ -35,7 +35,7 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  */
 function DisplayLayerInternal({ uid, graph }) {
   const reactFlowWrapper = useRef(void 0);
-  const { nodes, edges, operations, editNode } = useStoreHack()(selector, shallow);
+  const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
 
@@ -95,6 +95,16 @@ function DisplayLayerInternal({ uid, graph }) {
       const { id } = node;
       operations.restoreNodePosition(id);
       operations.connectOrDisconnect(target.id, id);
+    }
+    operations.highlightOrUnhighlightNode(null); //reset highlights
+  }
+
+  function onNodeDrag(_, node) { // continually check if nodes are intersecting and highlight them to show impending connection
+    const target = nodes.find(createIntersectionDetectorFor(node));
+    if(target) {
+      operations.highlightOrUnhighlightNode(target);
+    } else {
+      operations.highlightOrUnhighlightNode(null);
     }
   }
 
@@ -163,6 +173,13 @@ function DisplayLayerInternal({ uid, graph }) {
     }
   }, []);
 
+  const reactFlowStore = useReactFlowStoreApi();
+  useEffect(() => {
+    // TODO upstream to react flow
+    const { d3Selection } = reactFlowStore.getState();
+    d3Selection.on('dblclick.zoom', null);
+  }, []);
+
   console.debug("displaylayer graph", graph);
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
@@ -173,6 +190,8 @@ function DisplayLayerInternal({ uid, graph }) {
       edges={edges}
       onNodesChange={operations.onNodesChange}
       nodesConnectable={false}
+      nodesDraggable={!editingNodeId}
+      panOnDrag={!editingNodeId}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
@@ -182,6 +201,7 @@ function DisplayLayerInternal({ uid, graph }) {
       onNodeDoubleClick={onNodeStartEditingEventListener}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      onNodeDrag={onNodeDrag}
       zoomOnDoubleClick={false}
       onDoubleClick={onDoubleClick}
       fitView

@@ -16,23 +16,23 @@ export default function createIntersectionDetectorFor(nodeLike) {
     || myTop > otherBottom // I'm below you, with a horizontal line between us
     || myBottom < otherTop // I'm above you, with a horizontal line between us
   )) {
-    console.log(nodeLike)
-    console.log(other)
-    console.log(myRight)
-    console.log(myLeft)
-    console.log(myTop)
-    console.log(myBottom)
+    // console.log(nodeLike)
+    // console.log(other)
+    // console.log(myRight)
+    // console.log(myLeft)
+    // console.log(myTop)
+    // console.log(myBottom)
 
-    console.log("-------------")
-    console.log(otherLeft)
-    console.log(otherRight)
-    console.log(otherBottom)
-    console.log(otherTop)
-    console.log("--------------")
-    console.log(myRight < otherLeft)
-    console.log(myLeft > otherRight)
-    console.log(myTop > otherBottom)
-    console.log(myBottom < otherTop)
+    // console.log("-------------")
+    // console.log(otherLeft)
+    // console.log(otherRight)
+    // console.log(otherBottom)
+    // console.log(otherTop)
+    // console.log("--------------")
+    // console.log(myRight < otherLeft)
+    // console.log(myLeft > otherRight)
+    // console.log(myTop > otherBottom)
+    // console.log(myBottom < otherTop)
   }
     // To know when two nodes intersect, just consider the contrapositive
     return !(other.id === id // Ignore self-intersection, or else it will always return true

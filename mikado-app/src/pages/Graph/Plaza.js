@@ -119,7 +119,7 @@ function Plaza({ uid }) {
   const  key = uid + graph.subgraph;
   console.debug("plaza graph", graph, "key", key);
   return <main>
-    <MyAppBar graph={graph} graphHandle={setGraph} />
+    <MyAppBar uid={uid} graph={graph} graphHandle={setGraph} />
     <DisplayLayer key={key} uid={uid}
                   graph={graph}
                   enterGraph={enterGraph}
