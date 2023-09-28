@@ -1,23 +1,17 @@
 import { Handle, NodeToolbar } from "reactflow";
-import CheckIcon from '@mui/icons-material/Check';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import NodeToolbarCommon, { useNodeToolbarCommonOperations } from "./NodeToolbarCommon";
 import NodeLabel from "./NodeLabel";
 
 export default function LockedNode({ id, data }) {
   const operations = useNodeToolbarCommonOperations();
 
-  return (
-    <div>
-      <NodeToolbar>
-        <NodeToolbarCommon id={id} allowSubgraph={true} />
-        <button onClick={() => operations.setNodeCompleted(id, false)}>
-            <HighlightOffIcon />
-        </button>
-      </NodeToolbar>
-      <NodeLabel id={id} label={data.label} />
-      <Handle />
-      <CheckIcon />
-    </div>
-  )
+  return <>
+    <NodeToolbar>
+      <NodeToolbarCommon id={id} allowSubgraph={true} />
+      <button aria-label="Mark incomplete" data-icon="incomplete" onClick={() => operations.setNodeCompleted(id, false)} />
+    </NodeToolbar>
+    <NodeLabel id={id} label={data.label} />
+    <Handle />
+    <div aria-label="Completed" />
+  </>;
 }

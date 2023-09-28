@@ -63,7 +63,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
       forwardConnections[source].push(target);
       backwardConnections[target].push(source);
       // Construct JSON for edges, each has a unique ID
-      return createEdgeObject(source, target);
+      return createEdgeObject(source, target, newNodes[key].data.label, newNodes[value].data.label);
     });
   });
   // TODO verify acyclic (#41)

@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@material-design-icons/svg": "^0.14.12",
     "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.8",
     "@react-oauth/google": "^0.7.0",

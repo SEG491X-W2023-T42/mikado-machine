@@ -9,6 +9,6 @@ export function createNodeObject(id, x, y, type, label = "New Node", completed =
   };
 }
 
-export function createEdgeObject(source, target) {
-  return { id: `e${source}-${target}`, source, target };
+export function createEdgeObject(source, target, sourceLabel, targetLabel) {
+  return { id: `e${source}-${target}`, source, target, ariaLabel: `${sourceLabel} needs ${targetLabel}` };
 }

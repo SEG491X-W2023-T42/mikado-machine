@@ -3,8 +3,9 @@ import { loadFromDb, saveToDb } from "./serde";
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./collisionDetection";
-import * as htmlToImage from 'html-to-image';
 import { dimensions } from "../helpers/NodeConstants";
+import { runtime_assert } from "./assert";
+// import { saveAs } from 'file-saver';
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -125,6 +126,10 @@ class DisplayLayerOperations {
    */
   #backwardConnections = {};
 
+  /**
+   * Node labels as a map not a list.
+   */
+  #nodeLabels = {};
 
   // Zustand data
 
@@ -178,6 +183,10 @@ class DisplayLayerOperations {
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
+      const nodeLabels = this.#nodeLabels = {};
+      for (const node of nodes) {
+        nodeLabels[node.id] = node.data.label;
+      }
       this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
@@ -243,9 +252,10 @@ class DisplayLayerOperations {
     const id = Counter.generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
-	return true;
-
+    const newNode = createNodeObject(id, position.x, position.y, "ready");
+    this.#nodeLabels[newNode.id] = newNode.data.label;
+    this.#set({ nodes: [...nodes, newNode] }); // defaults to ready since new node is always ready with no dependencies
+    return true;
   }
 
   /**
@@ -270,6 +280,7 @@ class DisplayLayerOperations {
     // Then delete the containers for this vertex
     delete forwardConnections[id];
     delete backwardConnections[id];
+    delete this.#nodeLabels[id];
 
     const { nodes, edges } = this.#state;
     this.#set({
@@ -340,8 +351,8 @@ class DisplayLayerOperations {
       }
       forwardConnections[srcId].push(dstId);
       backwardConnections[dstId].push(srcId);
-      this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId)] });
-      this.updateNodeType(srcId)
+      this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId, this.#nodeLabels[srcId], this.#nodeLabels[dstId])] });
+      this.updateNodeType(srcId);
       return;
     } // else forward connection found, so will delete it
     const forward = forwardConnections[srcId];
@@ -354,7 +365,6 @@ class DisplayLayerOperations {
       ),
     });
     this.updateNodeType(srcId)
-
   }
 
   /**
@@ -406,30 +416,37 @@ class DisplayLayerOperations {
    * Returns the display name for a node
    */
   getNodeLabel(id) {
-    // This is only O(n) so no need to optimize
-    // Notably the drag operation is also at least O(n) so the user would notice that first
-    for (const node of this.#state.nodes) {
-      if (node.id === id) {
-        return node.data.label;
-      }
-    }
-    throw new Error();
+    runtime_assert(id in this.#nodeLabels);
+    return this.#nodeLabels[id];
   }
 
   /**
    * Changes the display name for a node
    */
   setNodeLabel(id, name) {
+    const nodeLabels = this.#nodeLabels;
+    nodeLabels[id] = name;
     this.#set({
       nodes: this.#state.nodes.map(
         node => node.id !== id ? node : { ...node, data: { ...node.data, label: name } },
       ),
+      edges: this.#state.edges.map(edge => {
+        const { source, target } = edge;
+        switch (id) {
+          case source:
+            return createEdgeObject(id, target, name, nodeLabels[target]);
+          case target:
+            return createEdgeObject(source, id, nodeLabels[source], name);
+          default:
+            return edge;
+        }
+      }),
     });
   }
 
   highlightOrUnhighlightNode(target) {
     if (target === null) { // if no target, unhighlight all nodes
-      for (const node of this.#state.nodes) { 
+      for (const node of this.#state.nodes) {
         document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
       }
     } else {
@@ -440,8 +457,8 @@ class DisplayLayerOperations {
           document.querySelector(`[data-id="${target.id}"]`).style.border = "2px solid rgba(105, 105, 105, 0.7)";
         }
       }
-    } 
-  } 
+    }
+  }
 
   getNodeType(id) {
     for (const node of this.#state.nodes) {
@@ -507,29 +524,25 @@ class DisplayLayerOperations {
   }
 
   export(fitView, saveNotifyError) {
-    fitView();
-    try {
-      htmlToImage.toSvg(document.querySelector('.react-flow'), {
-        filter: (node) => {
-          // TODO simplify
-          return !(node?.classList?.contains('react-flow__controls') ||
-            node?.classList?.contains('react-flow__background') ||
-            this.checkContainsMUI(node?.classList));
-        },
-      }).then((dataURL) => {
-        this.downloadPDF(dataURL);
-      });
-    } catch (e) {
-      saveNotifyError();
-      console.log(e.message);
-    }
-  }
-
-  downloadPDF(dataURL) {
-    const a = document.createElement("a");
-    a.setAttribute('download', 'mikado.svg');
-    a.setAttribute('href', dataURL);
-    a.click();
+    // fitView();
+    // try {
+    //   htmlToImage.toSvg(document.querySelector('.react-flow'), {
+    //     filter: (node) => {
+    //       // TODO simplify
+    //       return !(node?.classList?.contains('react-flow__controls') ||
+    //         node?.classList?.contains('react-flow__background') ||
+    //         this.checkContainsMUI(node?.classList));
+    //     },
+    //   }).then((dataURL) => {
+    //     this.downloadPDF(dataURL);
+    //   });
+    // } catch (e) {
+    //   saveNotifyError();
+    //   console.log(e.message);
+    // }
+    // let svg = elementToSVG(document.querySelector(".react-flow"));
+    // console.log(svg);
+    // saveAs(new Blob([new XMLSerializer().serializeToString(svg)], {type:"image/svg+xml"}), "mikado.svg")
   }
 
   checkContainsMUI(classList) {

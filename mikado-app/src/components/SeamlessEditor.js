@@ -5,21 +5,23 @@ export default function SeamlessEditor({ label, editing, initialValue, onFinishE
   const ref = useRef(void 0);
   const wasComposingRef = useRef(false);
   useEffect(() => {
-    if (editing) {
+    const { current } = ref;
+    if (current && editing) {
       setText(initialValue);
-      ref.current?.focus();
-      ref.current?.select();
+      current.focus();
+      current.select();
     }
   }, [editing]);
   if (!singleLine) {
     useEffect(() => {
+      if (!editing) return;
       const { current } = ref;
       if (!current) return;
       const { style } = current;
       // Shrink and grow based on content
       style.height = 0;
       style.height = current.scrollHeight + "px";
-    }, [text]);
+    }, [text, editing]);
   }
   if (!editing && text !== label) {
     setText(label);
@@ -56,7 +58,7 @@ export default function SeamlessEditor({ label, editing, initialValue, onFinishE
   } else {
     props.rows = 1;
   }
-  return createElement(singleLine ? "input" : "textarea", props);
+  return !editing ? createElement("div", props, label) : createElement(singleLine ? "input" : "textarea", props);
 
   // TODO: performance
   // - Use HTMLInputElement over TextNode only when necessary

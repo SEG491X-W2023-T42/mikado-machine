@@ -4,14 +4,12 @@ import NodeToolbarCommon from "./NodeToolbarCommon";
 import NodeLabel from "./NodeLabel";
 
 export default function LockedNode({ id, data }) {
-  return (
-    <div>
+  return <>
       <NodeToolbar>
         <NodeToolbarCommon id={id} />
       </NodeToolbar>
       <NodeLabel id={id} label={data.label} />
       <Handle />
-      <BlockedIcon />
-    </div>
-  )
+      <div aria-label="Blocked" />
+    </>;
 }
