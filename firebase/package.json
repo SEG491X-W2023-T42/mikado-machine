@@ -1,0 +1,17 @@
+{
+  "name": "firebase-infrastructure-as-code",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "firebase emulators:start --import=./data",
+    "deployProd": "firebase deploy",
+    "deployFeatureFlags": "FIRESTORE_EMULATOR_HOST=localhost:8080 node ./deployFeatureFlags.js",
+    "deployFeatureFlagsProd": "node ./deployFeatureFlags.js"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "firebase": "^10.4.0",
+    "firebase-admin": "^11.10.1",
+    "firebase-tools": "^12.6.1"
+  }
+}

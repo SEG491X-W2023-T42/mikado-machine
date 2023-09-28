@@ -3,6 +3,7 @@ import { useEnterGraphHack } from "./EnterGraphHackContext";
 import { runtime_assert } from "../../viewmodel/assert";
 import { useStoreHack } from "../../StoreHackContext";
 import SeamlessEditor from "../../components/SeamlessEditor";
+import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
@@ -19,27 +20,28 @@ const ARIA_LABELS = {
 };
 
 export default function MyNode({ id, data, type, exporting = false, ...rest }) {
+  const { allowRemoveNode, allowSubgraph, allowModifyNodeCompletion } = getGatekeeperFlags();
   const { editingNodeId, editingNodeInitialValue, editNode, operations } = exporting ? {} : useStoreHack()(selector);
   const editing = editingNodeId === id;
 
   const subgraph = operations?.isNodeSubgraph(id);
   const enterGraph = useEnterGraphHack();
 
-  const goal = type === "goal";
-  const locked = type === "locked";
+  const notGoal = type !== "goal";
+  const notLocked = type !== "locked";
   const completed = type === "complete";
   const ariaLabel = ARIA_LABELS[type];
   runtime_assert(ariaLabel);
 
   const result = <>
     {exporting ? null : <NodeToolbar>
-      <button aria-label="Delete" data-icon="delete" onClick={() => operations.deleteNode(id)} />
-      {goal ? null : <button
+      {allowRemoveNode && <button aria-label="Delete" data-icon="delete" onClick={() => operations.deleteNode(id)} />}
+      {allowSubgraph && notGoal && <button
         aria-label={subgraph ? "Enter subgraph" : "Create subgraph"}
         data-icon={subgraph ? "enter-subgraph" : "create-subgraph"}
         onClick={() => enterGraph((uid) => operations.createSubgraphAndSaveIfNotExists(uid, id))}
       />}
-      {goal || locked ? null : <button
+      {allowModifyNodeCompletion && notGoal && notLocked && <button
         aria-label={completed ? "Mark incomplete" : "Mark completed"}
         data-icon={completed ? "incomplete" : "completed"}
         onClick={() => void operations.setNodeCompleted(id, !completed)}

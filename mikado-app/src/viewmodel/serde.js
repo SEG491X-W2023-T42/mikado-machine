@@ -1,12 +1,7 @@
-import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
-import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-
-export const db = getFirestore(firebase);
-if (USING_DEBUG_EMULATORS) {
-  connectFirestoreEmulator(db, "localhost", 8080);
-}
+import { db } from "./gatekeeper";
 
 /**
  * Loads the nodes and edges from the database.

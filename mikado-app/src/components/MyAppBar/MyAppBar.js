@@ -4,7 +4,7 @@ import { AppBar, Button, Container, Toolbar } from '@mui/material'
 import AppBarProfileOverflowMenu from "./AppBarProfileOverflowMenu";
 import SeamlessEditor from "../SeamlessEditor";
 import { useEffect, useState } from "react";
-import { db } from "../../viewmodel/serde";
+import { db, getGatekeeperFlags } from "../../viewmodel/gatekeeper";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 function serializeGraphWithTitle(title) {
@@ -16,6 +16,7 @@ function serializeGraphWithTitle(title) {
 }
 
 export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) {
+  const { allowEditGraphName, hideProfileMenu } = getGatekeeperFlags();
   const [savedTitle, setSavedTitle] = useState(null);
   const [title, setTitle] = useState("");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -53,8 +54,7 @@ export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) 
     return () => void (cancelled = true);
   }, [title, savedTitle]);
   function startEditingTitle(e) {
-    if (title !== savedTitle) return;
-    if (isEditingTitle) return;
+    if (!allowEditGraphName || title !== savedTitle || isEditingTitle) return;
     e.preventDefault();
     setIsEditingTitle(true);
     // Not including key handlers because no other app starts editing titles that way
@@ -82,7 +82,7 @@ export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) 
           <Button sx={{color: "white"}} onClick={() => {graphHandle({id, subgraph: ""})}}>
             Back
           </Button>}
-          <AppBarProfileOverflowMenu></AppBarProfileOverflowMenu>
+          {!hideProfileMenu && <AppBarProfileOverflowMenu />}
         </Toolbar>
       </Container>
     </AppBar>

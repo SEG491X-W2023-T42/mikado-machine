@@ -10,5 +10,8 @@ service cloud.firestore {
     match /user/{uid}/graphs/{graph} {
       allow read, write: if uid == request.auth.uid;
     }
+    match /public/flags {
+      allow read: if true;
+    }
   }
 }
