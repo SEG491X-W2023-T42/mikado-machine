@@ -1,10 +1,13 @@
 import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import * as React from "react";
 import { useFirebase } from '../../context/FirebaseContext';
+import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const allSettings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settingsImplementedRange = [3, 4];
 
 export default function AppBarProfileOverflowMenu() {
+  const { hideUnimplementedProfileMenuItems } = getGatekeeperFlags();
   const [anchorUser, setAnchorUser] = React.useState(null);
   const { logOut } = useFirebase();
 
@@ -24,7 +27,12 @@ export default function AppBarProfileOverflowMenu() {
     }
   };
 
-  const settingsFunctions = [handleCloseUserMenu, handleCloseUserMenu, handleCloseUserMenu, handleSignOut];
+  let settings = allSettings;
+  let settingsFunctions = [handleCloseUserMenu, handleCloseUserMenu, handleCloseUserMenu, handleSignOut];
+  if (hideUnimplementedProfileMenuItems) {
+    settings = settings.slice(...settingsImplementedRange);
+    settingsFunctions = settingsFunctions.slice(...settingsImplementedRange);
+  }
 
   return <Box sx={{ flexGrow: 0 }}>
     <Tooltip title="Open settings">

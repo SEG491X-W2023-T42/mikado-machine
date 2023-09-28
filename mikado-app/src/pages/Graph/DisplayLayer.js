@@ -18,6 +18,7 @@ import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
 import { EnterGraphHackContext } from "./EnterGraphHackContext";
 import AddNodeFab from '../../components/Overlays/AddNodeFAB';
+import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
 
 
 /**
@@ -39,6 +40,7 @@ const notifySaveError = notifyError.bind(null, "There was a problem saving your 
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function DisplayLayerInternal({ uid, graph }) {
+  const { hideGraphControls, allowEditNodeLabel, allowAddNode } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -115,6 +117,7 @@ function DisplayLayerInternal({ uid, graph }) {
   }
 
   function addNode(paneClickOrUndef) {
+    if (!allowAddNode) return;
     const elem = reactFlowWrapper.current;
     runtime_assert(elem);
     const { x, y, width, height } = elem.getBoundingClientRect();
@@ -137,13 +140,13 @@ function DisplayLayerInternal({ uid, graph }) {
   }
 
   function startEditingNode(id, isBackspace) {
-    // TODO replace with text field
+    if (!allowEditNodeLabel) return;
     const defaultText = isBackspace ? "" : operations.getNodeLabel(id);
     editNode(id, defaultText);
   }
 
-  // TODO verify onNodeContextMenu works on iOS
   function onNodeStartEditingEventListener(e, node) {
+    if (!allowEditNodeLabel) return;
     e.preventDefault();
     startEditingNode(node.id, false);
   }
@@ -204,11 +207,11 @@ function DisplayLayerInternal({ uid, graph }) {
     >
       <Background />
     </ReactFlow>
-    <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
+    {!hideGraphControls && <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
       fitView();
       operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
-    }} />
-	{ isTouchscreen && <AddNodeFab onClick={() => void addNode()}/> }
+    }} />}
+    { allowAddNode && isTouchscreen && <AddNodeFab onClick={() => void addNode()} /> }
   </main>;
 }
 

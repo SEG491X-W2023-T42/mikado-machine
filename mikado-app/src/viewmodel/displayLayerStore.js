@@ -3,11 +3,12 @@ import { loadFromDb, saveToDb } from "./serde";
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./collisionDetection";
-import { dimensions, searchRadius } from "../helpers/NodeConstants";
+import { dimensions } from "../helpers/NodeConstants";
 import { runtime_assert } from "./assert";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import MyNode from "../pages/Graph/MyNode";
+import { getGatekeeperFlags } from "./gatekeeper";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -238,6 +239,10 @@ class DisplayLayerOperations {
     }
 
     // Virtual viewport sized to searchRadius
+    /**
+     * L-infinity norm radius added to node dimensions used for searching for closest free space.
+     */
+    const { nodePlacementSearchRadius: searchRadius } = getGatekeeperFlags();
     const viewportX = (position.x - width / 2 - searchRadius) | 0;
     const viewportY = (position.y - height / 2 - searchRadius) | 0;
     const viewportWidth = width + 2 * searchRadius;
