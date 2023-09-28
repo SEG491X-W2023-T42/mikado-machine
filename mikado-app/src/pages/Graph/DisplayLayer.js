@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, useStoreApi as useReactFlowStoreApi } from 'reactflow';
+import ReactFlow, {
+    Background,
+    ReactFlowProvider,
+    useOnSelectionChange,
+    useReactFlow,
+    useStoreApi as useReactFlowStoreApi
+} from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
@@ -26,7 +32,6 @@ const proOptions = { hideAttribution: true };
 const selector = (state) => state;
 
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
-const notifyExportError = notifyError.bind(null, "There was an error exporting the graph. Please try again.");
 
 /**
  * @see DisplayLayer
@@ -217,7 +222,10 @@ function DisplayLayerInternal({ uid, graph }) {
     >
       <Background />
     </ReactFlow>
-    <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
+    <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
+      fitView();
+      operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
+    }} />
 	{ isTouchscreen && <AddNodeFab onClick={() => mobileAddNode()}/> }
   </main>;
 }

@@ -1,6 +1,6 @@
 import { createElement, useEffect, useRef, useState } from "react";
 
-export default function SeamlessEditor({ label, editing, initialValue, onFinishEditing, singleLine }) {
+export default function SeamlessEditor({ label, editing, exporting, initialValue, onFinishEditing, singleLine }) {
   const [text, setText] = useState(label);
   const ref = useRef(void 0);
   const wasComposingRef = useRef(false);
@@ -58,7 +58,7 @@ export default function SeamlessEditor({ label, editing, initialValue, onFinishE
   } else {
     props.rows = 1;
   }
-  return !editing ? createElement("div", props, label) : createElement(singleLine ? "input" : "textarea", props);
+  return !editing ? createElement("div", exporting ? {} : props, label) : createElement(singleLine ? "input" : "textarea", props);
 
   // TODO: performance
   // - Use HTMLInputElement over TextNode only when necessary

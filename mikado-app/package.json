@@ -17,7 +17,6 @@
     "eslint-plugin-react": "^7.32.2",
     "firebase": "^9.17.1",
     "framer-motion": "^10.6.0",
-    "html-to-image": "^1.11.11",
     "notistack": "^3.0.1",
     "patch-package": "^6.5.1",
     "react": "^18.2.0",

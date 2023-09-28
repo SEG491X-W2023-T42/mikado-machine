@@ -5,7 +5,9 @@ import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
 import createIntersectionDetectorFor from "./collisionDetection";
 import { dimensions } from "../helpers/NodeConstants";
 import { runtime_assert } from "./assert";
-// import { saveAs } from 'file-saver';
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
+import MyNode from "../pages/Graph/MyNode";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -523,26 +525,71 @@ class DisplayLayerOperations {
     return false; // throw new Error(); // TODO
   }
 
-  export(fitView, saveNotifyError) {
-    // fitView();
-    // try {
-    //   htmlToImage.toSvg(document.querySelector('.react-flow'), {
-    //     filter: (node) => {
-    //       // TODO simplify
-    //       return !(node?.classList?.contains('react-flow__controls') ||
-    //         node?.classList?.contains('react-flow__background') ||
-    //         this.checkContainsMUI(node?.classList));
-    //     },
-    //   }).then((dataURL) => {
-    //     this.downloadPDF(dataURL);
-    //   });
-    // } catch (e) {
-    //   saveNotifyError();
-    //   console.log(e.message);
-    // }
-    // let svg = elementToSVG(document.querySelector(".react-flow"));
-    // console.log(svg);
-    // saveAs(new Blob([new XMLSerializer().serializeToString(svg)], {type:"image/svg+xml"}), "mikado.svg")
+  /**
+   * Renders to HTML and opens a popup to print.
+   */
+  export(edgesSvg) {
+    /*
+     * The user is prompted to print a popup. This can be to paper, to PDF, or in some browsers (Epiphany) to PostScript or SVG.
+     * Open the PDF with Inkscape to convert to SVG.
+     * Cancelling to save the HTML is also supported. It is standalone except for loading the font.
+     * The previous code using a library generated MiB-sized files and didn't render the icons.
+     * The current code targets 10KiB files.
+     * The icons now render perfectly in-browser, but are blurry when printed. This is a limitation of current browsers but isn't that bad.
+     */
+
+    let left = 0;
+    let right = 0;
+    let top = 0;
+    const { nodes } = this.#state;
+    const exactWidth = dimensions.width;
+    for (const node of nodes) {
+      const { x, y } = node.position;
+      left = Math.min(left, x);
+      top = Math.min(top, y);
+      right = Math.max(right, x + exactWidth);
+    }
+    const positionOffset = { x: -left, y: -top };
+
+    const safeWidth = 670; // https://stackoverflow.com/a/11084797/10477326
+    const printer = window.open("", "", `width=${safeWidth},height=${safeWidth}`);
+    const doc = printer.document;
+    const { head, body } = doc;
+
+    const style = doc.createElement("style");
+    head.append(style);
+    style.append(doc.createTextNode([...document.styleSheets].flatMap(x => [...x.cssRules].map(x => {
+      if (x instanceof CSSImportRule) return x.cssText;
+      if (!(x instanceof CSSStyleRule) ||
+        !/body|div\.react-flow__node(?!\w|:hover)|react-flow__edge-path|seamless-editor/.test(x.selectorText)) return "";
+      return x.cssText;
+    })).join("")));
+
+    const main = doc.createElement("main");
+    main.style.position = "absolute";
+    main.style.transform = `scale(${safeWidth / (right - left)})`;
+    body.append(main);
+    body.style.overflow = "hidden";
+
+    const root = createRoot(main);
+    flushSync(() => {
+      root.render(<>
+        {nodes.map(x => {
+          return <MyNode key={x.id} {...x} exporting positionOffset={positionOffset} />;
+        })}
+      </>)
+    });
+
+    const edgesSvgImport = doc.importNode(edgesSvg, true);
+    edgesSvgImport.setAttribute("width", 0); // Prevent affecting size
+    edgesSvgImport.setAttribute("height", 0);
+    edgesSvgImport.style.position = "absolute";
+    edgesSvgImport.style.transform = `translate(${positionOffset.x}px, ${positionOffset.y}px)`;
+    edgesSvgImport.style.overflow = "visible";
+    main.prepend(edgesSvgImport); // Disable hover by appending on top over nodes
+
+    printer.print();
+    // Leave popup open so it can be saved to HTML
   }
 
   checkContainsMUI(classList) {

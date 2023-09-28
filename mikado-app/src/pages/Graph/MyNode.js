@@ -6,20 +6,6 @@ import SeamlessEditor from "../../components/SeamlessEditor";
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
-// TODO deduplicate the various node types back into this file
-// function MyNode({ id, data }) {
-//   return (
-//     <div>
-//       <NodeToolbar>
-//         <NodeToolbarCommon id={id} />
-//       </NodeToolbar>
-//         {data.label}
-//       <Handle />
-//     </div>
-//   )
-// }
-//
-// export default MyNode;
 const selector = (state) => {
   const { editingNodeId, editingNodeInitialValue, editNode, operations } = state;
   return { editingNodeId, editingNodeInitialValue, editNode, operations };
@@ -32,8 +18,8 @@ const ARIA_LABELS = {
   "ready": "Ready",
 };
 
-export default function MyNode({ id, data, type }) {
-  const { editingNodeId, editingNodeInitialValue, editNode, operations } = useStoreHack()(selector);
+export default function MyNode({ id, data, type, exporting = false, ...rest }) {
+  const { editingNodeId, editingNodeInitialValue, editNode, operations } = exporting ? {} : useStoreHack()(selector);
   const editing = editingNodeId === id;
 
   const subgraph = operations?.isNodeSubgraph(id);
@@ -45,8 +31,8 @@ export default function MyNode({ id, data, type }) {
   const ariaLabel = ARIA_LABELS[type];
   runtime_assert(ariaLabel);
 
-  return <>
-    <NodeToolbar>
+  const result = <>
+    {exporting ? null : <NodeToolbar>
       <button aria-label="Delete" data-icon="delete" onClick={() => operations.deleteNode(id)} />
       {goal ? null : <button
         aria-label={subgraph ? "Enter subgraph" : "Create subgraph"}
@@ -58,10 +44,11 @@ export default function MyNode({ id, data, type }) {
         data-icon={completed ? "incomplete" : "completed"}
         onClick={() => void operations.setNodeCompleted(id, !completed)}
       />}
-    </NodeToolbar>
+    </NodeToolbar>}
     <SeamlessEditor
       label={data.label}
       editing={editing}
+      exporting={exporting}
       initialValue={!editing ? "" : editingNodeInitialValue}
       onFinishEditing={(filteredText) => {
         editNode("", "");
@@ -69,7 +56,21 @@ export default function MyNode({ id, data, type }) {
       }}
       singleLine={false}
     />
-    <Handle />
+    {exporting ? null : <Handle />}
     <div aria-label={ariaLabel} />
   </>;
+  if (exporting) {
+    const { position, positionOffset } = rest; // Exists when exporting only
+    return <div
+      style={{
+        position: "absolute",
+        left: position.x + positionOffset.x + "px",
+        top: position.y + positionOffset.y + "px",
+      }}
+      className={"react-flow__node react-flow__node-" + type}
+    >
+      {result}
+    </div>
+  }
+  return result;
 }

@@ -25,6 +25,7 @@ main > main {
 div.react-flow__node {
   padding: 10px 28px 10px 13px;
 
+  box-sizing: border-box; /*for printing*/
   min-height: 42px;
   width: 186px; /* fixed */
 
@@ -127,16 +128,17 @@ div.react-flow__handle.source {
   opacity: 0;
 }
 
+div.react-flow__node-toolbar > button, button.react-flow__controls-button[data-icon] {
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 div.react-flow__node-toolbar > button {
   appearance: none;
   width: 32px;
   height: 32px;
   border: none;
   border-radius: 32px;
-  background-position: center;
-  background-size: 24px 24px;
-  background-repeat: no-repeat;
-
   &:not(:first-child) {
     margin-left: 4px;
   }
@@ -159,5 +161,18 @@ div.react-flow__node-toolbar > button {
 
   &[data-icon="incomplete"] {
     background-image: url('@material-design-icons/svg/filled/highlight_off.svg');
+  }
+}
+
+button.react-flow__controls-button[data-icon] {
+  background-position: center;
+  background-size: 16px 16px;
+
+  &[data-icon="save"] {
+    background-image: url('@material-design-icons/svg/filled/save.svg')
+  }
+
+  &[data-icon="print"] {
+    background-image: url('@material-design-icons/svg/filled/print.svg')
   }
 }
