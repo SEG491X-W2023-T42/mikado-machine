@@ -387,8 +387,7 @@ class DisplayLayerOperations {
     const forwardConnections = this.#forwardConnections;
     const backwardConnections = this.#backwardConnections;
 
-    // Determine the types of the source and destination nodes
-    const srcNodeType = this.getNodeType(srcId);
+    // Determine the types of the destination nodes for protecting root/goal from becoming a child node
     const dstNodeType = this.getNodeType(dstId);
 
     if (forwardConnections[dstId].includes(srcId)) { // Backward connection found
