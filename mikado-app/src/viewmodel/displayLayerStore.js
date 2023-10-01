@@ -300,6 +300,11 @@ class DisplayLayerOperations {
   connectOrDisconnect(srcId, dstId) {
     const forwardConnections = this.#forwardConnections;
     const backwardConnections = this.#backwardConnections;
+
+    // Determine the types of the source and destination nodes
+    const srcNodeType = this.getNodeType(srcId);
+    const dstNodeType = this.getNodeType(dstId);
+
     if (forwardConnections[dstId].includes(srcId)) { // Backward connection found
       const tmp = dstId;
       dstId = srcId;
@@ -330,6 +335,12 @@ class DisplayLayerOperations {
         // Cycle detected, don't add edge
         return;
       }
+
+      if (dstNodeType === 'goal' ) {
+        // Prevent forming forward connections if goal node is dstNode
+        return;
+      }
+
       forwardConnections[srcId].push(dstId);
       backwardConnections[dstId].push(srcId);
       this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId)] });
@@ -340,6 +351,7 @@ class DisplayLayerOperations {
     const backward = backwardConnections[dstId];
     forward.splice(forward.indexOf(dstId), 1);
     backward.splice(backward.indexOf(srcId), 1);
+
     this.#set({
       edges: this.#state.edges.filter(
         edge => edge.source !== srcId || edge.target !== dstId,
