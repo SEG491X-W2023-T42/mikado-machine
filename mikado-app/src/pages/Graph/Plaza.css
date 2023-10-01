@@ -12,65 +12,54 @@
   flex-direction: column;
 }
 
+.react-flow__edge-path {
+  stroke-width: 3;
+  stroke: black;
+}
+
 main > main {
   flex-grow: 1;
   width: 100%;
 }
 
-.react-flow__node {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 8px;
-  gap: 4px;
+div.react-flow__node {
+  padding: 10px 28px 10px 13px;
 
-
+  box-sizing: border-box; /*for printing*/
+  min-height: 42px;
   width: 186px; /* fixed */
-  min-height: 20px; /* hugs contents */
 
   background: #FFF9C1; /* #DAEFFF for ready task, #DDF9E8 for complete task, #F5FBFF for locked */
   border: 1px solid dimgrey;
   border-radius: 8px;
 
-  /* Inside auto layout */
-
-  flex: none;
-  order: 0;
-  align-self: stretch;
-  flex-grow: 0;
-
   &:focus-within {
     outline: 1px solid dimgrey;
   }
+
+  & > div[aria-label] {
+    height: 18px;
+    width: 18px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-size: cover;
+    filter: invert(.41) opacity(.7);
+    /*display: none;*/
+  }
 }
 
-.react-flow__node > div {
-  min-height: 20px; /* hugs contents */
-  inline-size: 10px;
-  word-break: break-all;
-  padding: 2px 5px;
-
-  /* Inside auto layout */
-
-  flex: none;
-  order: 0;
-  flex-grow: 1;
+div.react-flow__node:hover {
+  filter: brightness(95%);
 }
 
-.react-flow__node .MuiSvgIcon-root {
-  color:rgba(105, 105, 105, 0.7);
-  position: absolute;
-  font-size: large;
-  right: 5px;
-  top: 5px;
-}
-
-.seamless-editor, .react-flow__node > div {
+.seamless-editor, div.react-flow__node {
   font-family: 'Inter', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
   line-height: 15px;
+  word-break: break-word;
 }
 
 .seamless-editor {
@@ -83,61 +72,116 @@ main > main {
   -webkit-text-fill-color: rgba(0, 0, 0, 1);
   color: rgba(0, 0, 0, 1);
   outline: none;
+  margin: 0;
   padding: 0;
   resize: none;
   width: 100%;
 
-  &:disabled {
+  &[disabled] {
     pointer-events: none;
     box-shadow: none;
   }
 }
 
-.react-flow__node-goal {
+div.react-flow__node-goal {
   outline: 1px solid rgba(105, 105, 105, 0.7);
   outline-offset: 3px;
+
+  & > div[aria-label] {
+    background-image: url('@material-design-icons/svg/filled/outlined_flag.svg');
+  }
+
+  &:focus-within {
+    outline: 2px solid #555;
+    outline-offset: 3px;
+    border: 1px solid #555;
+  }
 }
 
-.react-flow__node-goal > div {
-  padding-right: 15px;
-}
-
-.react-flow__node-goal:focus-within {
-  /* For Goal Node: */
-  outline: 2px solid #555;
-  outline-offset: 3px;
-  border: 1px solid #555;
-}
-
-.react-flow__node-ready {
+div.react-flow__node-ready {
    background: #DAEFFF;
+
+  & > div[aria-label] {
+    background-image: url('@material-design-icons/svg/filled/spa.svg');
+  }
 }
 
-.react-flow__node-ready > div {
-  padding-right: 20px;
+div.react-flow__node-locked {
+  background: #F5FBFF;
+
+  & > div[aria-label] {
+    background-image: url('@material-design-icons/svg/filled/remove_circle.svg');
+  }
 }
 
-
-.react-flow__node-locked {
-  background: #F5FBFF
-}
-
-.react-flow__node-locked > div {
-  padding-right: 20px;
-}
-
-
-.react-flow__node-complete {
+div.react-flow__node-complete {
   background: #DDF9E8;
+
+  & > div[aria-label] {
+    background-image: url('@material-design-icons/svg/filled/check.svg');
+  }
 }
 
-.react-flow__node-complete > div {
-  padding-right: 20px;
-}
-
-
-.react-flow__handle.source {
+div.react-flow__handle.source {
   top: 50%;
   pointer-events: none;
   opacity: 0;
+}
+
+div.react-flow__node-toolbar > button, button.react-flow__controls-button[data-icon] {
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+div.react-flow__node-toolbar > button {
+  appearance: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(105, 105, 105, 0.7);
+  border-radius: 32px;
+
+  &:hover{
+    filter:brightness(95%);
+  }
+  
+  &:focus{
+    outline: 1px solid rgba(105, 105, 105, 0.7);
+  }
+
+  &:not(:first-child) {
+    margin-left: 4px;
+  }
+
+  &[data-icon="delete"] {
+    background-image: url('@material-design-icons/svg/filled/delete.svg');
+  }
+
+  &[data-icon="enter-subgraph"] {
+    background-image: url('@material-design-icons/svg/filled/login.svg');
+  }
+
+  &[data-icon="create-subgraph"] {
+    background-image: url('@material-design-icons/svg/filled/add.svg');
+  }
+
+  &[data-icon="completed"] {
+    background-image: url('@material-design-icons/svg/filled/check.svg');
+  }
+
+  &[data-icon="incomplete"] {
+    background-image: url('@material-design-icons/svg/filled/highlight_off.svg');
+  }
+}
+
+button.react-flow__controls-button[data-icon] {
+  background-position: center;
+  background-size: 16px 16px;
+
+  &[data-icon="save"] {
+    background-image: url('@material-design-icons/svg/filled/save.svg')
+  }
+
+  &[data-icon="print"] {
+    background-image: url('@material-design-icons/svg/filled/print.svg')
+  }
 }

@@ -2,9 +2,13 @@ import { create } from "zustand";
 import { loadFromDb, saveToDb } from "./serde";
 import * as Counter from "./autoincrement";
 import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-import createIntersectionDetectorFor from "./aabb";
-import * as htmlToImage from 'html-to-image';
+import createIntersectionDetectorFor from "./collisionDetection";
 import { dimensions } from "../helpers/NodeConstants";
+import { runtime_assert } from "./assert";
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
+import MyNode from "../pages/Graph/MyNode";
+import { getGatekeeperFlags } from "./gatekeeper";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -125,6 +129,11 @@ class DisplayLayerOperations {
    */
   #backwardConnections = {};
 
+  /**
+   * Node labels as a map not a list.
+   */
+  #nodeLabels = {};
+
   // Zustand data
 
   /**
@@ -177,6 +186,10 @@ class DisplayLayerOperations {
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
       this.#forwardConnections = forwardConnections;
       this.#backwardConnections = backwardConnections;
+      const nodeLabels = this.#nodeLabels = {};
+      for (const node of nodes) {
+        nodeLabels[node.id] = node.data.label;
+      }
       this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
       this.#loading = false;
       this.#graphName = graphName;
@@ -195,28 +208,99 @@ class DisplayLayerOperations {
     });
   }
 
+  /**
+   * Returns the new node position closest to the clicked position while not intersecting any existing nodes, or null
+   */
   modifyNodePosition(position) {
-    // hacky code that checks every position starting from the specified pos
-    // and ending when a pos is found or there is no possible position in current
-    // viewport
+    /*
+     * O(w*h+n) algorithm instead of O(n**2).
+     * This takes 2ms JITed on one computer with a screen full of nodes.
+     * If it were slow, WebGL or WASM SIMD would have been used, but there is no need now.
+     * Importantly, the time is consistent and bounded.
+     * This was designed as GPU-friendly to make it easier to understand. Just think in terms of shaders.
+     */
+    console.time("modifyNodePosition");
 
     const { nodes } = this.#state;
-	const height = dimensions.height;
-	const width = dimensions.width;
+    const { width, height } = dimensions;
+    const halfWidth = (width / 2) | 0;
+    const halfHeight = (height / 2) | 0;
 
-	if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
-		return position;
-	}
+    // Fast path when there is space where the user wants to put it
+    const centeredPosition = {x: (position.x - halfWidth) | 0, y: (position.y - halfHeight) | 0};
+    if (!nodes.some(createIntersectionDetectorFor({
+      id: void 0,
+      position: centeredPosition,
+      width: width + 1,
+      height: height + 1,
+    }))) {
+      console.timeEnd("modifyNodePosition");
+      return centeredPosition;
+    }
 
-    for (let y = position.y - (dimensions.height * 2); y < position.y + (dimensions.height * 4); y += height) {
-      for (let x = position.x - dimensions.width; x < position.x + dimensions.width; x += width) {
-        const position = { x, y };
-        if (!nodes.some(createIntersectionDetectorFor({ id: void 0, position, width, height }))) {
-          return position;
+    // Virtual viewport sized to searchRadius
+    /**
+     * L-infinity norm radius added to node dimensions used for searching for closest free space.
+     */
+    const { nodePlacementSearchRadius: searchRadius } = getGatekeeperFlags();
+    const viewportX = (position.x - width / 2 - searchRadius) | 0;
+    const viewportY = (position.y - height / 2 - searchRadius) | 0;
+    const viewportWidth = width + 2 * searchRadius;
+    const viewportHeight = height + 2 * searchRadius;
+    const frustum = createIntersectionDetectorFor({
+      id: void 0,
+      position: {x: viewportX - halfWidth, y: viewportY - halfHeight},
+      width: viewportWidth + halfWidth,
+      height: viewportHeight + halfHeight,
+    });
+    const occupancyTexture = new Int8Array(viewportWidth * viewportHeight);
+
+    // Part 1: Rasterize all existing nodes onto the texture to mark their areas as off-limits
+    for (const node of nodes) {
+      if (!frustum(node)) continue;
+      const { x, y } = node.position;
+      // Pathfinding with a character with a size is the same thing as pathfinding with
+      // second character with no size but all world objects expanded by half of the first character's size
+      const screenLeft = (x | 0) - viewportX - halfWidth;
+      const screenTop = (y | 0) - viewportY - halfHeight;
+      const fillLeft = Math.max(0, screenLeft);
+      const fillTop = Math.max(0, screenTop);
+      // There was an off-by-one for some reason
+      const fillRight = Math.min(viewportWidth, screenLeft + (node.width | 0) + 2 * halfWidth + 1);
+      const fillBottom = Math.min(viewportHeight, screenTop + (node.height | 0) + 2 * halfHeight + 1);
+      for (let i = fillTop; i < fillBottom; ++i) {
+        const textureRowOffset = i * viewportWidth;
+        for (let j = fillLeft; j < fillRight; ++j) {
+          occupancyTexture[textureRowOffset + j] = 1;
         }
       }
     }
-    return null;
+
+    // Part 2: Read the texture looking for the closest available position to the cursor
+    const centerX = viewportWidth / 2;
+    const centerY = viewportHeight / 2;
+    const infiniteDistance = viewportWidth * viewportHeight + 1;
+    let best = infiniteDistance;
+    let bestX = 0;
+    let bestY = 0;
+    for (let y = 0; y < viewportHeight; ++y) {
+      const textureRowOffset = y * viewportWidth;
+      const yDist = y - centerY;
+      const yDistSquared = yDist * yDist;
+      for (let x = 0; x < viewportWidth; ++x) {
+        if (occupancyTexture[textureRowOffset + x]) continue;
+        const xDist = x - centerX;
+        const dist = xDist * xDist + yDistSquared;
+        if (dist >= best) continue;
+        best = dist;
+        bestX = x;
+        bestY = y;
+      }
+    }
+
+    console.timeEnd("modifyNodePosition");
+    if (best === infiniteDistance) return null;
+    return {x: bestX + viewportX - halfWidth, y: bestY + viewportY - halfHeight};
   }
 
   /**
@@ -235,9 +319,10 @@ class DisplayLayerOperations {
     const id = Counter.generateAutoincremented().toString();
     this.#forwardConnections[id] = [];
     this.#backwardConnections[id] = [];
-    this.#set({ nodes: [...nodes, createNodeObject(id, position.x, position.y, "ready")] }); // defaults to ready since new node is always ready with no dependencies
-	return true;
-
+    const newNode = createNodeObject(id, position.x, position.y, "ready");
+    this.#nodeLabels[newNode.id] = newNode.data.label;
+    this.#set({ nodes: [...nodes, newNode] }); // defaults to ready since new node is always ready with no dependencies
+    return true;
   }
 
   /**
@@ -262,6 +347,7 @@ class DisplayLayerOperations {
     // Then delete the containers for this vertex
     delete forwardConnections[id];
     delete backwardConnections[id];
+    delete this.#nodeLabels[id];
 
     const { nodes, edges } = this.#state;
     this.#set({
@@ -343,8 +429,8 @@ class DisplayLayerOperations {
 
       forwardConnections[srcId].push(dstId);
       backwardConnections[dstId].push(srcId);
-      this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId)] });
-      this.updateNodeType(srcId)
+      this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId, this.#nodeLabels[srcId], this.#nodeLabels[dstId])] });
+      this.updateNodeType(srcId);
       return;
     } // else forward connection found, so will delete it
     const forward = forwardConnections[srcId];
@@ -358,7 +444,6 @@ class DisplayLayerOperations {
       ),
     });
     this.updateNodeType(srcId)
-
   }
 
   /**
@@ -410,25 +495,48 @@ class DisplayLayerOperations {
    * Returns the display name for a node
    */
   getNodeLabel(id) {
-    // This is only O(n) so no need to optimize
-    // Notably the drag operation is also at least O(n) so the user would notice that first
-    for (const node of this.#state.nodes) {
-      if (node.id === id) {
-        return node.data.label;
-      }
-    }
-    throw new Error();
+    runtime_assert(id in this.#nodeLabels);
+    return this.#nodeLabels[id];
   }
 
   /**
    * Changes the display name for a node
    */
   setNodeLabel(id, name) {
+    const nodeLabels = this.#nodeLabels;
+    nodeLabels[id] = name;
     this.#set({
       nodes: this.#state.nodes.map(
         node => node.id !== id ? node : { ...node, data: { ...node.data, label: name } },
       ),
+      edges: this.#state.edges.map(edge => {
+        const { source, target } = edge;
+        switch (id) {
+          case source:
+            return createEdgeObject(id, target, name, nodeLabels[target]);
+          case target:
+            return createEdgeObject(source, id, nodeLabels[source], name);
+          default:
+            return edge;
+        }
+      }),
     });
+  }
+
+  highlightOrUnhighlightNode(target) {
+    if (target === null) { // if no target, unhighlight all nodes
+      for (const node of this.#state.nodes) {
+        document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+      }
+    } else {
+      for (const node of this.#state.nodes) { // highlight target and unhighlight all other nodes
+        if (node.id !== target.id){
+          document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+        } else {
+          document.querySelector(`[data-id="${target.id}"]`).style.border = "2px solid rgba(105, 105, 105, 0.7)";
+        }
+      }
+    }
   }
 
   getNodeType(id) {
@@ -494,30 +602,71 @@ class DisplayLayerOperations {
     return false; // throw new Error(); // TODO
   }
 
-  export(fitView, saveNotifyError) {
-    fitView();
-    try {
-      htmlToImage.toSvg(document.querySelector('.react-flow'), {
-        filter: (node) => {
-          // TODO simplify
-          return !(node?.classList?.contains('react-flow__controls') ||
-            node?.classList?.contains('react-flow__background') ||
-            this.checkContainsMUI(node?.classList));
-        },
-      }).then((dataURL) => {
-        this.downloadPDF(dataURL);
-      });
-    } catch (e) {
-      saveNotifyError();
-      console.log(e.message);
-    }
-  }
+  /**
+   * Renders to HTML and opens a popup to print.
+   */
+  export(edgesSvg) {
+    /*
+     * The user is prompted to print a popup. This can be to paper, to PDF, or in some browsers (Epiphany) to PostScript or SVG.
+     * Open the PDF with Inkscape to convert to SVG.
+     * Cancelling to save the HTML is also supported. It is standalone except for loading the font.
+     * The previous code using a library generated MiB-sized files and didn't render the icons.
+     * The current code targets 10KiB files.
+     * The icons now render perfectly in-browser, but are blurry when printed. This is a limitation of current browsers but isn't that bad.
+     */
 
-  downloadPDF(dataURL) {
-    const a = document.createElement("a");
-    a.setAttribute('download', 'mikado.svg');
-    a.setAttribute('href', dataURL);
-    a.click();
+    let left = 0;
+    let right = 0;
+    let top = 0;
+    const { nodes } = this.#state;
+    const exactWidth = dimensions.width;
+    for (const node of nodes) {
+      const { x, y } = node.position;
+      left = Math.min(left, x);
+      top = Math.min(top, y);
+      right = Math.max(right, x + exactWidth);
+    }
+    const positionOffset = { x: -left, y: -top };
+
+    const safeWidth = 670; // https://stackoverflow.com/a/11084797/10477326
+    const printer = window.open("", "", `width=${safeWidth},height=${safeWidth}`);
+    const doc = printer.document;
+    const { head, body } = doc;
+
+    const style = doc.createElement("style");
+    head.append(style);
+    style.append(doc.createTextNode([...document.styleSheets].flatMap(x => [...x.cssRules].map(x => {
+      if (x instanceof CSSImportRule) return x.cssText;
+      if (!(x instanceof CSSStyleRule) ||
+        !/body|div\.react-flow__node(?!\w|:hover)|react-flow__edge-path|seamless-editor/.test(x.selectorText)) return "";
+      return x.cssText;
+    })).join("")));
+
+    const main = doc.createElement("main");
+    main.style.position = "absolute";
+    main.style.transform = `scale(${safeWidth / (right - left)})`;
+    body.append(main);
+    body.style.overflow = "hidden";
+
+    const root = createRoot(main);
+    flushSync(() => {
+      root.render(<>
+        {nodes.map(x => {
+          return <MyNode key={x.id} {...x} exporting positionOffset={positionOffset} />;
+        })}
+      </>)
+    });
+
+    const edgesSvgImport = doc.importNode(edgesSvg, true);
+    edgesSvgImport.setAttribute("width", 0); // Prevent affecting size
+    edgesSvgImport.setAttribute("height", 0);
+    edgesSvgImport.style.position = "absolute";
+    edgesSvgImport.style.transform = `translate(${positionOffset.x}px, ${positionOffset.y}px)`;
+    edgesSvgImport.style.overflow = "visible";
+    main.prepend(edgesSvgImport); // Disable hover by appending on top over nodes
+
+    printer.print();
+    // Leave popup open so it can be saved to HTML
   }
 
   checkContainsMUI(classList) {

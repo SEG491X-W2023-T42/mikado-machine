@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@material-design-icons/svg": "^0.14.12",
     "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.8",
     "@react-oauth/google": "^0.7.0",
@@ -16,7 +17,6 @@
     "eslint-plugin-react": "^7.32.2",
     "firebase": "^9.17.1",
     "framer-motion": "^10.6.0",
-    "html-to-image": "^1.11.11",
     "notistack": "^3.0.1",
     "patch-package": "^6.5.1",
     "react": "^18.2.0",

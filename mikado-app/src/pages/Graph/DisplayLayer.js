@@ -1,17 +1,24 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import ReactFlow, { Background, ReactFlowProvider, useOnSelectionChange, useReactFlow, useStoreApi as useReactFlowStoreApi } from 'reactflow';
+import ReactFlow, {
+    Background,
+    ReactFlowProvider,
+    useOnSelectionChange,
+    useReactFlow,
+    useStoreApi as useReactFlowStoreApi
+} from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../components/CustomControl/CustomControl';
 import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
 import { runtime_assert } from "../../viewmodel/assert";
 import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
 import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import createIntersectionDetectorFor from "../../viewmodel/aabb";
+import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
 import { notifyError } from "../../components/ToastManager";
 import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
-import { dimensions } from '../../helpers/NodeConstants';
 import { EnterGraphHackContext } from "./EnterGraphHackContext";
+import AddNodeFab from '../../components/Overlays/AddNodeFAB';
+import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
 
 
 /**
@@ -25,7 +32,6 @@ const proOptions = { hideAttribution: true };
 const selector = (state) => state;
 
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
-const notifyExportError = notifyError.bind(null, "There was an error exporting the graph. Please try again.");
 
 /**
  * @see DisplayLayer
@@ -34,10 +40,12 @@ const notifyExportError = notifyError.bind(null, "There was an error exporting t
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function DisplayLayerInternal({ uid, graph }) {
+  const { hideGraphControls, allowEditNodeLabel, allowAddNode } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
+  const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
 
   // Assert uid will never change
   // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
@@ -96,48 +104,49 @@ function DisplayLayerInternal({ uid, graph }) {
       operations.restoreNodePosition(id);
       operations.connectOrDisconnect(target.id, id);
     }
+    operations.highlightOrUnhighlightNode(null); //reset highlights
   }
 
-  function onDoubleClick(e) {
+  function onNodeDrag(_, node) { // continually check if nodes are intersecting and highlight them to show impending connection
+    const target = nodes.find(createIntersectionDetectorFor(node));
+    if(target) {
+      operations.highlightOrUnhighlightNode(target);
+    } else {
+      operations.highlightOrUnhighlightNode(null);
+    }
+  }
+
+  function addNode(paneClickOrUndef) {
+    if (!allowAddNode) return;
+    const elem = reactFlowWrapper.current;
+    runtime_assert(elem);
+    const { x, y, width, height } = elem.getBoundingClientRect();
 
     // Adds node if on background pane
-    if ('DIV' === e.target.tagName) {
-        // Background double click
-        if (e.target.className.includes('react-flow__pane')) {
-            const elem = reactFlowWrapper.current;
-            if (!elem) {
-                return;
-            }
-
-            const position = project({
-                x: e.clientX,
-                y: e.clientY - reactFlowWrapper.current.getBoundingClientRect().top,
-            });
-
-            // Adjusting so that the node is in center of mouse
-            position.x = position.x - dimensions.width / 2
-            position.y = position.y - dimensions.height / 2
-
-            const viewport = project({
-                x: elem.clientWidth,
-                y: elem.clientHeight,
-            });
-
-            operations.addNode(position, viewport) || notifyError("No space for new node! Please try adding elsewhere.");
-        }
+    let position = {
+      x: width / 2,
+      y: height / 2,
+    };
+    if (paneClickOrUndef) {
+      // Background double clicks only
+      if (paneClickOrUndef.target.tagName !== "DIV" || !paneClickOrUndef.target.className.includes("react-flow__pane")) return;
+      position = {
+        x: paneClickOrUndef.clientX - x,
+        y: paneClickOrUndef.clientY - y,
+      };
     }
-
-
+    position = project(position);
+    operations.addNode(position) || notifyError("No space for new node! Please try adding elsewhere.");
   }
 
   function startEditingNode(id, isBackspace) {
-    // TODO replace with text field
+    if (!allowEditNodeLabel) return;
     const defaultText = isBackspace ? "" : operations.getNodeLabel(id);
     editNode(id, defaultText);
   }
 
-  // TODO verify onNodeContextMenu works on iOS
   function onNodeStartEditingEventListener(e, node) {
+    if (!allowEditNodeLabel) return;
     e.preventDefault();
     startEditingNode(node.id, false);
   }
@@ -191,13 +200,18 @@ function DisplayLayerInternal({ uid, graph }) {
       onNodeDoubleClick={onNodeStartEditingEventListener}
       onNodeDragStart={onNodeDragStart}
       onNodeDragStop={onNodeDragStop}
+      onNodeDrag={onNodeDrag}
       zoomOnDoubleClick={false}
-      onDoubleClick={onDoubleClick}
+      onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
       <Background />
     </ReactFlow>
-    <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => operations.export(fitView, notifyExportError)} />
+    {!hideGraphControls && <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
+      fitView();
+      operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
+    }} />}
+    { allowAddNode && isTouchscreen && <AddNodeFab onClick={() => void addNode()} /> }
   </main>;
 }
 
