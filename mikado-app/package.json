@@ -5,7 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@material-design-icons/svg": "^0.14.12",
+    "@material-design-icons/svg": "^0.14.13",
     "@mui/icons-material": "^5.11.9",
     "@mui/material": "^5.11.8",
     "@react-oauth/google": "^0.7.0",
@@ -31,7 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -53,7 +53,16 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.22.20",
+    "@babel/preset-react": "^7.22.15",
     "eslint": "^8.35.0",
     "eslint-plugin-react": "^7.32.2"
+  },
+  "babel": {
+    "presets": ["@babel/preset-env", "@babel/preset-react"]
+  },
+  "jest" :{
+    "testEnvironment": "jsdom"
   }
 }
