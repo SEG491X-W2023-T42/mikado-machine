@@ -1,6 +1,6 @@
 Copyright (c) 2023 Mikado developers
 
-1. VIP includes the people involved with this capstone project: Matthew Joseph Demczyk, Andriy Drozdyuk, Philippe Gagné, Daanish Khan, Timothy Lethbridge, Jodi Qiao, Daniel Tang, Peter Yoon.
+1. VIP includes the people involved with this capstone project: Parva Satyaprakash Pathak, Andriy Drozdyuk, Philippe Gagné, Daanish Khan, Timothy Lethbridge, Jodi Qiao, Daniel Tang, Peter Yoon.
 2. The author of a derivative work agrees to grant a `SPDX-License-Identifier: AGPL-3.0-or-later` license to everyone once at the same time they communicate that work to anyone.
 3. At the same time, whether or not they are a VIP or communicating it to a VIP, they agree to simultaneously grant a `SPDX-License-Identifier: MIT OR Apache-2.0` to all the VIPs
 4. The conditions in this file apply until it is deleted, in which case previous grants survive and it becomes possible to choose specifically which of the contained granted licenses to use
