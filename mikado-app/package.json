@@ -31,7 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
+    "test": "jest --config=jest.config.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -61,8 +61,5 @@
   },
   "babel": {
     "presets": ["@babel/preset-env", "@babel/preset-react"]
-  },
-  "jest" :{
-    "testEnvironment": "jsdom"
   }
 }
