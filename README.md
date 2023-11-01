@@ -23,6 +23,7 @@ More to come later.
 | ----------------------------------------------------- | ------------------------------------------------------------ |
 | [Engineering Document 1](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=02d1d9669c36749e783362a134334325d&authkey=Af_v09HoxvDNxJ5kmvOKvak&e=uNOmGr) | Needs, Problem Statement, Metrics, Benchmarking, and Target Specification |
 | [Engineering Document 2](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=0e5a2ba4875f54907aa22e91c38a8f54b&authkey=AVMKptfKF6eivHzPvJc9Hf4&e=ehJRaB) | Iteration 1 Agile Document |
+| [Engineering Document 3](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?share=EfUU4Y7E_ylOrKw0atwOUcYBhRlV_WsZJmfpThZ6BbYo3w) | Iteration 2 Agile Document |
 | [Project Management Gantt Chart](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=07b4afb81ea1b485dbaec7906683c5016&authkey=AVBAN_1w6hmBHhqfMNYwbdc&e=glD2qx) | Gantt chart for tracking tasks and planning over time |
 | [Formal Time Sheet](https://uottawa-my.sharepoint.com/personal/dqiao100_uottawa_ca/_layouts/15/guestaccess.aspx?docid=0290cd280943547d2b1fbee27c9330d13&authkey=AUHJjRQIY8Rv-EkD2LFu7u4&e=mEpMRc) | Time tracking |
 
