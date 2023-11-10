@@ -1,34 +1,34 @@
 // __mocks__/mockUseDisplayLayerStore.js
 import * as Counter from "../src/viewmodel/autoincrement";
-import DisplayLayerOperations from "../src/viewmodel/displayLayerStore"; 
+import DisplayLayerOperations from "../src/viewmodel/displayLayerStore";
 
 // Mock Zustand's create function
-export const create = jest.fn(initial => {
-    const store = {
-      ...initial,
-      set: jest.fn(),
-      get: jest.fn(() => store),
-    };
-  
-    // Mock the set function
-    store.set = jest.fn(updates => {
-      Object.assign(store, updates);
-      return store;
-    });
-  
-    // Mock the get function
-    store.get = jest.fn(() => store);
-  
+export const create = jest.fn((initial) => {
+  const store = {
+    ...initial,
+    set: jest.fn(),
+    get: jest.fn(() => store),
+  };
+
+  // Mock the set function
+  store.set = jest.fn((updates) => {
+    Object.assign(store, updates);
     return store;
   });
-  
-  const mockUseDisplayLayerStore = () => {
-    const store = create({
+
+  // Mock the get function
+  store.get = jest.fn(() => store);
+
+  return store;
+});
+
+const mockUseDisplayLayerStore = () => {
+  const store = create({
     nodes: [],
     edges: [],
     loadAutoincremented: Counter.generateAutoincremented,
     //operations: new DisplayLayerOperations(store.set, store.get),
-    operations: new DisplayLayerOperations(jest.fn(), jest.fn()),
+    // operations: new DisplayLayerOperations(jest.fn(), jest.fn()),
     editingNodeId: "",
     editingNodeInitialValue: "",
     // editNode(id, initialValue) {
@@ -47,6 +47,5 @@ export const create = jest.fn(initial => {
 
   return store;
 };
-  
-  export default mockUseDisplayLayerStore;
-  
+
+export default mockUseDisplayLayerStore;

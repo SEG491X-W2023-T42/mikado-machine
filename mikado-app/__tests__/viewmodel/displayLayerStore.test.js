@@ -38,8 +38,6 @@ describe('addNode method', () => {
     // Access the mocked Zustand store
     const store = MockUseDisplayLayerStore();
 
-    render(<MockUseDisplayLayerStore nodes={store.nodes} />);
-
     // Mock the modifyNodePosition function to return a valid position
     jest.spyOn(store.operations, 'modifyNodePosition').mockReturnValue({ x: 100, y: 100 });
 
