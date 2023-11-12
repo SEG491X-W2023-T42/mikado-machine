@@ -1,5 +1,5 @@
 import { connectFirestoreEmulator, doc, getDoc, getFirestore } from "firebase/firestore";
-import { firebase, USING_DEBUG_EMULATORS } from "../firebase";
+import { firebase, USING_DEBUG_EMULATORS } from "../../Firebase";
 
 export const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
