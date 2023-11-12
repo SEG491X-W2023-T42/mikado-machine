@@ -1,7 +1,7 @@
 import { useFirebase } from "./FirebaseContext";
 import { createElement } from "react";
 import { Navigate } from "react-router-dom";
-import { startGatekeeperFlagFetch } from "../viewmodel/gatekeeper";
+import { startGatekeeperFlagFetch } from "../graphlayer/store/Gatekeeper";
 
 function AuthenticatedUidWrapper({ wrapped, ...props }) {
   const { user, userLoaded } = useFirebase();

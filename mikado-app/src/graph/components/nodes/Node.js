@@ -1,9 +1,9 @@
 import { ConnectionMode, Handle, NodeToolbar } from "reactflow";
-import { useEnterGraphHack } from "./EnterGraphHackContext";
-import { runtime_assert } from "../../viewmodel/assert";
-import { useStoreHack } from "../../StoreHackContext";
-import SeamlessEditor from "../../components/SeamlessEditor";
-import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
+import { useEnterGraphHack } from "../../../context/EnterGraphHackContext";
+import { runtime_assert } from "../../../graphlayer/store/Assert";
+import { useStoreHack } from "../../../context/StoreHackContext";
+import SeamlessEditor from "../SeamlessEditor";
+import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
@@ -19,7 +19,7 @@ const ARIA_LABELS = {
   "ready": "Ready",
 };
 
-export default function MyNode({ id, data, type, exporting = false, ...rest }) {
+export default function Node({ id, data, type, exporting = false, ...rest }) {
   const { allowRemoveNode, allowSubgraph, allowModifyNodeCompletion } = getGatekeeperFlags();
   const { editingNodeId, editingNodeInitialValue, editNode, operations } = exporting ? {} : useStoreHack()(selector);
   const editing = editingNodeId === id;

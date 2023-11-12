@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import * as Counter from "./autoincrement";
-import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-import { db } from "./gatekeeper";
+import * as Counter from "./Autoincrement";
+import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
+import { db } from "../graphlayer/store/Gatekeeper";
 
 /**
  * Loads the nodes and edges from the database.

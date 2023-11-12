@@ -1,12 +1,12 @@
 import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import * as React from "react";
-import { useFirebase } from '../../context/FirebaseContext';
-import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
+import { useFirebase } from '../../../context/FirebaseContext';
+import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 
 const allSettings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 const settingsImplementedRange = [3, 4];
 
-export default function AppBarProfileOverflowMenu() {
+export default function GraphHeaderProfileOverflowMenu() {
   const { hideUnimplementedProfileMenuItems } = getGatekeeperFlags();
   const [anchorUser, setAnchorUser] = React.useState(null);
   const { logOut } = useFirebase();

@@ -7,7 +7,7 @@ import {
   onAuthStateChanged, 
   signOut } 
 from 'firebase/auth';
-import { firebase, USING_DEBUG_EMULATORS } from '../firebase';
+import { firebase, USING_DEBUG_EMULATORS } from '../Firebase';
 
 const ctxt = createContext(void 0);
 const auth = getAuth(firebase);

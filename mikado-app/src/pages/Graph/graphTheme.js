@@ -1,6 +1,6 @@
 import { MarkerType } from "reactflow";
-import FloatingEdge from "./FloatingEdge";
-import MyNode from "./MyNode";
+import FloatingEdge from "../../helpers/FloatingEdge";
+import Node from "../../graph/components/nodes/Node";
 
 export const DEFAULT_EDGE_OPTIONS = {
   markerEnd: {
@@ -27,8 +27,8 @@ export const NODE_TYPES = {
    * Override default (and, so far, only) node type
    */
   default: AssertFalseNode,
-  goal: MyNode,
-  ready: MyNode,
-  locked: MyNode,
-  complete: MyNode,
+  goal: Node,
+  ready: Node,
+  locked: Node,
+  complete: Node,
 }

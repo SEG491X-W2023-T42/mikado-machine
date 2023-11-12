@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import { loadFromDb, saveToDb } from "./serde";
-import * as Counter from "./autoincrement";
-import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-import createIntersectionDetectorFor from "./collisionDetection";
-import { dimensions } from "../helpers/NodeConstants";
-import { runtime_assert } from "./assert";
+import { loadFromDb, saveToDb } from "../../helpers/Api";
+import * as Counter from "../../helpers/Autoincrement";
+import { createEdgeObject, createNodeObject } from "./DisplayObjectFactory";
+import createIntersectionDetectorFor from "../../helpers/CollisionDetection";
+import { dimensions } from "../../helpers/NodeConstants";
+import { runtime_assert } from "./Assert";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
-import MyNode from "../pages/Graph/MyNode";
-import { getGatekeeperFlags } from "./gatekeeper";
+import Node from "../../graph/components/nodes/Node";
+import { getGatekeeperFlags } from "./Gatekeeper";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -85,9 +85,9 @@ function arrayRemoveByValueIfPresent(array, value) {
  * It is also here to skip shallow compare of all those methods.
  */
 
-class DisplayLayerOperations {
+class GraphLayerViewerOperations {
   /*
-   * DisplayLayer cache data.
+   * GraphLayerViewer cache data.
    * This data contains caches so that computations can be efficiently performed before
    * passing them to the View (React Flow).
    */
@@ -651,7 +651,7 @@ class DisplayLayerOperations {
     flushSync(() => {
       root.render(<>
         {nodes.map(x => {
-          return <MyNode key={x.id} {...x} exporting positionOffset={positionOffset} />;
+          return <Node key={x.id} {...x} exporting positionOffset={positionOffset} />;
         })}
       </>)
     });
@@ -707,7 +707,7 @@ class DisplayLayerOperations {
   }
 }
 
-const useDisplayLayerStore = () => create((set, get) => ({ // TODO
+const useGraphLayerViewerStore = () => create((set, get) => ({ // TODO
   nodes: [],
   edges: [],
   /**
@@ -717,7 +717,7 @@ const useDisplayLayerStore = () => create((set, get) => ({ // TODO
   /**
    * The actual operations
    */
-  operations: new DisplayLayerOperations(set, get),
+  operations: new GraphLayerViewerOperations(set, get),
   /**
    * The node being edited
    */
@@ -728,4 +728,4 @@ const useDisplayLayerStore = () => create((set, get) => ({ // TODO
   },
 }));
 
-export default useDisplayLayerStore;
+export default useGraphLayerViewerStore;

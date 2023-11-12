@@ -1,8 +1,8 @@
 import AuthenticatedUidWrapper from "../../context/AuthenticatedUidWrapper";
-import Plaza from "./Plaza";
+import GraphViewer from "./GraphViewer";
 
 function GraphPage() {
-  return <AuthenticatedUidWrapper wrapped={Plaza} />
+  return <AuthenticatedUidWrapper wrapped={GraphViewer} />
 }
 
 export default GraphPage;
