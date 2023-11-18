@@ -151,6 +151,11 @@ class GraphLayerViewerOperations {
    */
   #state;
 
+  /**
+   * Quest parent branches 
+   */
+  #questParents;
+
   constructor(set, get) {
     this.#set = set;
     this.#state = (this.#get = get)();
@@ -175,7 +180,15 @@ class GraphLayerViewerOperations {
    * Processes changes from React Flow
    */
   onNodesChange(changes) {
-    myOnNodesChange(changes, this.#state.nodes, this.#set);
+    myOnNodesChange(changes, this.#state.nodes, this.#set); 
+  }
+
+  /**
+   * Update parent quests
+   */
+  updateQuestParents() {
+	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id)); 
+	console.log(this.#questParents)
   }
 
   /**
@@ -184,17 +197,19 @@ class GraphLayerViewerOperations {
   load(uid, graphName, subgraphID) {
     this.#loading = true;
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
-      this.#forwardConnections = forwardConnections;
-      this.#backwardConnections = backwardConnections;
-      const nodeLabels = this.#nodeLabels = {};
-      for (const node of nodes) {
-        nodeLabels[node.id] = node.data.label;
-      }
-      this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
-      this.#loading = false;
-      this.#graphName = graphName;
-      this.#subgraphNodeID = subgraphID;
+		this.#forwardConnections = forwardConnections;
+		this.#backwardConnections = backwardConnections;
+		const nodeLabels = this.#nodeLabels = {};
+		for (const node of nodes) {
+		nodeLabels[node.id] = node.data.label;
+		}
+		this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
+		this.#loading = false;
+		this.#graphName = graphName;
+		this.#subgraphNodeID = subgraphID;
+		this.updateQuestParents();
     });
+
   }
 
   /**
@@ -430,6 +445,7 @@ class GraphLayerViewerOperations {
       backwardConnections[dstId].push(srcId);
       this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId, this.#nodeLabels[srcId], this.#nodeLabels[dstId])] });
       this.updateNodeType(srcId);
+      this.updateQuestParents();
       return;
     } // else forward connection found, so will delete it
     const forward = forwardConnections[srcId];
@@ -443,6 +459,7 @@ class GraphLayerViewerOperations {
       ),
     });
     this.updateNodeType(srcId)
+	this.updateQuestParents();
   }
 
   /**
