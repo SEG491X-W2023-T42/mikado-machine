@@ -234,7 +234,6 @@ class GraphLayerViewerOperations {
 			parentNodes = newParentNodes;
 		}
 	}
-	console.log(this.#currentTasks);
 
   }
 
