@@ -215,21 +215,18 @@ class GraphLayerViewerOperations {
 
 	const questlineId = this.#currentQuestline.id
 
-	let canidateReadyNodes = this.#state.nodes.filter((node) => node.type == 'ready').map(function(node) {return node.id})
+	let canidateReadyNodes = this.#state.nodes.filter((node) => node.type == 'ready');
 	this.#currentTasks = [];
 
 	for (const canidateReadyNode of canidateReadyNodes) {
-		let parentNodes = this.#backwardConnections[canidateReadyNode]
-		let done = false;
+		let parentNodes = this.#backwardConnections[canidateReadyNode.id]
 		
-		while (!done) {
+		while (parentNodes.length > 0) {
 			let newParentNodes = [];
 
 			if (parentNodes.includes(questlineId.toString())) {
-				this.#currentTasks.push(...this.#state.nodes.filter((node) => node.id == canidateReadyNode))
-				done = true;
-			} else if (parentNodes.length == 0) {
-				done = true;
+				this.#currentTasks.push(canidateReadyNode)
+				break;
 			}
 
 			parentNodes.forEach((connection) => newParentNodes.push(...this.#backwardConnections[connection]))
