@@ -692,6 +692,7 @@ class GraphLayerViewerOperations {
    */
   setCurrentQuestline(questlineId) {
 	this.#currentQuestline = this.#questParents.filter((node) => node.id == questlineId);
+	this.updateQuestParents();
   }
 
   /**
