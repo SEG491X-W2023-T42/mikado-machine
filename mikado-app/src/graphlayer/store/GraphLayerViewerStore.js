@@ -9,6 +9,7 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import Node from "../../graph/components/nodes/Node";
 import { getGatekeeperFlags } from "./Gatekeeper";
+import { connectFirestoreEmulator } from "firebase/firestore";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -156,6 +157,16 @@ class GraphLayerViewerOperations {
    */
   #questParents;
 
+  /**
+   * Current questline
+   */
+  #currentQuestline;
+
+  /**
+   * Current quest tasks
+   */
+  #currentTasks
+
   constructor(set, get) {
     this.#set = set;
     this.#state = (this.#get = get)();
@@ -187,9 +198,52 @@ class GraphLayerViewerOperations {
    * Update parent quests
    */
   updateQuestParents() {
-	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id)); 
-	console.log(this.#questParents)
+	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id));
+	if (this.#currentQuestline == undefined) {
+		this.#currentQuestline = this.#questParents[0]
+	}
+	this.updateQuest()
   }
+
+  /**
+   * Choose quest
+   */
+  updateQuest() {
+	if (this.#questParents === undefined || this.#questParents.length == 0) {
+		return;
+	}
+
+	const questlineId = this.#currentQuestline.id
+
+	let canidateReadyNodes = this.#state.nodes.filter((node) => node.type == 'ready').map(function(node) {return node.id})
+	this.#currentTasks = [];
+
+	for (const canidateReadyNode of canidateReadyNodes) {
+		let parentNodes = this.#backwardConnections[canidateReadyNode]
+		let done = false;
+		
+		while (!done) {
+			let newParentNodes = [];
+
+			if (parentNodes.includes(questlineId.toString())) {
+				this.#currentTasks.push(...this.#state.nodes.filter((node) => node.id == canidateReadyNode))
+				done = true;
+			} else if (parentNodes.length == 0) {
+				done = true;
+			}
+
+			parentNodes.forEach((connection) => newParentNodes.push(...this.#backwardConnections[connection]))
+
+			parentNodes = newParentNodes;
+		}
+	}
+	console.log(this.#currentTasks);
+
+  }
+
+  /**
+   * 
+   */
 
   /**
    * Loads this layer from the database
@@ -505,6 +559,7 @@ class GraphLayerViewerOperations {
     backwardConnections.forEach(id => {
       this.updateNodeType(id)
     })
+	this.updateQuest();
   }
 
   /**
@@ -617,6 +672,38 @@ class GraphLayerViewerOperations {
     }
     return false; // throw new Error(); // TODO
   }
+
+  /**
+   * Gets current task list.
+   */
+  getCurrentTasks() {
+	return this.#currentTasks;
+  }
+
+  /**
+   * Gets current questline parent node.
+   */
+  getCurrentQuestline(){
+	return this.#currentQuestline;
+  }
+
+  /**
+   * Sets current questline by id
+   */
+  setCurrentQuestline(questlineId) {
+	this.#currentQuestline = this.#questParents.filter((node) => node.id == questlineId);
+  }
+
+  /**
+   * Gets all available quests.
+   */
+  getAllQuests() {
+	return this.#questParents;
+  }
+
+  /**
+   * 
+   */
 
   /**
    * Renders to HTML and opens a popup to print.
