@@ -7,7 +7,7 @@ export const DEFAULT_EDGE_OPTIONS = {
     type: MarkerType.ArrowClosed,
     width: 10,
     height: 10,
-    color: "black",
+    color: "grey",
   },
 };
 
