@@ -19,6 +19,7 @@ import { StoreHackContext, useStoreHack } from "../../context/StoreHackContext.j
 import { EnterGraphHackContext } from "../../context/EnterGraphHackContext.js";
 import AddNodeFab from '../../graph/components/overlays/AddNodeFAB.js';
 import { getGatekeeperFlags } from "../store/Gatekeeper.js";
+import QuestOverlay from '../../graph/components/overlays/QuestOverlay.js';
 
 
 /**
@@ -46,6 +47,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
   const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
+  const [currentTask, setCurrentTask] = useState();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the GraphLayerViewer, which can be enforced by setting a React key prop on it
@@ -56,6 +58,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
   // Load data from db
   useEffect(() => {
     operations.load(uid, graph.id, graph.subgraph)
+	
   }, [uid, operations, graph]);
 
   const [testCount, setTestCount] = useState(0);
@@ -64,6 +67,10 @@ function GraphLayerViewerInternal({ uid, graph }) {
     setTestCount(testCount + 1);
     return () => console.debug("GraphLayerViewer unmount");
   }, []);
+
+  useEffect(() => {
+	setCurrentTask(operations.getCurrentTasks())
+  }, [operations.getCurrentTasks()])
 
   /*
   // Zoom on transition call
@@ -212,6 +219,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
     }} />}
     { allowAddNode && isTouchscreen && <AddNodeFab onClick={() => void addNode()} /> }
+	<QuestOverlay currentTask={currentTask} />
   </main>;
 }
 
