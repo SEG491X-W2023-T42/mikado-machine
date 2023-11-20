@@ -9,7 +9,6 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import Node from "../../graph/components/nodes/Node";
 import { getGatekeeperFlags } from "./Gatekeeper";
-import { connectFirestoreEmulator } from "firebase/firestore";
 
 /**
  * Subset of React Flow's onNodesChange.
