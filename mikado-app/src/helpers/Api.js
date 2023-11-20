@@ -21,7 +21,6 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 
   // TODO add a version key and prevent loading newer schemas
   const { node_names, positions, connections, type } = docSnap.data();
-  console.log(docSnap.data());
 
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.
