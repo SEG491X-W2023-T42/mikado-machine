@@ -427,8 +427,10 @@ class GraphLayerViewerOperations {
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
 	
-	if (id == this.#currentQuestline.id) {
-		this.#currentQuestline = undefined
+	if (this.#currentQuestline != undefined) {
+		if (id == this.#currentQuestline.id) {
+			this.#currentQuestline = undefined
+		}
 	}
 	this.updateQuestParents();
   }
