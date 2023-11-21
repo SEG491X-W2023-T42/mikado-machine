@@ -1,10 +1,10 @@
-import "./MyAppBar.css";
+import "./GraphHeader.css";
 import * as React from 'react';
 import { AppBar, Button, Container, Toolbar } from '@mui/material'
-import AppBarProfileOverflowMenu from "./AppBarProfileOverflowMenu";
-import SeamlessEditor from "../SeamlessEditor";
+import GraphHeaderProfileOverflowMenu from "./GraphHeaderProfileOverflowMenu";
+import SeamlessEditor from "../../../graph/components/SeamlessEditor";
 import { useEffect, useState } from "react";
-import { db, getGatekeeperFlags } from "../../viewmodel/gatekeeper";
+import { db, getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 function serializeGraphWithTitle(title) {
@@ -15,7 +15,7 @@ function serializeGraphWithTitle(title) {
   }
 }
 
-export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) {
+export default function GraphHeader({ uid, graph: { id, subgraph }, graphHandle }) {
   const { allowEditGraphName, hideProfileMenu } = getGatekeeperFlags();
   const [savedTitle, setSavedTitle] = useState(null);
   const [title, setTitle] = useState("");
@@ -82,7 +82,7 @@ export default function MyAppBar({ uid, graph: { id, subgraph }, graphHandle }) 
           <Button sx={{color: "white"}} onClick={() => {graphHandle({id, subgraph: ""})}}>
             Back
           </Button>}
-          {!hideProfileMenu && <AppBarProfileOverflowMenu />}
+          {!hideProfileMenu && <GraphHeaderProfileOverflowMenu />}
         </Toolbar>
       </Container>
     </AppBar>

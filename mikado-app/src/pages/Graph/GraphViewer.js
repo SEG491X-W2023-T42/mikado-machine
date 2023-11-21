@@ -1,19 +1,19 @@
-import DisplayLayer from "./DisplayLayer";
-import "./Plaza.css";
+import GraphLayerViewer from "../../graphlayer/component/GraphLayerViewer";
+import "./GraphViewer.css";
 import { useMemo, useState } from "react";
 import * as React from 'react';
-import MyAppBar from "../../components/MyAppBar/MyAppBar";
+import GraphHeader from '../../graph/components/graphheader/GraphHeader';
 
 /**
- * The Plaza component is the main page that users view and edit graphs.
+ * The GraphViewer component is the main page that users view and edit graphs.
  *
- * Most of the time the user may just see one DisplayLayer be the whole thing.
- * The difference between Graph and DisplayLayer is that the Plaza normally persists throughout
- * an editing session of one Mikado, while the DisplayLayer may be destroyed when entering subtrees.
- * Plaza may also be responsible for animating tow DisplayLayers, one exiting and one entering.
+ * Most of the time the user may just see one GraphLayerViewer be the whole thing.
+ * The difference between Graph and GraphLayerViewer is that the GraphViewer normally persists throughout
+ * an editing session of one Mikado, while the GraphLayerViewer may be destroyed when entering subtrees.
+ * GraphViewer may also be responsible for animating tow GraphLayerViewers, one exiting and one entering.
  * It also contains the bottom sheet.
  */
-function Plaza({ uid }) {
+function GraphViewer({ uid }) {
   /**
    * The default Mikado to open.
    *
@@ -52,8 +52,8 @@ function Plaza({ uid }) {
     setGraphTransition({
       startFrom: "in",
       transitionOut: false, transitionIn: true,
-      pos: displayLayerHandle.getSelectedNodePos(),
-      nodeID: displayLayerHandle.getSelectedNodeID()
+      pos: GraphLayerViewerHandle.getSelectedNodePos(),
+      nodeID: GraphLayerViewerHandle.getSelectedNodeID()
     });
 
     // Changing graph transition
@@ -74,14 +74,14 @@ function Plaza({ uid }) {
     setTimeout(() => setGraphTransition({
       startFrom: "in",
       transitionOut: true, transitionIn: false,
-      pos: displayLayerHandle.getSelectedNodePos(),
-      nodeID: displayLayerHandle.getSelectedNodeID()
+      pos: GraphLayerViewerHandle.getSelectedNodePos(),
+      nodeID: GraphLayerViewerHandle.getSelectedNodeID()
     }), 1600);
     setTimeout(() => setGraphTransition({
       startFrom: "in",
       transitionOut: false, transitionIn: false,
-      pos: displayLayerHandle.getSelectedNodePos(),
-      nodeID: displayLayerHandle.getSelectedNodeID()
+      pos: GraphLayerViewerHandle.getSelectedNodePos(),
+      nodeID: GraphLayerViewerHandle.getSelectedNodeID()
     }), 1900);
   }
 
@@ -90,8 +90,8 @@ function Plaza({ uid }) {
     setGraphTransition({
       startFrom: "out",
       transitionOut: true, transitionIn: false,
-      pos: displayLayerHandle.getSelectedNodePos(),
-      nodeID: displayLayerHandle.getSelectedNodeID()
+      pos: GraphLayerViewerHandle.getSelectedNodePos(),
+      nodeID: GraphLayerViewerHandle.getSelectedNodeID()
     });
 
     // Changing graph transition
@@ -111,14 +111,14 @@ function Plaza({ uid }) {
     setTimeout(() => setGraphTransition({
       startFrom: "out",
       transitionOut: false, transitionIn: true,
-      pos: displayLayerHandle.getSelectedNodePos(),
-      nodeID: displayLayerHandle.getSelectedNodeID()
+      pos: GraphLayerViewerHandle.getSelectedNodePos(),
+      nodeID: GraphLayerViewerHandle.getSelectedNodeID()
     }), 1600);
     setTimeout(() => setGraphTransition({
       startFrom: "out",
       transitionOut: false, transitionIn: false,
-      pos: displayLayerHandle.getSelectedNodePos(),
-      nodeID: displayLayerHandle.getSelectedNodeID()
+      pos: GraphLayerViewerHandle.getSelectedNodePos(),
+      nodeID: GraphLayerViewerHandle.getSelectedNodeID()
     }), 1900);
   }
    */
@@ -132,14 +132,14 @@ function Plaza({ uid }) {
   }
 
   const  key = uid + graph.subgraph;
-  console.debug("plaza graph", graph, "key", key);
+  console.debug("GraphViewer graph", graph, "key", key);
   return <main>
-    <MyAppBar uid={uid} graph={graph} graphHandle={setGraph} />
-    <DisplayLayer key={key} uid={uid}
+    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} />
+    <GraphLayerViewer key={key} uid={uid}
                   graph={graph}
                   enterGraph={enterGraph}
     />
   </main>
 }
 
-export default Plaza;
+export default GraphViewer;

@@ -1,7 +1,7 @@
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import * as Counter from "./autoincrement";
-import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-import { db } from "./gatekeeper";
+import * as Counter from "./Autoincrement";
+import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
+import { db } from "../graphlayer/store/Gatekeeper";
 
 /**
  * Loads the nodes and edges from the database.
@@ -21,7 +21,6 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 
   // TODO add a version key and prevent loading newer schemas
   const { node_names, positions, connections, type } = docSnap.data();
-  console.log(docSnap.data());
 
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.

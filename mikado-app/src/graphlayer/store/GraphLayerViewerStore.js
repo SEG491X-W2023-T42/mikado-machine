@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import { loadFromDb, saveToDb } from "./serde";
-import * as Counter from "./autoincrement";
-import { createEdgeObject, createNodeObject } from "./displayObjectFactory";
-import createIntersectionDetectorFor from "./collisionDetection";
-import { dimensions } from "../helpers/NodeConstants";
-import { runtime_assert } from "./assert";
+import { loadFromDb, saveToDb } from "../../helpers/Api";
+import * as Counter from "../../helpers/Autoincrement";
+import { createEdgeObject, createNodeObject } from "./DisplayObjectFactory";
+import createIntersectionDetectorFor from "../../helpers/CollisionDetection";
+import { dimensions } from "../../helpers/NodeConstants";
+import { runtime_assert } from "./Assert";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
-import MyNode from "../pages/Graph/MyNode";
-import { getGatekeeperFlags } from "./gatekeeper";
+import Node from "../../graph/components/nodes/Node";
+import { getGatekeeperFlags } from "./Gatekeeper";
 
 /**
  * Subset of React Flow's onNodesChange.
@@ -85,9 +85,9 @@ function arrayRemoveByValueIfPresent(array, value) {
  * It is also here to skip shallow compare of all those methods.
  */
 
-class DisplayLayerOperations {
+class GraphLayerViewerOperations {
   /*
-   * DisplayLayer cache data.
+   * GraphLayerViewer cache data.
    * This data contains caches so that computations can be efficiently performed before
    * passing them to the View (React Flow).
    */
@@ -151,6 +151,21 @@ class DisplayLayerOperations {
    */
   #state;
 
+  /**
+   * Quest parent branches 
+   */
+  #questParents;
+
+  /**
+   * Current questline
+   */
+  #currentQuestline;
+
+  /**
+   * Current quest tasks
+   */
+  #currentTasks
+
   constructor(set, get) {
     this.#set = set;
     this.#state = (this.#get = get)();
@@ -175,7 +190,62 @@ class DisplayLayerOperations {
    * Processes changes from React Flow
    */
   onNodesChange(changes) {
-    myOnNodesChange(changes, this.#state.nodes, this.#set);
+    myOnNodesChange(changes, this.#state.nodes, this.#set); 
+  }
+
+  /**
+   * Update parent quests
+   */
+  updateQuestParents() {
+	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
+	
+	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
+		if (this.#questParents.length != 0) {
+			this.#currentQuestline = this.#questParents[0]
+		} else {
+			this.#currentTasks = undefined
+		}
+	}
+	this.updateQuest()
+  }
+
+  /**
+   * Choose quest
+   */
+  updateQuest() {
+	if (this.#questParents === undefined || this.#questParents.length == 0) {
+		return;
+	}
+
+	const questlineId = this.#currentQuestline.id
+
+	let canidateReadyNodes = this.#state.nodes.filter((node) => node.type == 'ready');
+	this.#currentTasks = [];
+
+	for (const canidateReadyNode of canidateReadyNodes) {
+		let parentNodes = this.#backwardConnections[canidateReadyNode.id]
+		
+		while (parentNodes.length > 0) {
+			let newParentNodes = [];
+
+			if (parentNodes.includes(questlineId.toString()) || canidateReadyNode.id == questlineId) {
+				this.#currentTasks.push(canidateReadyNode)
+				break;
+			}
+
+			parentNodes.forEach((connection) => newParentNodes.push(...this.#backwardConnections[connection]))
+
+			parentNodes = newParentNodes;
+		}
+	}
+
+  }
+
+  /**
+   * Complete current task
+   */
+  completeCurrentTask() {
+	this.setNodeCompleted(this.#currentTasks[0].id, "complete")
   }
 
   /**
@@ -184,17 +254,19 @@ class DisplayLayerOperations {
   load(uid, graphName, subgraphID) {
     this.#loading = true;
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
-      this.#forwardConnections = forwardConnections;
-      this.#backwardConnections = backwardConnections;
-      const nodeLabels = this.#nodeLabels = {};
-      for (const node of nodes) {
-        nodeLabels[node.id] = node.data.label;
-      }
-      this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
-      this.#loading = false;
-      this.#graphName = graphName;
-      this.#subgraphNodeID = subgraphID;
+		this.#forwardConnections = forwardConnections;
+		this.#backwardConnections = backwardConnections;
+		const nodeLabels = this.#nodeLabels = {};
+		for (const node of nodes) {
+		nodeLabels[node.id] = node.data.label;
+		}
+		this.#set({ nodes, edges, loadAutoincremented: Counter.generateAutoincremented });
+		this.#loading = false;
+		this.#graphName = graphName;
+		this.#subgraphNodeID = subgraphID;
+		this.updateQuestParents();
     });
+
   }
 
   /**
@@ -354,6 +426,13 @@ class DisplayLayerOperations {
       nodes: nodes.filter(node => node.id !== id),
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
+	
+	if (this.#currentQuestline != undefined) {
+		if (id == this.#currentQuestline.id) {
+			this.#currentQuestline = undefined
+		}
+	}
+	this.updateQuestParents();
   }
 
   /**
@@ -430,6 +509,7 @@ class DisplayLayerOperations {
       backwardConnections[dstId].push(srcId);
       this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId, this.#nodeLabels[srcId], this.#nodeLabels[dstId])] });
       this.updateNodeType(srcId);
+      this.updateQuestParents();
       return;
     } // else forward connection found, so will delete it
     const forward = forwardConnections[srcId];
@@ -443,6 +523,7 @@ class DisplayLayerOperations {
       ),
     });
     this.updateNodeType(srcId)
+	this.updateQuestParents();
   }
 
   /**
@@ -468,7 +549,8 @@ class DisplayLayerOperations {
         allComplete = false;
       }
 
-      if (node.type === "ready") {
+      if (node.type === "ready" || node.type === "locked") {
+        // hack for fixing nodes that don't update appearance when connecting from leaves toward root
         this.setNodeType(id, "locked")
         return;
       }
@@ -488,6 +570,7 @@ class DisplayLayerOperations {
     backwardConnections.forEach(id => {
       this.updateNodeType(id)
     })
+	this.updateQuestParents();
   }
 
   /**
@@ -520,6 +603,7 @@ class DisplayLayerOperations {
         }
       }),
     });
+	this.updateQuestParents();
   }
 
   highlightOrUnhighlightNode(target) {
@@ -613,6 +697,39 @@ class DisplayLayerOperations {
   }
 
   /**
+   * Gets current task list.
+   */
+  getCurrentTasks() {
+	return this.#currentTasks;
+  }
+
+  /**
+   * Gets current questline parent node.
+   */
+  getCurrentQuestline(){
+	return this.#currentQuestline;
+  }
+
+  /**
+   * Sets current questline by id
+   */
+  setCurrentQuestline(questlineId) {
+	this.#currentQuestline = this.#questParents.filter((node) => node.id == questlineId);
+	this.updateQuestParents();
+  }
+
+  /**
+   * Gets all available quests.
+   */
+  getAllQuests() {
+	return this.#questParents;
+  }
+
+  /**
+   * 
+   */
+
+  /**
    * Renders to HTML and opens a popup to print.
    */
   export(edgesSvg) {
@@ -662,7 +779,7 @@ class DisplayLayerOperations {
     flushSync(() => {
       root.render(<>
         {nodes.map(x => {
-          return <MyNode key={x.id} {...x} exporting positionOffset={positionOffset} />;
+          return <Node key={x.id} {...x} exporting positionOffset={positionOffset} />;
         })}
       </>)
     });
@@ -718,7 +835,7 @@ class DisplayLayerOperations {
   }
 }
 
-const useDisplayLayerStore = () => create((set, get) => ({ // TODO
+const useGraphLayerViewerStore = () => create((set, get) => ({ // TODO
   nodes: [],
   edges: [],
   /**
@@ -728,7 +845,7 @@ const useDisplayLayerStore = () => create((set, get) => ({ // TODO
   /**
    * The actual operations
    */
-  operations: new DisplayLayerOperations(set, get),
+  operations: new GraphLayerViewerOperations(set, get),
   /**
    * The node being edited
    */
@@ -739,4 +856,4 @@ const useDisplayLayerStore = () => create((set, get) => ({ // TODO
   },
 }));
 
-export default useDisplayLayerStore;
+export default useGraphLayerViewerStore;

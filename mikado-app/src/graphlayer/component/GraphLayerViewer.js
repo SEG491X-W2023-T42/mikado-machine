@@ -8,17 +8,18 @@ import ReactFlow, {
     useStoreApi as useReactFlowStoreApi
 } from 'reactflow';
 import { shallow } from "zustand/shallow";
-import CustomControl from '../../components/CustomControl/CustomControl';
-import useDisplayLayerStore from "../../viewmodel/displayLayerStore";
-import { runtime_assert } from "../../viewmodel/assert";
-import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "./graphTheme";
-import { MY_NODE_CONNECTION_MODE } from "./MyNode";
-import createIntersectionDetectorFor from "../../viewmodel/collisionDetection";
-import { notifyError } from "../../components/ToastManager";
-import { StoreHackContext, useStoreHack } from "../../StoreHackContext.js";
-import { EnterGraphHackContext } from "./EnterGraphHackContext";
-import AddNodeFab from '../../components/Overlays/AddNodeFAB';
-import { getGatekeeperFlags } from "../../viewmodel/gatekeeper";
+import CustomControl from '../../graph/components/CustomControl.js';
+import useGraphLayerViewerStore from "../store/GraphLayerViewerStore.js";
+import { runtime_assert } from "../store/Assert.js";
+import { DEFAULT_EDGE_OPTIONS, EDGE_TYPES, NODE_TYPES } from "../../pages/Graph/graphTheme.js";
+import { MY_NODE_CONNECTION_MODE } from "../../graph/components/nodes/Node";
+import createIntersectionDetectorFor from "../../helpers/CollisionDetection";
+import { notifyError } from "../../graph/components/ToastManager.js";
+import { StoreHackContext, useStoreHack } from "../../context/StoreHackContext.js";
+import { EnterGraphHackContext } from "../../context/EnterGraphHackContext.js";
+import AddNodeFab from '../../graph/components/overlays/AddNodeFAB.js';
+import { getGatekeeperFlags } from "../store/Gatekeeper.js";
+import QuestOverlay from '../../graph/components/overlays/QuestOverlay.js';
 
 
 /**
@@ -34,36 +35,42 @@ const selector = (state) => state;
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
 
 /**
- * @see DisplayLayer
+ * @see GraphLayerViewer
  *
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function DisplayLayerInternal({ uid, graph }) {
+function GraphLayerViewerInternal({ uid, graph }) {
   const { hideGraphControls, allowEditNodeLabel, allowAddNode } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
   const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
+  const [currentTask, setCurrentTask] = useState();
 
   // Assert uid will never change
-  // Changing layers should be done by replacing the DisplayLayer, which can be enforced by setting a React key prop on it
-  // In general, DisplayLayer would be too complex to reason about if we allowed uid to change
+  // Changing layers should be done by replacing the GraphLayerViewer, which can be enforced by setting a React key prop on it
+  // In general, GraphLayerViewer would be too complex to reason about if we allowed uid to change
   const [assertUid] = useState(uid);
   runtime_assert(assertUid === uid);
 
   // Load data from db
   useEffect(() => {
     operations.load(uid, graph.id, graph.subgraph)
+	
   }, [uid, operations, graph]);
 
   const [testCount, setTestCount] = useState(0);
   useEffect(() => {
-    console.log("displaylayer mount", testCount, "nodes", nodes, edges, operations);
+    console.log("GraphLayerViewer mount", testCount, "nodes", nodes, edges, operations);
     setTestCount(testCount + 1);
-    return () => console.debug("displaylayer unmount");
+    return () => console.debug("GraphLayerViewer unmount");
   }, []);
+
+  useEffect(() => {
+	setCurrentTask(operations.getCurrentTasks())
+  }, [operations.getCurrentTasks()])
 
   /*
   // Zoom on transition call
@@ -179,7 +186,7 @@ function DisplayLayerInternal({ uid, graph }) {
     d3Selection.on('dblclick.zoom', null);
   }, []);
 
-  console.debug("displaylayer graph", graph);
+  console.debug("GraphLayerViewer graph", graph);
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
@@ -205,33 +212,36 @@ function DisplayLayerInternal({ uid, graph }) {
       onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
-      <Background />
+      { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      <Background /> 
+      
     </ReactFlow>
     {!hideGraphControls && <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
       fitView();
       operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
     }} />}
     { allowAddNode && isTouchscreen && <AddNodeFab onClick={() => void addNode()} /> }
+	
   </main>;
 }
 
 /**
- * The DisplayLayer component shows ane layer of a Mikado that can be edited.
+ * The GraphLayerViewer component shows ane layer of a Mikado that can be edited.
  *
- * A new DisplayLayer is created and replaces the current one when entering/exiting a subtree.
+ * A new GraphLayerViewer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function DisplayLayer({ uid, graph, enterGraph }) {
-  const [useStore] = useState(() => useDisplayLayerStore());
+function GraphLayerViewer({ uid, graph, enterGraph }) {
+  const [useStore] = useState(() => useGraphLayerViewerStore());
   return (
     <ReactFlowProvider>
       <StoreHackContext.Provider value={useStore}>
         <EnterGraphHackContext.Provider value={enterGraph}>
-          <DisplayLayerInternal uid={uid} graph={graph} />
+          <GraphLayerViewerInternal uid={uid} graph={graph} />
         </EnterGraphHackContext.Provider>
       </StoreHackContext.Provider>
     </ReactFlowProvider>
   );
 }
 
-export default DisplayLayer;
+export default GraphLayerViewer;
