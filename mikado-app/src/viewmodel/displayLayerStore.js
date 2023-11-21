@@ -602,6 +602,17 @@ class DisplayLayerOperations {
   }
 
   /**
+   *  Returns true if node is in a subgraph, false otherwise.
+   */
+  isNodeInSubgraph() {
+    if (this.#subgraphNodeID !== ""){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Renders to HTML and opens a popup to print.
    */
   export(edgesSvg) {
