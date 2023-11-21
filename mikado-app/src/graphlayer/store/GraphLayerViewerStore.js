@@ -197,10 +197,11 @@ class GraphLayerViewerOperations {
    * Update parent quests
    */
   updateQuestParents() {
-	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id));
-	if (this.#currentQuestline == undefined) {
+	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
+	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
 		this.#currentQuestline = this.#questParents[0]
 	}
+	console.log(this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete')
 	this.updateQuest()
   }
 
@@ -223,7 +224,7 @@ class GraphLayerViewerOperations {
 		while (parentNodes.length > 0) {
 			let newParentNodes = [];
 
-			if (parentNodes.includes(questlineId.toString())) {
+			if (parentNodes.includes(questlineId.toString()) || canidateReadyNode.id == questlineId) {
 				this.#currentTasks.push(canidateReadyNode)
 				break;
 			}
@@ -237,8 +238,11 @@ class GraphLayerViewerOperations {
   }
 
   /**
-   * 
+   * Complete current task
    */
+  completeCurrentTask() {
+	this.setNodeCompleted(this.#currentTasks[0].id, "complete")
+  }
 
   /**
    * Loads this layer from the database
@@ -554,7 +558,7 @@ class GraphLayerViewerOperations {
     backwardConnections.forEach(id => {
       this.updateNodeType(id)
     })
-	this.updateQuest();
+	this.updateQuestParents();
   }
 
   /**
@@ -587,6 +591,7 @@ class GraphLayerViewerOperations {
         }
       }),
     });
+	this.updateQuestParents();
   }
 
   highlightOrUnhighlightNode(target) {

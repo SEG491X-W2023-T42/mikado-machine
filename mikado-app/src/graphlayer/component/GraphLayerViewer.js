@@ -212,14 +212,16 @@ function GraphLayerViewerInternal({ uid, graph }) {
       onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
-      <Background />
+      <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/>
+      <Background /> 
+      
     </ReactFlow>
     {!hideGraphControls && <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
       fitView();
       operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
     }} />}
     { allowAddNode && isTouchscreen && <AddNodeFab onClick={() => void addNode()} /> }
-	<QuestOverlay currentTask={currentTask} />
+	
   </main>;
 }
 
