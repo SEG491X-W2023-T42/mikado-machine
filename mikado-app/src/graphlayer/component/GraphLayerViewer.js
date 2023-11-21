@@ -212,7 +212,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
-      <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/>
+      { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background /> 
       
     </ReactFlow>
