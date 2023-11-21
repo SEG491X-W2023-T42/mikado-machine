@@ -198,10 +198,14 @@ class GraphLayerViewerOperations {
    */
   updateQuestParents() {
 	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
+	
 	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
-		this.#currentQuestline = this.#questParents[0]
+		if (this.#questParents.length != 0) {
+			this.#currentQuestline = this.#questParents[0]
+		} else {
+			this.#currentTasks = undefined
+		}
 	}
-	console.log(this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete')
 	this.updateQuest()
   }
 
@@ -422,6 +426,11 @@ class GraphLayerViewerOperations {
       nodes: nodes.filter(node => node.id !== id),
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
+	
+	if (id == this.#currentQuestline.id) {
+		this.#currentQuestline = undefined
+	}
+	this.updateQuestParents();
   }
 
   /**
