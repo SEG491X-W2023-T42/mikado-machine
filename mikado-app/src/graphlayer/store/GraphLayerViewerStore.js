@@ -197,9 +197,14 @@ class GraphLayerViewerOperations {
    * Update parent quests
    */
   updateQuestParents() {
-	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id));
-	if (this.#currentQuestline == undefined) {
-		this.#currentQuestline = this.#questParents[0]
+	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
+	
+	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
+		if (this.#questParents.length != 0) {
+			this.#currentQuestline = this.#questParents[0]
+		} else {
+			this.#currentTasks = undefined
+		}
 	}
 	this.updateQuest()
   }
@@ -223,7 +228,7 @@ class GraphLayerViewerOperations {
 		while (parentNodes.length > 0) {
 			let newParentNodes = [];
 
-			if (parentNodes.includes(questlineId.toString())) {
+			if (parentNodes.includes(questlineId.toString()) || canidateReadyNode.id == questlineId) {
 				this.#currentTasks.push(canidateReadyNode)
 				break;
 			}
@@ -237,8 +242,11 @@ class GraphLayerViewerOperations {
   }
 
   /**
-   * 
+   * Complete current task
    */
+  completeCurrentTask() {
+	this.setNodeCompleted(this.#currentTasks[0].id, "complete")
+  }
 
   /**
    * Loads this layer from the database
@@ -418,6 +426,13 @@ class GraphLayerViewerOperations {
       nodes: nodes.filter(node => node.id !== id),
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
+	
+	if (this.#currentQuestline != undefined) {
+		if (id == this.#currentQuestline.id) {
+			this.#currentQuestline = undefined
+		}
+	}
+	this.updateQuestParents();
   }
 
   /**
@@ -555,7 +570,7 @@ class GraphLayerViewerOperations {
     backwardConnections.forEach(id => {
       this.updateNodeType(id)
     })
-	this.updateQuest();
+	this.updateQuestParents();
   }
 
   /**
@@ -588,6 +603,7 @@ class GraphLayerViewerOperations {
         }
       }),
     });
+	this.updateQuestParents();
   }
 
   highlightOrUnhighlightNode(target) {
