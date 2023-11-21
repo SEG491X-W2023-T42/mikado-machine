@@ -534,7 +534,8 @@ class GraphLayerViewerOperations {
         allComplete = false;
       }
 
-      if (node.type === "ready") {
+      if (node.type === "ready" || node.type === "locked") {
+        // hack for fixing nodes that don't update appearance when connecting from leaves toward root
         this.setNodeType(id, "locked")
         return;
       }
