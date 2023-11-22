@@ -228,7 +228,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       <Background /> 
       
     </ReactFlow>
-    {!hideGraphControls && <CustomControl onExportClick={() => {
+    {!hideGraphControls && <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
       fitView();
       operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
     }} />}
