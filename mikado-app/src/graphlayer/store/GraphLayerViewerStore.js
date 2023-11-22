@@ -620,14 +620,14 @@ class GraphLayerViewerOperations {
   highlightOrUnhighlightNode(target) {
     if (target === null) { // if no target, unhighlight all nodes
       for (const node of this.#state.nodes) {
-        document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+        document.querySelector(`[data-id="${node.id}"]`).classList.remove("hovered")
       }
     } else {
       for (const node of this.#state.nodes) { // highlight target and unhighlight all other nodes
         if (node.id !== target.id){
-          document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+          document.querySelector(`[data-id="${node.id}"]`).classList.remove("hovered")
         } else {
-          document.querySelector(`[data-id="${target.id}"]`).style.border = "2px solid rgba(105, 105, 105, 0.7)";
+          document.querySelector(`[data-id="${target.id}"]`).classList.add("hovered")
         }
       }
     }
