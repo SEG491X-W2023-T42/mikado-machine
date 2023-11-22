@@ -39,7 +39,7 @@ export default function Node({ id, data, type, exporting = false, ...rest }) {
 
   const result = <>
     {exporting ? null : <NodeToolbar>
-      {allowRemoveNode && <button aria-label="Delete" data-icon="delete" title="Delete task" onClick={() => operations.deleteNode(id)} />}
+      {allowRemoveNode && notGoal && <button aria-label="Delete" data-icon="delete" title="Delete task" onClick={() => operations.deleteNode(id)} />}
       {allowSubgraph && notGoal && !subgraph && <button
         aria-label= "Create subgraph"
         data-icon="create-subgraph"
