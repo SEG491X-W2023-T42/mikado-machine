@@ -39,15 +39,17 @@ export default function Node({ id, data, type, exporting = false, ...rest }) {
 
   const result = <>
     {exporting ? null : <NodeToolbar>
-      {allowRemoveNode && <button aria-label="Delete" data-icon="delete" onClick={() => operations.deleteNode(id)} />}
+      {allowRemoveNode && <button aria-label="Delete" data-icon="delete" title="Delete task" onClick={() => operations.deleteNode(id)} />}
       {allowSubgraph && notGoal && !subgraph && <button
         aria-label= "Create subgraph"
         data-icon="create-subgraph"
+        title="Create subgraph"
         onClick={() => enterGraph((uid) => operations.createSubgraphAndSaveIfNotExists(uid, id))}
       />}
       {allowModifyNodeCompletion && notGoal && notLocked && <button
         aria-label={completed ? "Mark incomplete" : "Mark completed"}
         data-icon={completed ? "incomplete" : "completed"}
+        title={completed ? "Mark incomplete" : "Mark completed"}
         onClick={() => void operations.setNodeCompleted(id, !completed)}
       />}
     </NodeToolbar>}
