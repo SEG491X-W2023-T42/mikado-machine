@@ -165,7 +165,7 @@ class GraphLayerViewerOperations {
   /**
    * Current quest tasks
    */
-  #currentTasks
+  #currentTasks;
 
   /**
    * Tracks if changes occured
@@ -204,7 +204,6 @@ class GraphLayerViewerOperations {
    */
   updateQuestParents() {
 	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
-	
 	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
 		if (this.#questParents.length != 0) {
 			this.#currentQuestline = this.#questParents[0]
@@ -259,6 +258,7 @@ class GraphLayerViewerOperations {
    */
   load(uid, graphName, subgraphID) {
     this.#loading = true;
+
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
 		this.#forwardConnections = forwardConnections;
 		this.#backwardConnections = backwardConnections;
@@ -695,6 +695,17 @@ class GraphLayerViewerOperations {
       }
     }
     return false; // throw new Error(); // TODO
+  }
+
+  /**
+   *  Returns true if node is in a subgraph, false otherwise.
+   */
+  isNodeInSubgraph() {
+    if (this.#subgraphNodeID !== ""){
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

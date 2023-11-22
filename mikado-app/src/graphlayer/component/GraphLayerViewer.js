@@ -58,7 +58,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
   // Load data from db
   useEffect(() => {
     operations.load(uid, graph.id, graph.subgraph)
-	
   }, [uid, operations, graph]);
 
   const [testCount, setTestCount] = useState(0);

@@ -13,8 +13,8 @@
 }
 
 .react-flow__edge-path {
-  stroke-width: 3;
-  stroke: black;
+  stroke-width: 2;
+  stroke: grey;
 }
 
 main > main {
@@ -23,7 +23,14 @@ main > main {
 }
 
 div.react-flow__node {
-  padding: 10px 28px 10px 13px;
+  /* padding: 10px 28px 10px 13px; */
+  padding: 8px;
+
+  display: flex;
+  flex-direction: column;
+  gap:12px;
+  align-items: flex-start;
+  align-self: stretch;
 
   box-sizing: border-box; /*for printing*/
   min-height: 42px;
@@ -31,21 +38,59 @@ div.react-flow__node {
 
   background: #FFF9C1; /* #DAEFFF for ready task, #DDF9E8 for complete task, #F5FBFF for locked */
   border: 1px solid dimgrey;
-  border-radius: 8px;
+  border-radius: 8px;  
 
   &:focus-within {
     outline: 1px solid dimgrey;
   }
 
-  & > div[aria-label] {
-    height: 18px;
-    width: 18px;
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background-size: cover;
-    filter: invert(.41) opacity(.7);
-    /*display: none;*/
+  & > .content-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    align-self: stretch;
+
+    & > .node-icon-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      & > div[aria-label] {
+        height: 20px;
+        width: 20px;
+        background-size: cover;
+        filter: invert(.41) opacity(.8);
+      }
+    }
+  }
+
+  & > button {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+
+    /* width: content; */
+    padding: 6px 8px;
+    gap: 6px;
+    
+    background: none;
+
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.60);
+
+    color: rgba(0, 0, 0, 0.60);
+    /* font-family: Inter; */
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.1);
+      filter: brightness(95%);
+      cursor: pointer;
+    }
+
   }
 
   &.hovered {
@@ -67,6 +112,7 @@ div.react-flow__node:hover {
 }
 
 .seamless-editor {
+  flex: 1 0 0 ;
   appearance: none;
   background: none;
   border: none;
@@ -79,7 +125,7 @@ div.react-flow__node:hover {
   margin: 0;
   padding: 0;
   resize: none;
-  width: 100%;
+  /* width: 100%; */
 
   &[disabled] {
     pointer-events: none;
@@ -91,8 +137,12 @@ div.react-flow__node-goal {
   outline: 1px solid rgba(105, 105, 105, 0.7);
   outline-offset: 3px;
 
-  & > div[aria-label] {
-    background-image: url('@material-design-icons/svg/filled/outlined_flag.svg');
+  & > .content-wrapper {
+    & > .node-icon-wrapper {
+      & > div[aria-label] {
+        background-image: url('@material-design-icons/svg/filled/outlined_flag.svg');
+      }
+    }
   }
 
   &:focus-within {
@@ -103,26 +153,40 @@ div.react-flow__node-goal {
 }
 
 div.react-flow__node-ready {
-   background: #DAEFFF;
+  background: #F5FBFF; 
 
-  & > div[aria-label] {
-    background-image: url('@material-design-icons/svg/filled/spa.svg');
+  & > .content-wrapper {
+    & > .node-icon-wrapper {
+      & > div[aria-label] {
+        /* background-image: url('@material-design-icons/svg/filled/spa.svg'); */
+        width: 0px;
+        height: 0px;
+      } 
+    }   
   }
 }
 
 div.react-flow__node-locked {
-  background: #F5FBFF;
+  background: #DAEFFF;
 
-  & > div[aria-label] {
-    background-image: url('@material-design-icons/svg/filled/remove_circle.svg');
+  & > .content-wrapper {
+    & > .node-icon-wrapper {
+      & > div[aria-label] {
+        background-image: url('@material-design-icons/svg/outlined/remove_circle.svg');
+      }
+    }
   }
 }
 
 div.react-flow__node-complete {
   background: #DDF9E8;
 
-  & > div[aria-label] {
-    background-image: url('@material-design-icons/svg/filled/check.svg');
+  & > .content-wrapper {
+    & > .node-icon-wrapper {
+      & > div[aria-label] {
+        background-image: url('@material-design-icons/svg/filled/check.svg');
+      }
+    }
   }
 }
 
@@ -165,7 +229,9 @@ div.react-flow__node-toolbar > button {
   }
 
   &[data-icon="create-subgraph"] {
-    background-image: url('@material-design-icons/svg/filled/add.svg');
+    background-image: url('../../assets/add_subgraph_icon.svg');
+    background-size: 24px;
+
   }
 
   &[data-icon="completed"] {
@@ -173,7 +239,7 @@ div.react-flow__node-toolbar > button {
   }
 
   &[data-icon="incomplete"] {
-    background-image: url('@material-design-icons/svg/filled/highlight_off.svg');
+    background-image: url('@material-design-icons/svg/filled/remove_done.svg');
   }
 }
 
