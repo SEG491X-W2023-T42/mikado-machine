@@ -164,7 +164,7 @@ class GraphLayerViewerOperations {
   /**
    * Current quest tasks
    */
-  #currentTasks
+  #currentTasks;
 
   constructor(set, get) {
     this.#set = set;
@@ -190,7 +190,7 @@ class GraphLayerViewerOperations {
    * Processes changes from React Flow
    */
   onNodesChange(changes) {
-    myOnNodesChange(changes, this.#state.nodes, this.#set); 
+    myOnNodesChange(changes, this.#state.nodes, this.#set);
   }
 
   /**
@@ -198,7 +198,6 @@ class GraphLayerViewerOperations {
    */
   updateQuestParents() {
 	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
-	
 	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
 		if (this.#questParents.length != 0) {
 			this.#currentQuestline = this.#questParents[0]
@@ -253,6 +252,7 @@ class GraphLayerViewerOperations {
    */
   load(uid, graphName, subgraphID) {
     this.#loading = true;
+
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
 		this.#forwardConnections = forwardConnections;
 		this.#backwardConnections = backwardConnections;
@@ -724,10 +724,6 @@ class GraphLayerViewerOperations {
   getAllQuests() {
 	return this.#questParents;
   }
-
-  /**
-   * 
-   */
 
   /**
    * Renders to HTML and opens a popup to print.

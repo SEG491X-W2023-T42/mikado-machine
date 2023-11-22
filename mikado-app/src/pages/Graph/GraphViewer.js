@@ -3,6 +3,7 @@ import "./GraphViewer.css";
 import { useMemo, useState } from "react";
 import * as React from 'react';
 import GraphHeader from '../../graph/components/graphheader/GraphHeader';
+import { graphStack } from "../../helpers/GraphStack";
 
 /**
  * The GraphViewer component is the main page that users view and edit graphs.
@@ -123,12 +124,19 @@ function GraphViewer({ uid }) {
   }
    */
   function enterGraph(lambda) {
-    const subgraph = lambda(uid);
-    console.debug("trying to enter subgraph", subgraph);
-    setGraph({
-      id: graph.id,
-      subgraph,
-    });
+	if (lambda == -1) {
+		console.debug("trying to leave subgraph");
+		graphStack.pop()
+	} else {
+		const subgraph = lambda(uid);
+		console.debug("trying to enter subgraph", subgraph);
+		graphStack.push(subgraph)
+	}
+	setGraph({
+		id: graph.id,
+		subgraph: graphStack.at(-1)
+	});
+	
   }
 
   const  key = uid + graph.subgraph;

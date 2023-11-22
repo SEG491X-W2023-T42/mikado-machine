@@ -6,6 +6,7 @@ import SeamlessEditor from "../../../graph/components/SeamlessEditor";
 import { useEffect, useState } from "react";
 import { db, getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { graphStack } from "../../../helpers/GraphStack";
 
 function serializeGraphWithTitle(title) {
   return {
@@ -79,7 +80,7 @@ export default function GraphHeader({ uid, graph: { id, subgraph }, graphHandle 
             singleLine={true}
           />
           {(subgraph !== "") &&
-          <Button sx={{color: "white"}} onClick={() => {graphHandle({id, subgraph: ""})}}>
+          <Button sx={{color: "white"}} onClick={() => {graphHandle({id, subgraph: ""}); graphStack.length = 1}}>
             Back
           </Button>}
           {!hideProfileMenu && <GraphHeaderProfileOverflowMenu />}
