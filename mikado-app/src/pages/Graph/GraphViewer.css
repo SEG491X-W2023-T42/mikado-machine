@@ -225,7 +225,9 @@ div.react-flow__node-toolbar > button {
   }
 
   &[data-icon="create-subgraph"] {
-    background-image: url('@material-design-icons/svg/filled/add.svg');
+    background-image: url('../../assets/add_subgraph_icon.svg');
+    background-size: 24px;
+
   }
 
   &[data-icon="completed"] {
