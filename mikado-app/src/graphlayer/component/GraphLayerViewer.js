@@ -64,12 +64,23 @@ function GraphLayerViewerInternal({ uid, graph }) {
   useEffect(() => {
     console.log("GraphLayerViewer mount", testCount, "nodes", nodes, edges, operations);
     setTestCount(testCount + 1);
+
     return () => console.debug("GraphLayerViewer unmount");
   }, []);
 
   useEffect(() => {
 	setCurrentTask(operations.getCurrentTasks())
   }, [operations.getCurrentTasks()])
+
+  useEffect(() => {
+	window.setInterval(function() {
+		if (operations.getHasChanged()) {
+			console.log("Saved changes!")
+			operations.save(uid, notifySaveError)
+			operations.resetHasChanged()
+		}
+	}, 15000)
+  }, [])
 
   /*
   // Zoom on transition call
@@ -211,6 +222,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
+      
       { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background /> 
       

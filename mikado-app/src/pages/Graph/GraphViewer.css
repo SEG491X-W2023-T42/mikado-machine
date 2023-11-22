@@ -92,6 +92,10 @@ div.react-flow__node {
     }
 
   }
+
+  &.hovered {
+	outline: 2px solid rgba(105, 105, 105, 0.7);
+  }
 }
 
 div.react-flow__node:hover {
