@@ -223,7 +223,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       fitView
     >
       
-      {/* { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> } */}
+      { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       { false && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background /> 
       
