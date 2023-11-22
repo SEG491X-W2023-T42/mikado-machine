@@ -15,7 +15,7 @@ import { getGatekeeperFlags } from "./Gatekeeper";
  * This is to filter the changes so that of the user's requested changes,
  * only changes we can handle are realized.
  */
-function myOnNodesChange(changes, nodes, set) {
+function myOnNodesChange(changes, nodes, set, setHasChanged) {
   const changesById = {};
   let affected = false;
   for (const change of changes) {
@@ -49,6 +49,7 @@ function myOnNodesChange(changes, nodes, set) {
             position && (node.position = position);
             node.dragging = dragging ?? node.dragging;
             // Ignoring positionAbsolute and expandParent as the DB can't persist them
+			setHasChanged(true)
             break;
           }
           case "dimensions": {
@@ -164,7 +165,12 @@ class GraphLayerViewerOperations {
   /**
    * Current quest tasks
    */
-  #currentTasks
+  #currentTasks;
+
+  /**
+   * Tracks if changes occured
+   */
+  #hasChanged = false
 
   constructor(set, get) {
     this.#set = set;
@@ -190,7 +196,7 @@ class GraphLayerViewerOperations {
    * Processes changes from React Flow
    */
   onNodesChange(changes) {
-    myOnNodesChange(changes, this.#state.nodes, this.#set); 
+    myOnNodesChange(changes, this.#state.nodes, this.#set, this.setHasChanged); 
   }
 
   /**
@@ -198,7 +204,6 @@ class GraphLayerViewerOperations {
    */
   updateQuestParents() {
 	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
-	
 	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
 		if (this.#questParents.length != 0) {
 			this.#currentQuestline = this.#questParents[0]
@@ -253,6 +258,7 @@ class GraphLayerViewerOperations {
    */
   load(uid, graphName, subgraphID) {
     this.#loading = true;
+
     loadFromDb(uid, graphName, subgraphID).then(([nodes, edges, forwardConnections, backwardConnections]) => {
 		this.#forwardConnections = forwardConnections;
 		this.#backwardConnections = backwardConnections;
@@ -369,7 +375,6 @@ class GraphLayerViewerOperations {
         bestY = y;
       }
     }
-
     console.timeEnd("modifyNodePosition");
     if (best === infiniteDistance) return null;
     return {x: bestX + viewportX - halfWidth, y: bestY + viewportY - halfHeight};
@@ -394,6 +399,8 @@ class GraphLayerViewerOperations {
     const newNode = createNodeObject(id, position.x, position.y, "ready");
     this.#nodeLabels[newNode.id] = newNode.data.label;
     this.#set({ nodes: [...nodes, newNode] }); // defaults to ready since new node is always ready with no dependencies
+
+	this.#hasChanged = true;
     return true;
   }
 
@@ -432,6 +439,7 @@ class GraphLayerViewerOperations {
 			this.#currentQuestline = undefined
 		}
 	}
+	this.#hasChanged = true;
 	this.updateQuestParents();
   }
 
@@ -509,6 +517,7 @@ class GraphLayerViewerOperations {
       backwardConnections[dstId].push(srcId);
       this.#set({ edges: [...this.#state.edges, createEdgeObject(srcId, dstId, this.#nodeLabels[srcId], this.#nodeLabels[dstId])] });
       this.updateNodeType(srcId);
+      this.#hasChanged = true;
       this.updateQuestParents();
       return;
     } // else forward connection found, so will delete it
@@ -522,7 +531,8 @@ class GraphLayerViewerOperations {
         edge => edge.source !== srcId || edge.target !== dstId,
       ),
     });
-    this.updateNodeType(srcId)
+    this.updateNodeType(srcId);
+	this.#hasChanged = true;
 	this.updateQuestParents();
   }
 
@@ -603,20 +613,21 @@ class GraphLayerViewerOperations {
         }
       }),
     });
+	this.#hasChanged = true;
 	this.updateQuestParents();
   }
 
   highlightOrUnhighlightNode(target) {
     if (target === null) { // if no target, unhighlight all nodes
       for (const node of this.#state.nodes) {
-        document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+        document.querySelector(`[data-id="${node.id}"]`).classList.remove("hovered")
       }
     } else {
       for (const node of this.#state.nodes) { // highlight target and unhighlight all other nodes
         if (node.id !== target.id){
-          document.querySelector(`[data-id="${node.id}"]`).style.border = "1px solid rgba(105, 105, 105, 0.7)";
+          document.querySelector(`[data-id="${node.id}"]`).classList.remove("hovered")
         } else {
-          document.querySelector(`[data-id="${target.id}"]`).style.border = "2px solid rgba(105, 105, 105, 0.7)";
+          document.querySelector(`[data-id="${target.id}"]`).classList.add("hovered")
         }
       }
     }
@@ -640,6 +651,7 @@ class GraphLayerViewerOperations {
         node => node.id !== id ? node : {... node, type: type},
       ),
     });
+	this.#hasChanged = true;
   }
 
   /**
@@ -686,6 +698,17 @@ class GraphLayerViewerOperations {
   }
 
   /**
+   *  Returns true if node is in a subgraph, false otherwise.
+   */
+  isNodeInSubgraph() {
+    if (this.#subgraphNodeID !== ""){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Gets current task list.
    */
   getCurrentTasks() {
@@ -715,8 +738,25 @@ class GraphLayerViewerOperations {
   }
 
   /**
-   * 
+   * Checks if any changes has occured
    */
+  getHasChanged() {
+	return this.#hasChanged
+  }
+
+  /**
+   * Sets changes boolean
+   */
+  setHasChanged(changed) {
+	this.#hasChanged = changed
+  }
+
+  /**
+   * Resets the change boolean
+   */
+  resetHasChanged() {
+	this.#hasChanged = false;
+  }
 
   /**
    * Renders to HTML and opens a popup to print.

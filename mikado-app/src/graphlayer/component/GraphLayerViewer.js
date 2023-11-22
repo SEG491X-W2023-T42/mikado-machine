@@ -58,19 +58,29 @@ function GraphLayerViewerInternal({ uid, graph }) {
   // Load data from db
   useEffect(() => {
     operations.load(uid, graph.id, graph.subgraph)
-	
   }, [uid, operations, graph]);
 
   const [testCount, setTestCount] = useState(0);
   useEffect(() => {
     console.log("GraphLayerViewer mount", testCount, "nodes", nodes, edges, operations);
     setTestCount(testCount + 1);
+
     return () => console.debug("GraphLayerViewer unmount");
   }, []);
 
   useEffect(() => {
 	setCurrentTask(operations.getCurrentTasks())
   }, [operations.getCurrentTasks()])
+
+  useEffect(() => {
+	window.setInterval(function() {
+		if (operations.getHasChanged()) {
+			console.log("Saved changes!")
+			operations.save(uid, notifySaveError)
+			operations.resetHasChanged()
+		}
+	}, 15000)
+  }, [])
 
   /*
   // Zoom on transition call
@@ -212,7 +222,9 @@ function GraphLayerViewerInternal({ uid, graph }) {
       onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
-      { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      
+      {/* { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> } */}
+      { false && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background /> 
       
     </ReactFlow>

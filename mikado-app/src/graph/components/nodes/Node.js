@@ -4,6 +4,7 @@ import { runtime_assert } from "../../../graphlayer/store/Assert";
 import { useStoreHack } from "../../../context/StoreHackContext";
 import SeamlessEditor from "../SeamlessEditor";
 import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
+import { ArrowDownward, ArrowUpward} from '@mui/icons-material';
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
@@ -27,39 +28,62 @@ export default function Node({ id, data, type, exporting = false, ...rest }) {
   const subgraph = operations?.isNodeSubgraph(id);
   const enterGraph = useEnterGraphHack();
 
+  const isInSubgraph = operations?.isNodeInSubgraph();
+
   const notGoal = type !== "goal";
   const notLocked = type !== "locked";
   const completed = type === "complete";
   const ariaLabel = ARIA_LABELS[type];
   runtime_assert(ariaLabel);
 
+
   const result = <>
     {exporting ? null : <NodeToolbar>
-      {allowRemoveNode && <button aria-label="Delete" data-icon="delete" onClick={() => operations.deleteNode(id)} />}
-      {allowSubgraph && notGoal && <button
-        aria-label={subgraph ? "Enter subgraph" : "Create subgraph"}
-        data-icon={subgraph ? "enter-subgraph" : "create-subgraph"}
+      {allowRemoveNode && notGoal && <button aria-label="Delete" data-icon="delete" title="Delete task" onClick={() => operations.deleteNode(id)} />}
+      {allowSubgraph && notGoal && !subgraph && <button
+        aria-label= "Create subgraph"
+        data-icon="create-subgraph"
+        title="Create subgraph"
         onClick={() => enterGraph((uid) => operations.createSubgraphAndSaveIfNotExists(uid, id))}
       />}
       {allowModifyNodeCompletion && notGoal && notLocked && <button
         aria-label={completed ? "Mark incomplete" : "Mark completed"}
         data-icon={completed ? "incomplete" : "completed"}
+        title={completed ? "Mark incomplete" : "Mark completed"}
         onClick={() => void operations.setNodeCompleted(id, !completed)}
       />}
     </NodeToolbar>}
-    <SeamlessEditor
-      label={data.label}
-      editing={editing}
-      exporting={exporting}
-      initialValue={!editing ? "" : editingNodeInitialValue}
-      onFinishEditing={(filteredText) => {
-        editNode("", "");
-        operations.setNodeLabel(id, filteredText);
-      }}
-      singleLine={false}
-    />
+
+    <div className="content-wrapper">
+      <SeamlessEditor
+        label={data.label}
+        editing={editing}
+        exporting={exporting}
+        initialValue={!editing ? "" : editingNodeInitialValue}
+        onFinishEditing={(filteredText) => {
+          editNode("", "");
+          operations.setNodeLabel(id, filteredText);
+        }}
+        singleLine={false}
+      />
+      <div className="node-icon-wrapper">
+        <div aria-label={ariaLabel} />
+      </div>
+    </div>
+    
     {exporting ? null : <Handle />}
-    <div aria-label={ariaLabel} />
+    {(subgraph || (isInSubgraph && !notGoal)) && //if node has a subgraph, or if a node is the root node of a subgraph
+      <button className="enter-exit-subgraph-button" // button to enter or exit subgraph
+        aria-label = {notGoal? "Enter subgraph" : "Return to parent graph"}
+        onClick= {notGoal? () => enterGraph((uid) => operations.createSubgraphAndSaveIfNotExists(uid, id)) 
+                  : () => enterGraph(-1)
+                }
+      >
+        {notGoal? <ArrowDownward sx={{fontSize:16}} /> : <ArrowUpward sx={{fontSize:16}}/>}
+        {notGoal? "Enter subgraph" : "Return to parent graph"}
+      </button>
+    }
+
   </>;
   if (exporting) {
     const { position, positionOffset } = rest; // Exists when exporting only
