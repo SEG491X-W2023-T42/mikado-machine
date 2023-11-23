@@ -76,8 +76,8 @@ function GraphLayerViewerInternal({ uid, graph }) {
 	window.setInterval(function() {
 		if (operations.getHasChanged()) {
 			console.log("Saved changes!")
-			operations.save(uid, notifySaveError)
 			operations.resetHasChanged()
+			operations.save(uid, notifySaveError)
 		}
 	}, 15000)
   }, [])
