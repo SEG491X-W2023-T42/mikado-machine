@@ -34,6 +34,13 @@ const selector = (state) => state;
 
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
 
+function isSelectingNotEditing() {
+  const { classList } = document.activeElement;
+  return (classList.contains("react-flow__node") && classList.contains("selected")) // 1 node
+    || classList.contains("react-flow__nodesselection-rect") // 2+ nodes
+    ; // Otherwise don't interfere with text editing
+}
+
 /**
  * @see GraphLayerViewer
  *
@@ -45,7 +52,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
-  const selectedNodeId = useRef(void 0);
+  const selectedNodeIds = useRef([]);
   const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
   const [currentTask] = useState();
 
@@ -105,9 +112,27 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   useOnSelectionChange({
     onChange({ nodes }) {
-      selectedNodeId.current = nodes.length !== 1 ? void 0 : nodes[0].id;
+      selectedNodeIds.current = nodes.map(x => x.id);
     }
   });
+
+  function onCopy(e) {
+    if (!isSelectingNotEditing()) return;
+    console.log("copy", e);
+    e.preventDefault();
+  }
+
+  function onCut(e) {
+    if (!isSelectingNotEditing()) return;
+    console.log("cut", e);
+    e.preventDefault();
+  }
+
+  function onPaste(e) {
+    if (!isSelectingNotEditing()) return;
+    console.log("paste", e);
+    e.preventDefault();
+  }
 
   function onNodeDragStart(_, node) {
     operations.markNodePosition(node.id);
@@ -157,6 +182,11 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   function startEditingNode(id, isBackspace) {
     if (!allowEditNodeLabel) return;
+    if (!id) {
+      const { current } = selectedNodeIds;
+      if (current.length !== 1) return;
+      id = current[0];
+    }
     const defaultText = isBackspace ? "" : operations.getNodeLabel(id);
     editNode(id, defaultText);
   }
@@ -172,12 +202,12 @@ function GraphLayerViewerInternal({ uid, graph }) {
       if ("maxLength" in document.activeElement) return; // Ignore when already in text field
       // Not bothering to try adding the key to the text field, whether appending or replacing
       // That would break accessibility, keyboard layouts, and IMEs
-      selectedNodeId.current && startEditingNode(selectedNodeId.current, false);
+      startEditingNode(void 0, false);
     }
     function backspaceListener(e) {
       if (e.key !== "Backspace") return;
       if ("maxLength" in document.activeElement) return; // Ignore when already in text field
-      selectedNodeId.current && startEditingNode(selectedNodeId.current, true);
+      startEditingNode(void 0, true);
     }
 
 	function deleteListener(e) {
@@ -211,7 +241,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
-  return <main ref={reactFlowWrapper}>
+  return <main ref={reactFlowWrapper} onCopy={onCopy} onCut={onCut} onPaste={onPaste}>
     <ReactFlow
       nodes={nodes}
       edges={edges}
