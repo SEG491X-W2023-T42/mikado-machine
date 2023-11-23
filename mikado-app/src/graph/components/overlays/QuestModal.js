@@ -1,8 +1,13 @@
 import * as React from 'react';
 import { Dialog, DialogActions, DialogTitle, Button, styled, IconButton, Typography, DialogContent, Grid, List, ListItem } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { useStoreHack } from "../../../context/StoreHackContext";
+import { shallow } from "zustand/shallow";
+
+const selector = (store) => store; // TODO optimize
 
 export default function QuestModal({ open, handleClose }) {
+  const { operations } = useStoreHack()(selector, shallow);
 
 	const StyledDialog = styled(Dialog)(({ theme }) => ({
 		'& .MuiDialogContent-root': {
@@ -46,9 +51,10 @@ export default function QuestModal({ open, handleClose }) {
 			<DialogContent dividers>
         <h1>Other Quests {/*TODO %*/}</h1>
         <List disablePadding>
-          <ListItem>Mytask {/*TODO %*/}</ListItem>
-          <ListItem>Mytask {/*TODO %*/}</ListItem>
-          <ListItem>Mytask {/*TODO %*/}</ListItem>
+          {
+            operations.getAllQuests().map(parent =>
+              <ListItem key={parent.id}>{parent.data.label} {/*TODO %*/}</ListItem>)
+          }
         </List>
 			</DialogContent>
 			<DialogActions>
