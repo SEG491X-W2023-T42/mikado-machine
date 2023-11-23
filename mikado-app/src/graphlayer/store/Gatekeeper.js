@@ -28,6 +28,7 @@ const sanitizers = [
   ["allowSubgraph", sanitizeBoolean, true],
   ["allowModifyNodeCompletion", sanitizeBoolean, true],
   ["nodePlacementSearchRadius", sanitizeInt, 200],
+  ["enableQuestline", sanitizeBoolean, false],
 ];
 
 function sanitizeFlags(newFlags) {
