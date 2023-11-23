@@ -76,8 +76,8 @@ function GraphLayerViewerInternal({ uid, graph }) {
 	window.setInterval(function() {
 		if (operations.getHasChanged()) {
 			console.log("Saved changes!")
-			operations.save(uid, notifySaveError)
 			operations.resetHasChanged()
+			operations.save(uid, notifySaveError)
 		}
 	}, 15000)
   }, [])
@@ -208,6 +208,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       nodesConnectable={false}
       nodesDraggable={!editingNodeId}
       panOnDrag={!editingNodeId}
+      panOnScroll={true}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
@@ -222,18 +223,18 @@ function GraphLayerViewerInternal({ uid, graph }) {
       onDoubleClick={isTouchscreen ? void 0 : addNode}
       fitView
     >
-      
+
       { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       { false && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
-      <Background /> 
-      
+      <Background />
+
     </ReactFlow>
     {!hideGraphControls && <CustomControl onSaveClick={() => operations.save(uid, notifySaveError)} onExportClick={() => {
       fitView();
       operations.export(reactFlowWrapper.current.querySelector("svg.react-flow__edges"));
     }} />}
     { allowAddNode && isTouchscreen && <AddNodeFab onClick={() => void addNode()} /> }
-	
+
   </main>;
 }
 
