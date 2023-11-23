@@ -443,13 +443,15 @@ class GraphLayerViewerOperations {
   /**
    * Inserts a new node
    */
-  addNode(position) {
+  addNode(position, forceForPaste = false) {
     const { nodes } = this.#state;
 
     // Node interception fix
-    position = this.modifyNodePosition(position);
-    if (!position) {
-      return false;
+    if (!forceForPaste) {
+      position = this.modifyNodePosition(position);
+      if (!position) {
+        return "";
+      }
     }
 
     // Allocate everything
@@ -460,8 +462,8 @@ class GraphLayerViewerOperations {
     this.#nodeLabels[newNode.id] = newNode.data.label;
     this.#set({ nodes: [...nodes, newNode] }); // defaults to ready since new node is always ready with no dependencies
 
-	this.#hasChanged = true;
-    return true;
+    // this.#hasChanged = true;
+    return newNode.id;
   }
 
   /**
@@ -861,7 +863,7 @@ class GraphLayerViewerOperations {
     const style = doc.createElement("style");
     head.append(style);
     style.append(doc.createTextNode([...document.styleSheets].flatMap(x => [...x.cssRules].map(x => {
-		
+
       if (x instanceof CSSImportRule) return x.cssText;
       if (!(x instanceof CSSStyleRule) ||
         !/body|div\.react-flow__node(?!\w|:hover)|react-flow__edge-path|seamless-editor/.test(x.selectorText)) return "";
@@ -956,15 +958,15 @@ class GraphLayerViewerOperations {
 				obj[key] = [...this.#forwardConnections[key]];
 				return obj;
 			}, {})
-		
+
 		visitedNodes.forEach((nodeId) => {
 			if (nodeId != id) {
 				this.deleteNode(nodeId);
 			}
 		})
-		
+
 		this.save(uid, () => {});
-		
+
 		// Save new subgraph with connected nodes to db
 		saveToDb(connectedNodes, connectedNodesForwardConnections, uid, this.#graphName, result)
 

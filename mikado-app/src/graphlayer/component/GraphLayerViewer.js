@@ -20,6 +20,7 @@ import { EnterGraphHackContext } from "../../context/EnterGraphHackContext.js";
 import AddNodeFab from '../../graph/components/overlays/AddNodeFAB.js';
 import { getGatekeeperFlags } from "../store/Gatekeeper.js";
 import QuestOverlay from '../../graph/components/overlays/QuestOverlay.js';
+import { serializeSelection } from "./NodeSerializer";
 
 
 /**
@@ -118,20 +119,30 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   function onCopy(e) {
     if (!isSelectingNotEditing()) return;
-    console.log("copy", e);
+    // TODO NodeSerializer.js isn't working right now, so this will have to do
+    e.clipboardData.setData("text/plain", "Mikado" + JSON.stringify(selectedNodeIds.current));
     e.preventDefault();
   }
 
   function onCut(e) {
     if (!isSelectingNotEditing()) return;
     console.log("cut", e);
+    // TODO
     e.preventDefault();
   }
 
   function onPaste(e) {
     if (!isSelectingNotEditing()) return;
-    console.log("paste", e);
     e.preventDefault();
+    let input = e.clipboardData.getData("text");
+    if (!input.startsWith("Mikado")) return;
+    input = input.subString(3);
+    const pasted = JSON.parse(input);
+    for (const node of pasted) {
+      const id = operations.addNode(nodes[node].position, true);
+      operations.setNodeLabel(id, nodes[node].label);
+    }
+    // console.log("paste", e);
   }
 
   function onNodeDragStart(_, node) {
