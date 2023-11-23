@@ -153,7 +153,7 @@ class GraphLayerViewerOperations {
   #state;
 
   /**
-   * Quest parent branches 
+   * Quest parent branches
    */
   #questParents;
 
@@ -196,7 +196,7 @@ class GraphLayerViewerOperations {
    * Processes changes from React Flow
    */
   onNodesChange(changes) {
-    myOnNodesChange(changes, this.#state.nodes, this.#set, this.setHasChanged); 
+    myOnNodesChange(changes, this.#state.nodes, this.#set, this.setHasChanged);
   }
 
   /**
@@ -229,7 +229,7 @@ class GraphLayerViewerOperations {
 
 	for (const canidateReadyNode of canidateReadyNodes) {
 		let parentNodes = this.#backwardConnections[canidateReadyNode.id]
-		
+
 		while (parentNodes.length > 0) {
 			let newParentNodes = [];
 
@@ -383,13 +383,16 @@ class GraphLayerViewerOperations {
   /**
    * Inserts a new node
    */
-  addNode(position) {
+  addNode(position, forceForPaste = false) {
     const { nodes } = this.#state;
 
     // Node interception fix
-    position = this.modifyNodePosition(position);
-    if (!position) {
-      return false;
+    if (!forceForPaste) {
+      position = this.modifyNodePosition(position);
+      if (!position) {
+        return void 0;
+      }
+      position = { x: position.x + 10, y: position.y + 10 };
     }
 
     // Allocate everything
@@ -401,7 +404,7 @@ class GraphLayerViewerOperations {
     this.#set({ nodes: [...nodes, newNode] }); // defaults to ready since new node is always ready with no dependencies
 
 	this.#hasChanged = true;
-    return true;
+    return newNode.id;
   }
 
   /**
@@ -433,7 +436,7 @@ class GraphLayerViewerOperations {
       nodes: nodes.filter(node => node.id !== id),
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
-	
+
 	if (this.#currentQuestline != undefined) {
 		if (id == this.#currentQuestline.id) {
 			this.#currentQuestline = undefined
