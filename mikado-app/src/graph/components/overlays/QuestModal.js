@@ -31,6 +31,17 @@ function QuestModalInner() {
     </DialogContent>
     <DialogContent dividers>
       <h1>Other Quests</h1>
+      <List disablePadding>
+        {
+          operations.getAllQuests().flatMap(parent => {
+            const { id, data: { label } } = parent;
+            if (id === currentQuestlineId) return [];
+            return [<ListItemButton key={id} onClick={() => operations.setCurrentQuestlineId(id)}>
+              <ListItem>{label} {/*TODO %*/}</ListItem>
+            </ListItemButton>];
+          })
+        }
+      </List>
     </DialogContent>
   </>;
 }
