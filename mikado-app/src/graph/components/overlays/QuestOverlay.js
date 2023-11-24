@@ -28,6 +28,6 @@ export default function QuestOverlay() {
 
   return <>
     <QuestOverlayInner handleClickOpen={() => setOpen(true)} />
-    {/*<QuestModal open={open} handleClose={() => setOpen(false)} />*/}
+    <QuestModal open={open} handleClose={() => setOpen(false)} />
   </>;
 }
