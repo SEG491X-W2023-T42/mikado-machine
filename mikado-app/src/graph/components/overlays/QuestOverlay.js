@@ -1,28 +1,33 @@
-import { Button, ButtonGroup } from '@mui/material'
-import * as React from 'react';
-import QuestModal from './QuestModal';
+import { Button } from '@mui/material'
+import QuestModal, { NO_TASKS_TEXT } from './QuestModal';
 import './QuestOverlay.css'
+import { useStoreHack } from "../../../context/StoreHackContext";
+import { shallow } from "zustand/shallow";
+import { useState } from "react";
 
-export default function QuestOverlay({ currentTask, completeClick }) {
-	const [open, setOpen] = React.useState(false);
+const selector = (store) => store.currentTwoTasks;
 
-	const handleClickOpen = () => {
-		setOpen(true);
-	}
+/**
+ * Inner component to prevent flashes changing the questline
+ */
+function QuestOverlayInner({ handleClickOpen }) {
+  const [currentTask] = useStoreHack()(selector, shallow);
+  return <Button variant="outlined" className="overlay" onClick={handleClickOpen}>
+    Current Quest:
+    <div className="questlineTask">{currentTask?.data?.label ?? NO_TASKS_TEXT}</div>
+    {/*TODO idk why the following code is there, but it wasn't in the design*/}
+    {/*<ButtonGroup variant="contained">*/}
+    {/*	<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} onClick={completeClick} disabled={currentTask == undefined || currentTask.length == 0}>Complete</Button>*/}
+    {/*	<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} disabled={currentTask == undefined || currentTask.length == 0} onClick={handleClickOpen}>See More</Button>*/}
+    {/*</ButtonGroup>*/}
+  </Button>;
+}
 
-	const handleClose = () => {
-		setOpen(false);
-	}
-	return (
-		<div className="overlay">
-			<h2>Current Task:</h2>
-			<h3>{currentTask == undefined || currentTask.length == 0 ? "Connect a non-complete node to the Goal Node to start a new Quest!" : currentTask[0].data.label}</h3>
-			<ButtonGroup variant="contained">
-				<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} onClick={completeClick} disabled={currentTask == undefined || currentTask.length == 0}>Complete</Button>
-				<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} disabled={currentTask == undefined || currentTask.length == 0} onClick={handleClickOpen}>See More</Button>
-			</ButtonGroup>
-			<QuestModal open={open} handleClose={handleClose} />
-		</div>
-	)
+export default function QuestOverlay() {
+  const [open, setOpen] = useState(false);
 
+  return <>
+    <QuestOverlayInner handleClickOpen={() => setOpen(true)} />
+    {/*<QuestModal open={open} handleClose={() => setOpen(false)} />*/}
+  </>;
 }

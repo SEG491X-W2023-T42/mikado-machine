@@ -1,11 +1,15 @@
 @import "reactflow/dist/base.css";
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-.overlay {
+.overlay.overlay {
+  display: block;
 	min-width: 300px;
 	max-width: 400px;
 	height: fit-content+20px;
-	background-color: #e6e4f2;
+  text-transform: none;
+  &, &:hover {
+    background: #e6e4f2;
+  }
 	border-radius: 10px;
 	border-color: #686372;
 	border-style: solid;
@@ -20,4 +24,8 @@
 	left: 2em;
 	z-index: 100;
 }
-  
+
+.questlineTask {
+  font-size: 18pt;
+  font-weight: bold;
+}

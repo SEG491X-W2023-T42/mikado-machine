@@ -69,10 +69,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
   }, []);
 
   useEffect(() => {
-	setCurrentTask(operations.getCurrentTasks())
-  }, [operations.getCurrentTasks()])
-
-  useEffect(() => {
 	window.setInterval(function() {
 		if (operations.getHasChanged()) {
 			console.log("Saved changes!")
