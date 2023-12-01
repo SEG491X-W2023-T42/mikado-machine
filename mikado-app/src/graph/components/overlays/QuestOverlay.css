@@ -2,19 +2,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
 .overlay.overlay {
-  display: block;
+  	display: block;
 	min-width: 300px;
 	max-width: 400px;
 	height: fit-content+20px;
-  text-transform: none;
-  &, &:hover {
-    background: #e6e4f2;
-  }
+	text-transform: none;
 	border-radius: 10px;
 	border-color: #686372;
 	border-style: solid;
 	box-shadow: 0 0 20px 0 #bebcc5;
-	padding: 5px;
+	padding: 6px;
 	padding-bottom: 15px;
 	font-family: 'Inter', sans-serif !important;
 	text-align: center;
@@ -23,6 +20,10 @@
 	top: 2em;
 	left: 2em;
 	z-index: 100;
+  &, &:hover {
+    background: #e6e4f2;
+  }
+	
 }
 
 .questlineTask {
