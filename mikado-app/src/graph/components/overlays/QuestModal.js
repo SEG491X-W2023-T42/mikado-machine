@@ -48,7 +48,7 @@ function QuestModalInner() {
 			</ListItem>
 		</List>
     </DialogContent>
-    <DialogContent dividers>
+    { operations.getAllQuests().length > 1 && <DialogContent dividers>
 		{<Typography variant="h4" fontFamily="Inter">Other Quests</Typography>}
       <List disablePadding>
         {
@@ -81,7 +81,7 @@ function QuestModalInner() {
           })
         }
       </List>
-    </DialogContent>
+    </DialogContent> }
   </>;
 }
 
