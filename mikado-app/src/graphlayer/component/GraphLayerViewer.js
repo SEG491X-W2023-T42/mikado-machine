@@ -47,7 +47,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
   const { project, fitView } = useReactFlow();
   const selectedNodeId = useRef(void 0);
   const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
-  const [currentTask, setCurrentTask] = useState();
+  const [currentTask] = useState();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the GraphLayerViewer, which can be enforced by setting a React key prop on it
@@ -220,7 +220,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       fitView
     >
 
-      { <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      { enableQuestline && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background />
 
     </ReactFlow>
