@@ -3,7 +3,7 @@ import * as React from "react";
 import { useFirebase } from '../../../context/FirebaseContext';
 import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 
-const allSettings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const allSettings = ['Profile', 'Account', 'Dashboard', 'Log out'];
 const settingsImplementedRange = [3, 4];
 
 export default function GraphHeaderProfileOverflowMenu() {
@@ -61,7 +61,7 @@ export default function GraphHeaderProfileOverflowMenu() {
     >
       {settings.map((setting, index) => (
         <MenuItem key={setting} onClick={settingsFunctions[index]}>
-          <Typography textAlign="center">{setting}</Typography>
+          <Typography textAlign="center" sx={{fontSize: "11pt"}}>{setting}</Typography>
         </MenuItem>
       ))}
     </Menu>
