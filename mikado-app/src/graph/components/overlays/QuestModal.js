@@ -52,7 +52,7 @@ function QuestModalInner() {
 		{<Typography variant="h4" fontFamily="Inter">Other Quests</Typography>}
       <List disablePadding>
         {
-          operations.getAllQuests().flatMap(parent => {
+          operations.getAllQuests().flatMap((parent, i) => {
             const { id, data: { label } } = parent;
             if (id === currentQuestlineId) return [];
             return [
@@ -75,7 +75,7 @@ function QuestModalInner() {
 							</React.Fragment>
 						} />
 					</ListItem>
-					<Divider variant="inset" compoennt="li" />
+					{ operations.getAllQuests().length - 1 != i && <Divider compoennt="li" /> }
 				</div>
             ];
           })
