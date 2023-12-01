@@ -41,7 +41,7 @@ const notifySaveError = notifyError.bind(null, "There was a problem saving your 
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function GraphLayerViewerInternal({ uid, graph }) {
-  const { hideGraphControls, allowEditNodeLabel, allowAddNode } = getGatekeeperFlags();
+  const { hideGraphControls, allowEditNodeLabel, allowAddNode, enableQuestline } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
@@ -67,10 +67,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
     return () => console.debug("GraphLayerViewer unmount");
   }, []);
-
-  useEffect(() => {
-	setCurrentTask(operations.getCurrentTasks())
-  }, [operations.getCurrentTasks()])
 
   useEffect(() => {
 	window.setInterval(function() {
@@ -224,8 +220,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       fitView
     >
 
-      {/* { !isTouchscreen && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> } */}
-      { false && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      { <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background />
 
     </ReactFlow>

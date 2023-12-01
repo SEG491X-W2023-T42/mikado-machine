@@ -24,7 +24,8 @@ npm run start
 Only do this after merging a pull request:
 
 ```bash
-npm run deploy
+npm run deployProd
+npm run deployFeatureFlagsProd
 ```
 
 This will deploy indexes, and the rules. If more items have been added to this folder, then they might also be deployed.
@@ -35,6 +36,7 @@ Run the following with the emulators running. Make sure all accounts are deleted
 
 ```bash
 rm -rf data
+npm run deployFeatureFlags
 npx firebase emulators:export ./data
 ```
 

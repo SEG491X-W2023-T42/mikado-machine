@@ -14,6 +14,7 @@ const TARGET_FEATURE_FLAGS = {
    allowSubgraph: true,
    allowModifyNodeCompletion: true,
    nodePlacementSearchRadius: 200,
+   enableQuestline: true,
   }
 }
 

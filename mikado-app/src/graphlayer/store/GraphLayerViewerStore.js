@@ -153,24 +153,19 @@ class GraphLayerViewerOperations {
   #state;
 
   /**
-   * Quest parent branches 
+   * Questlines identified by the ancestor neighboring the goal node
    */
-  #questParents;
-
-  /**
-   * Current questline
-   */
-  #currentQuestline;
-
-  /**
-   * Current quest tasks
-   */
-  #currentTasks;
+  #questParents = [];
 
   /**
    * Tracks if changes occured
    */
   #hasChanged = false
+
+  /**
+   * Tracks percentage completion of all questlines
+   */
+  #questlinesProgress = [];
 
   constructor(set, get) {
     this.#set = set;
@@ -196,61 +191,126 @@ class GraphLayerViewerOperations {
    * Processes changes from React Flow
    */
   onNodesChange(changes) {
-    myOnNodesChange(changes, this.#state.nodes, this.#set, this.setHasChanged); 
+    myOnNodesChange(changes, this.#state.nodes, this.#set, this.setHasChanged);
   }
 
   /**
-   * Update parent quests
+   * Update list of questlines, identified by greatest parent i.e. ancestor neighboring the goal node
    */
   updateQuestParents() {
-	this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[this.#state.nodes.filter((node) => node.type === 'goal')[0].id]).includes(node.id) && node.type != 'complete');
-	if (this.#currentQuestline == undefined || this.#state.nodes.filter((node) => node.id == this.#currentQuestline.id)[0].type == 'complete') {
-		if (this.#questParents.length != 0) {
-			this.#currentQuestline = this.#questParents[0]
-		} else {
-			this.#currentTasks = undefined
-		}
-	}
-	this.updateQuest()
+    const goalNodeId = this.#state.nodes.filter((node) => node.type === 'goal')[0].id;
+    // if (+goalNodeId) {
+    //   console.warn("Goal node should be node 0");
+    // }
+    this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[goalNodeId]).includes(node.id) && node.type !== 'complete');
+    this.#questlinesProgress = [];
+	const prevQuestlineId = this.#state.currentQuestlineId;
+    questlineUnchanged: {
+      let currentQuestlineId = "";
+      for (const node of this.#state.nodes) {
+        switch (node.type) {
+          default:
+            continue;
+          case "locked":
+          case "ready":
+        }
+        if (!currentQuestlineId) {
+          currentQuestlineId = node.id;
+        }
+        if (node.id === prevQuestlineId) break questlineUnchanged;
+      }
+      this.#set({ currentQuestlineId });
+    }
+    this.updateQuest();
   }
 
   /**
-   * Choose quest
+   * Update progress of all questlines
+   */
+  updateQuestlinesProgress() {
+	for (const parent of this.#questParents) {
+		let count = 0;
+		let completedNodes = 0;
+		const traverse = (node) => {
+			count += 1;
+			if (node.type == 'complete') completedNodes += 1;
+			if (this.#forwardConnections[node.id].length == 0) return;
+			for (const child of this.#forwardConnections[node.id]) {
+				traverse(this.#state.nodes.filter((n) => n.id == child)[0]);
+			}
+		}
+		traverse(parent)
+		this.#questlinesProgress[parent.id] = Math.floor(completedNodes*1.0/count * 100)
+	}
+  }
+
+  /**
+   * Update task list for current questline
    */
   updateQuest() {
-	if (this.#questParents === undefined || this.#questParents.length == 0) {
-		return;
-	}
+    const { currentQuestlineId: questlineId, currentTwoTasks: prevTwoTasks } = this.#state;
+    if (!questlineId) {
+      if (prevTwoTasks.length) {
+        this.#set({ currentTwoTasks: [] });
+      }
+      return;
+    }
 
-	const questlineId = this.#currentQuestline.id
+    // This can be thought of two algorithm ideas brought together:
+    // - A mark-sweep algorithm outward from the root to efficiently mark the ready nodes
+    //   - This would be O(E), O(E) = O(V**2) worst-case
+    //   - But this wastes the information when a quest is entirely complete
+    // - A backwards algorithm to filter by walking towards the root
+    //   - This would normally be O(V**3)
+    //   - With the cache, it would be O(V**2 + E) worst-case and only O(V) average-case
+    // TODO idk if this needs to be replaced with the mark-sweep algorithm to implement percentages, but at least it's no longer O(N**3) now
 
-	let canidateReadyNodes = this.#state.nodes.filter((node) => node.type == 'ready');
-	this.#currentTasks = [];
+    /**
+     * Map from locked nodes to {true, false, unknown}.
+     * Completed, and ready nodes will never be encountered because none exist closer to the root node than a ready node.
+     * The target node does not need to be added.
+     * The goal node does not need to be added (TODO once it's confirmed it has ID 0).
+     *
+     * true means it's in this questline.
+     * false means it's not.
+     * unknown will launch the calculation recursively when encountered.
+     */
+    const inclusionCache = {};
 
-	for (const canidateReadyNode of canidateReadyNodes) {
-		let parentNodes = this.#backwardConnections[canidateReadyNode.id]
-		
-		while (parentNodes.length > 0) {
-			let newParentNodes = [];
+    const backwardConnections = this.#backwardConnections;
+    const calculateInclusion = (id) => {
+      const parents = backwardConnections[id];
+      for (const parent of parents) {
+        if (!inclusionCache[parent]) continue;
+        return inclusionCache[id] = true;
+      }
+      for (const parent of parents) {
+        if (parent !== questlineId && !(inclusionCache[parent] ?? !calculateInclusion(parent))) continue;
+        return inclusionCache[id] = true;
+      }
+      return inclusionCache[id] = false;
+    }
 
-			if (parentNodes.includes(questlineId.toString()) || canidateReadyNode.id == questlineId) {
-				this.#currentTasks.push(canidateReadyNode)
-				break;
-			}
-
-			parentNodes.forEach((connection) => newParentNodes.push(...this.#backwardConnections[connection]))
-
-			parentNodes = newParentNodes;
-		}
-	}
-
-  }
-
-  /**
-   * Complete current task
-   */
-  completeCurrentTask() {
-	this.setNodeCompleted(this.#currentTasks[0].id, "complete")
+    let twoTasks = [];
+    for (const node of this.#state.nodes) {
+      const { id, type } = node;
+      if (type !== "ready") continue;
+      if (id === questlineId) {
+        twoTasks = [node];
+        break;
+      }
+      for (const parent of backwardConnections[id]) {
+        if (parent !== questlineId && !(inclusionCache[parent] ?? calculateInclusion(parent))) continue;
+        twoTasks.push(node);
+        break;
+      }
+      // Only need to display 2 tasks
+      if (twoTasks.length === 2) break;
+    }
+    if (prevTwoTasks[0] !== twoTasks[0] || prevTwoTasks[1] !== twoTasks[1]) {
+      this.#set({currentTwoTasks: twoTasks});
+    }
+	this.updateQuestlinesProgress();
   }
 
   /**
@@ -433,12 +493,10 @@ class GraphLayerViewerOperations {
       nodes: nodes.filter(node => node.id !== id),
       edges: edges.filter(edge => edge.source !== id && edge.target !== id),
     });
-	
-	if (this.#currentQuestline != undefined) {
-		if (id == this.#currentQuestline.id) {
-			this.#currentQuestline = undefined
-		}
-	}
+
+    if (this.#state.currentQuestlineId === id) {
+      this.#set({ currentQuestlineId: "" });
+    }
 	this.#hasChanged = true;
 	this.updateQuestParents();
   }
@@ -678,6 +736,20 @@ class GraphLayerViewerOperations {
     throw new Error();
   }
 
+  getOneNodeParent(childId) {
+    const parents = this.#backwardConnections[childId];
+    if (!parents) return void 0;
+    const goalNodeId = this.#state.nodes.filter((node) => node.type === 'goal')[0].id;
+    // if (+goalNodeId) {
+    //   console.warn("Goal node should be node 0");
+    // }
+    for (const parent of parents) {
+      if (parent === goalNodeId) continue;
+      return this.getNode(parent);
+    }
+    return void 0;
+  }
+
   /**
    * Returns the graph name
    */
@@ -701,33 +773,16 @@ class GraphLayerViewerOperations {
    *  Returns true if node is in a subgraph, false otherwise.
    */
   isNodeInSubgraph() {
-    if (this.#subgraphNodeID !== ""){
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Gets current task list.
-   */
-  getCurrentTasks() {
-	return this.#currentTasks;
-  }
-
-  /**
-   * Gets current questline parent node.
-   */
-  getCurrentQuestline(){
-	return this.#currentQuestline;
+    return this.#subgraphNodeID !== "";
   }
 
   /**
    * Sets current questline by id
    */
-  setCurrentQuestline(questlineId) {
-	this.#currentQuestline = this.#questParents.filter((node) => node.id == questlineId);
-	this.updateQuestParents();
+  setCurrentQuestlineId(questlineId) {
+    runtime_assert(this.#questParents.some(x => x.id === questlineId));
+    this.#set({currentQuestlineId: questlineId})
+    this.updateQuestParents();
   }
 
   /**
@@ -756,6 +811,13 @@ class GraphLayerViewerOperations {
    */
   resetHasChanged() {
 	this.#hasChanged = false;
+  }
+
+  /**
+   * Gets questline progress
+   */
+  getQuestlineProgress() {
+	return this.#questlinesProgress;
   }
 
   /**
@@ -883,6 +945,14 @@ const useGraphLayerViewerStore = () => create((set, get) => ({ // TODO
   editNode(id, initialValue) {
     set({...get(), editingNodeId: id, editingNodeInitialValue: initialValue})
   },
+  /**
+   * Current questline, identified by the id of the node connected to the root node
+   */
+  currentQuestlineId: "",
+  /**
+   * Top 2 ready quests in the current questline
+   */
+  currentTwoTasks: [],
 }));
 
 export default useGraphLayerViewerStore;
