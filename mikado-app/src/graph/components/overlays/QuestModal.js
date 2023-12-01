@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Dialog, DialogActions, DialogTitle, Button, styled, IconButton, DialogContent, Grid, List, ListItem, ListItemButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Box, Dialog, Divider, ListItemText, DialogActions, DialogTitle, Button, styled, IconButton, DialogContent, Grid, List, ListItem, ListItemButton, Typography, LinearProgress } from '@mui/material';
+import { Close, ArrowForward } from '@mui/icons-material';
 import { useStoreHack } from "../../../context/StoreHackContext";
 import { shallow } from "zustand/shallow";
 
@@ -13,6 +13,21 @@ const selector = (store) => ({
   currentTwoTasks: store.currentTwoTasks,
 });
 
+function LinearProgressWithLabel(props) {
+	return (
+		<Box sx={{ display: 'flex', alignItems: 'center' }}>
+			<Box sx={{ width: '100%', mr: 1 }}>
+				<LinearProgress variant="determinate" {...props} />
+			</Box>
+			<Box sx={{ minWidth: 35 }}>
+				<Typography variant="body2" color="text.secondary">{`${Math.round(
+					props.value,
+				)}%`}</Typography>
+			</Box>
+		</Box>
+	);
+  }
+
 /**
  * Inner component to prevent flashes changing the questline
  */
@@ -22,23 +37,47 @@ function QuestModalInner() {
 
   return <>
     <DialogContent dividers>
-      <h1>Current Quest {/*TODO %*/}</h1>
-      <Grid container justifyContent="space-between">
-        <Grid item className="questlineTask">{task1?.data?.label ?? NO_TASKS_TEXT /*Current Task*/}</Grid>
-        <Grid item className="questlineTask">{task2?.data?.label ?? NO_NEXT_TASK_TEXT /*Next Task*/}</Grid>
-        <Grid item>{/* Spacer */}</Grid>
-      </Grid>
+		<LinearProgressWithLabel variant="determinate" value={operations.getQuestlineProgress()[currentQuestlineId]} />
+		<List sx={{ width: '100%' }}>
+			<ListItem>
+				<ListItemText primary="Current Task" secondary={task1?.data?.label ?? NO_TASKS_TEXT} />
+			</ListItem>
+			<Divider variant="inset" compoennt="li" />
+			<ListItem>
+				<ListItemText primary="Next Task" secondary={task2?.data?.label ?? NO_NEXT_TASK_TEXT } />
+			</ListItem>
+		</List>
     </DialogContent>
     <DialogContent dividers>
-      <h1>Other Quests</h1>
+		{<Typography variant="h4" fontFamily="Inter">Other Quests</Typography>}
       <List disablePadding>
         {
           operations.getAllQuests().flatMap(parent => {
             const { id, data: { label } } = parent;
             if (id === currentQuestlineId) return [];
-            return [<ListItemButton key={id} onClick={() => operations.setCurrentQuestlineId(id)}>
-              <ListItem>{label} {/*TODO %*/}</ListItem>
-            </ListItemButton>];
+            return [
+				<div key={id}>
+					<ListItem
+						secondaryAction={
+							<IconButton edge="end" onClick={() => operations.setCurrentQuestlineId(id)}>
+								<ArrowForward />
+							</IconButton>
+						}
+					>
+						<ListItemText primary={
+							<React.Fragment>
+								<Typography sx={{ display: 'inline' }}>
+									{label}
+								</Typography>
+								<Typography color="text.secondary" align="right" sx={{ display: 'inline'}}>
+									&nbsp;- {operations.getQuestlineProgress()[id]}%
+								</Typography>
+							</React.Fragment>
+						} />
+					</ListItem>
+					<Divider variant="inset" compoennt="li" />
+				</div>
+            ];
           })
         }
       </List>
@@ -63,7 +102,7 @@ export default function QuestModal({ open, handleClose }) {
     maxWidth={'sm'}
   >
     <DialogTitle>
-      {"Questline Details"}
+      {<Typography variant="h4" fontFamily="Inter">Questline Details</Typography>}
     </DialogTitle>
     <IconButton
       aria-label="close"

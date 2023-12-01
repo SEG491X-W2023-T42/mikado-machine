@@ -162,6 +162,11 @@ class GraphLayerViewerOperations {
    */
   #hasChanged = false
 
+  /**
+   * Tracks percentage completion of all questlines
+   */
+  #questlinesProgress = [];
+
   constructor(set, get) {
     this.#set = set;
     this.#state = (this.#get = get)();
@@ -198,7 +203,8 @@ class GraphLayerViewerOperations {
     //   console.warn("Goal node should be node 0");
     // }
     this.#questParents = this.#state.nodes.filter((node) => (this.#forwardConnections[goalNodeId]).includes(node.id) && node.type !== 'complete');
-    const prevQuestlineId = this.#state.currentQuestlineId;
+    this.#questlinesProgress = [];
+	const prevQuestlineId = this.#state.currentQuestlineId;
     questlineUnchanged: {
       let currentQuestlineId = "";
       for (const node of this.#state.nodes) {
@@ -216,6 +222,26 @@ class GraphLayerViewerOperations {
       this.#set({ currentQuestlineId });
     }
     this.updateQuest();
+  }
+
+  /**
+   * Update progress of all questlines
+   */
+  updateQuestlinesProgress() {
+	for (const parent of this.#questParents) {
+		let count = 0;
+		let completedNodes = 0;
+		const traverse = (node) => {
+			count += 1;
+			if (node.type == 'complete') completedNodes += 1;
+			if (this.#forwardConnections[node.id].length == 0) return;
+			for (const child of this.#forwardConnections[node.id]) {
+				traverse(this.#state.nodes.filter((n) => n.id == child)[0]);
+			}
+		}
+		traverse(parent)
+		this.#questlinesProgress[parent.id] = Math.floor(completedNodes*1.0/count * 100)
+	}
   }
 
   /**
@@ -284,6 +310,7 @@ class GraphLayerViewerOperations {
     if (prevTwoTasks[0] !== twoTasks[0] || prevTwoTasks[1] !== twoTasks[1]) {
       this.#set({currentTwoTasks: twoTasks});
     }
+	this.updateQuestlinesProgress();
   }
 
   /**
@@ -784,6 +811,13 @@ class GraphLayerViewerOperations {
    */
   resetHasChanged() {
 	this.#hasChanged = false;
+  }
+
+  /**
+   * Gets questline progress
+   */
+  getQuestlineProgress() {
+	return this.#questlinesProgress;
   }
 
   /**
