@@ -1,14 +1,84 @@
-div.MuiToolbar-root > .seamless-editor {
-  -webkit-text-fill-color: #fff;
-  color: #fff;
-  font-size: 16pt;
-  font-family: monospace;
-  font-weight: 700;
-  letter-spacing: .3rem;
-  text-align: center;
-  box-shadow: 0 1px 0 lightgrey;
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-  &[disabled] {
-    box-shadow: none;
+/* @property --header-height {
+  syntax: '<header-height>';
+  initial-value: 48px;
+  inherits: false;
+
+} */
+
+:root{
+  --header-height: 56px;
+}
+
+a {
+  color:inherit;
+}
+
+header.MuiPaper-root{
+  box-shadow: none;
+  background-color: #414141;
+  /* border-bottom: 1px solid rgba(123, 127, 156, 0.7); */
+  height: var(--header-height);
+}
+
+div.MuiContainer-root {
+  /* border-bottom: 1px solid #d3d3d3; */
+  box-shadow: none;
+}
+
+div.MuiToolbar-root { 
+  height: var(--header-height);
+  min-height: var(--header-height);
+
+  > .seamless-editor {
+    -webkit-text-fill-color: #fff;
+    color: #fff;
+    font-size: 15pt;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    /* letter-spacing: .2rem; */
+    text-align: center;
+    box-shadow: 0 1px 0 lightgrey;
+    justify-self: center;
+
+    &[disabled] {
+      box-shadow: none;
+    }
   }
+}
+
+div.MuiAvatar-root {
+  height: 32px;
+  width: 32px;
+  padding: 1px;
+  border: 2px solid lightgrey;
+}
+
+.MuiTypography-root {
+  font-family: 'Inter', sans-serif !important;
+}
+
+div.MuiPaper-root {
+  background-color: #414141;
+  border: rgba(105,105,105) 1px solid;
+  border-top: none;
+  box-shadow: none;
+  
+  color:#fff;
+  
+  > .MuiList-root {
+    padding: 0;
+
+    > .MuiMenuItem-root {
+
+      border-top: rgba(105,105,105) 1px solid; 
+      
+    }
+  }
+}
+
+div.MuiPopover-paper {
+  border-top: rgba(105,105,105) 1px solid; 
+  max-width: 25%;
 }

@@ -172,7 +172,7 @@ div.react-flow__node-locked {
   & > .content-wrapper {
     & > .node-icon-wrapper {
       & > div[aria-label] {
-        background-image: url('@material-design-icons/svg/outlined/remove_circle.svg');
+        background-image: url('@material-design-icons/svg/outlined/remove_circle_outline.svg');
       }
     }
   }
