@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, setDoc, collection } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, deleteDoc, collection } from "firebase/firestore";
 import * as Counter from "./Autoincrement";
 import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
 import { db } from "../graphlayer/store/Gatekeeper";
@@ -75,6 +75,55 @@ export async function getAllGraphs(uid) {
 
 	return names;
 
+}
+
+export async function addGraph(uid, graphName) {
+
+  try {
+    // check if graph already exist
+    const graphDocRef = doc(db, uid, graphName);
+    const graphDocSnap = await getDoc(graphDocRef);
+  
+    if (graphDocSnap.exists()) {
+      throw new Error("Graph with the same name already exists.");
+    }
+  
+    const data = {
+  
+      node_names: {},
+      positions: {},
+      connections: {},
+      type: {},
+  
+    };
+  
+    await setDoc(graphDocRef, data);
+  
+    return true;
+  } catch (error) {
+    console.error("Error adding graph: ", error);
+    return false;
+  }
+}
+
+export async function deleteGraph(uid, graphName) {
+  
+  try {
+    // check if graph already exist
+    const graphDocRef = doc(db, uid, graphName);
+    const graphDocSnap = await getDoc(graphDocRef);
+
+    if (!graphDocSnap.exists()) {
+      throw new Error("Graph does not exist, can't delete.");
+    }
+
+    await deleteDoc(graphDocRef);
+    return true;
+
+  } catch (error) {
+    console.error("Error deleting grpah: ", error);
+    return false;
+  }
 }
 
 /**
