@@ -124,9 +124,9 @@ export default function GraphHeader({ uid, graph: { id } }) {
           >
             <Typography textAlign={"left"} sx={{ px: 2, py: 1, fontSize:"10pt" }}>
               {/* <span style={{fontSize: "11pt", pb: 4}}> Welcome to MyMikado! </span>  */}
-              <h2>Welcome to myMikado!</h2>
+              <h2>Welcome to MyMikado!</h2>
               <p>
-                myMikado is a graph editor for managing goals and tasks in a tree format with the <a href="https://mikadomethod.info/" target="new">Mikado Method</a>.
+                MyMikado is a graph editor for managing goals and tasks in a tree format with the <a href="https://mikadomethod.info/" target="new">Mikado Method</a>.
               </p>
               <p>
                 The Mikado Method is a process developed by <b>Ola Ellnestam</b> and <b>Daniel Brolund</b> for managing large-scale critical changes to existing software projects. 

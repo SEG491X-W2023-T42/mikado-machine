@@ -29,6 +29,20 @@ export const FirebaseContextProvider = ({ children }) => {
     signOut(auth);
   }
 
+  const getGoogleDisplayName = () => {
+    console.log(user.auth);
+    if (user != null) {
+      return user.auth.currentUser.displayName;
+    }
+  }
+
+  const getGoogleProfilePicture = () => {
+    console.log(user.auth);
+    if (user != null) {
+      return user.auth.currentUser.photoURL;
+    }
+  }
+
   // If auth is approved, yeet the user value
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (currentUser) => {
@@ -41,7 +55,7 @@ export const FirebaseContextProvider = ({ children }) => {
   }, [])
 
   return (
-    <ctxt.Provider value={{ googleSignIn, logOut, user, userLoaded }}>
+    <ctxt.Provider value={{ googleSignIn, logOut, getGoogleDisplayName, getGoogleProfilePicture, user, userLoaded}}>
       {children}
     </ctxt.Provider>
   );
