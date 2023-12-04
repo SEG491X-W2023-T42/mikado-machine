@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import * as React from 'react';
 import GraphHeader from '../../graph/components/graphheader/GraphHeader';
 import { graphStack } from "../../helpers/GraphStack";
+import GraphNavigationBar from "../../graph/components/graphnavigation/GraphNavigation";
 
 /**
  * The GraphViewer component is the main page that users view and edit graphs.
@@ -25,6 +26,9 @@ function GraphViewer({ uid }) {
 
   // TODO get this from URL
   const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
+  const [navOpen, setNavOpen] = React.useState(false)
+
+
   const impersonateUid = useMemo(() => {
     try {
       const result = localStorage.getItem("impersonateUid");
@@ -142,7 +146,8 @@ function GraphViewer({ uid }) {
   const  key = uid + graph.subgraph;
   console.debug("GraphViewer graph", graph, "key", key);
   return <main>
-    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} />
+    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} />
+	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid}/>
     <GraphLayerViewer key={key} uid={uid}
                   graph={graph}
                   enterGraph={enterGraph}
