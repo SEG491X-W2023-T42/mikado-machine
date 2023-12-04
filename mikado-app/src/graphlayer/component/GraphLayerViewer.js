@@ -62,7 +62,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   const [testCount, setTestCount] = useState(0);
   useEffect(() => {
-    console.log("GraphLayerViewer mount", testCount, "nodes", nodes, edges, operations);
     setTestCount(testCount + 1);
 
     return () => console.debug("GraphLayerViewer unmount");
@@ -71,7 +70,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
   useEffect(() => {
 	window.setInterval(function() {
 		if (operations.getHasChanged()) {
-			console.log("Saved changes!")
 			operations.resetHasChanged()
 			operations.save(uid, notifySaveError)
 		}
@@ -192,7 +190,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
     d3Selection.on('dblclick.zoom', null);
   }, []);
 
-  console.debug("GraphLayerViewer graph", graph);
+
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
@@ -204,7 +202,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
       nodesConnectable={false}
       nodesDraggable={!editingNodeId}
       panOnDrag={!editingNodeId}
-      panOnScroll={true}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
