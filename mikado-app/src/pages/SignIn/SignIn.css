@@ -9,32 +9,44 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: #0a021c;
-  background-image: radial-gradient(#eee 1px, transparent 0);
+  background-color: #fff;
+  background-image: radial-gradient(rgb(181, 181, 187) 1px, transparent 0);
   background-size: 40px 40px;
 }
 
 .sign-in-card {
-  width: 400px;
+  width: fit-content;
+  max-width: 450px;
   height: fit-content+20px;
-  margin: 0 auto;
-  margin-top: 100px;
-  background-color: #e6e4f2;
+  position:absolute;
+  top: 40%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+
+  /* margin-top: 100px; */
+  background-color: rgba(65, 65, 65, 0.9);
   border-radius: 10px;
-  box-shadow: 0 0 10px 0 #e7e6ea;
-  padding: 20px;
+  /* box-shadow: 0 0 10px 0 #e7e6ea; */
+  padding: 32px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   font-family: 'Inter', sans-serif !important;
   text-align: center;
-  color: #0a021c;
+  color: #fff;
 }
 
 .google-sign-in-button {
+  background-color: #DAEFFF !important;
+  color: black !important;
   height: 50px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 8px !important;
+  font-family: 'Inter', sans-serif !important;
+  margin-top:20px !important;
+  margin-bottom: 20px !important; 
 }
 
 .google-button-text {
@@ -43,4 +55,16 @@
 
 .footnote {
   font-size: 10px;
+}
+
+h1 {
+  /* font-size: 24px; */
+  font-weight: 600;
+  /* margin-bottom: 10px; */
+}
+
+.detail-text{
+  font-size: 10pt;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
