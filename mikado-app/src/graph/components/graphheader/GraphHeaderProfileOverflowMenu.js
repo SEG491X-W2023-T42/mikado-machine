@@ -44,6 +44,7 @@ export default function GraphHeaderProfileOverflowMenu() {
       </IconButton>
     </Tooltip>
     <Menu
+      className="settings-menu"
       sx={{ mt: '45px' }}
       id="menu-appbar"
       anchorEl={anchorUser}
