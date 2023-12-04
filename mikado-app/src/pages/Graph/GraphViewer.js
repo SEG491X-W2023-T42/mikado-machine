@@ -143,11 +143,19 @@ function GraphViewer({ uid }) {
 	
   }
 
+  function switchGraph(graphId) {
+	graphStack.length = 1;
+	setGraph({
+		id: graphId,
+		subgraph: graphStack.at(-1)
+	})
+  }
+
   const  key = uid + graph.subgraph;
   console.debug("GraphViewer graph", graph, "key", key);
   return <main>
     <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} />
-	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid}/>
+	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid} switchGraph={switchGraph}/>
     <GraphLayerViewer key={key} uid={uid}
                   graph={graph}
                   enterGraph={enterGraph}

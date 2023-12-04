@@ -3,7 +3,7 @@ import { Box, List, ListItem, ListItemButton, ListItemIcon, Divider, ListItemTex
 import { Inbox, Add, Delete } from '@mui/icons-material';
 import { getAllGraphs } from '../../../helpers/Api';
 
-export default function GraphNavigationBar({open, setOpen, uid}) {
+export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	const [graphs, setGraphs] = React.useState([]);
 	
@@ -46,19 +46,19 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 				onKeyDown={toggleDrawer(false)}
 			>
 				<List>
-					{graphs.map((text) => (
-					<ListItem key={text} disablePadding
+					{graphs.map((id) => (
+					<ListItem key={id} disablePadding
 						secondaryAction={
 							<IconButton edge="end">
 								<Delete />
 							</IconButton>
 						}
 					>
-						<ListItemButton>
+						<ListItemButton onClick={() => switchGraph(id)}>
 							<ListItemIcon>
 								<Inbox />
 							</ListItemIcon>
-							<ListItemText primary={text} />
+							<ListItemText primary={id} />
 						</ListItemButton>
 					</ListItem>
 				))}
