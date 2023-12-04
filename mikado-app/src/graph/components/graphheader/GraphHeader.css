@@ -60,25 +60,23 @@ div.MuiAvatar-root {
 }
 
 div.MuiPaper-root {
-  background-color: #414141;
   border: rgba(105,105,105) 1px solid;
-  border-top: none;
-  box-shadow: none;
-  
+  background-color: #414141;
   color:#fff;
-  
-  > .MuiList-root {
-    padding: 0;
+  box-shadow: none;
+}
 
-    > .MuiMenuItem-root {
+ul.MuiList-root {
+  border-top: none !important;
+  padding: 0px !important;
 
-      border-top: rgba(105,105,105) 1px solid; 
-      
-    }
+  > .MuiMenuItem-root {
+
+    /* border-top: rgba(105,105,105) 1px solid;  */
+    
   }
 }
 
 div.MuiPopover-paper {
-  border-top: rgba(105,105,105) 1px solid; 
   max-width: 25%;
 }
