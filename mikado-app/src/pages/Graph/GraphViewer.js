@@ -147,7 +147,7 @@ function GraphViewer({ uid }) {
   console.debug("GraphViewer graph", graph, "key", key);
   return <main>
     <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} />
-	<GraphNavigationBar open={navOpen} setOpen={setNavOpen}/>
+	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid}/>
     <GraphLayerViewer key={key} uid={uid}
                   graph={graph}
                   enterGraph={enterGraph}

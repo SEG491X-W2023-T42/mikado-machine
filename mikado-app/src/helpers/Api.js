@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, setDoc, collection } from "firebase/firestore";
 import * as Counter from "./Autoincrement";
 import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
 import { db } from "../graphlayer/store/Gatekeeper";
@@ -64,6 +64,17 @@ export async function loadFromDb(uid, graphName, subgraphName) {
   // TODO verify acyclic (#41)
 
   return [newNodes, newEdges, forwardConnections, backwardConnections];
+}
+
+export async function getAllGraphs(uid) {
+	const snapshot = await getDocs(collection(db, uid));
+	let names = [];
+	snapshot.forEach((doc) => {
+		names.push(doc.id);
+	})
+
+	return names;
+
 }
 
 /**

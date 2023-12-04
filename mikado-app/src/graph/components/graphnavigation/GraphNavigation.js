@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, Divider, ListItemText, SwipeableDrawer, Button } from '@mui/material';
-import { Mail, Inbox, Add } from '@mui/icons-material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, Divider, ListItemText, IconButton, SwipeableDrawer, Button } from '@mui/material';
+import { Inbox, Add, Delete } from '@mui/icons-material';
+import { getAllGraphs } from '../../../helpers/Api';
 
-export default function GraphNavigationBar({open, setOpen}) {
+export default function GraphNavigationBar({open, setOpen, uid}) {
+
+	const [graphs, setGraphs] = React.useState([]);
 	
 	const toggleDrawer = (open) => (event) => {
 		if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -11,6 +14,17 @@ export default function GraphNavigationBar({open, setOpen}) {
 	
 		setOpen(open);
 	};
+
+	React.useEffect(() => {
+		const getGraphs = async () => {
+			if (open == true) {
+				const allGraphs = await getAllGraphs(uid)
+				setGraphs(allGraphs);
+			}
+		}
+
+		getGraphs().catch(console.error)
+	}, [open])
 
 	return (
 		<SwipeableDrawer
@@ -32,11 +46,17 @@ export default function GraphNavigationBar({open, setOpen}) {
 				onKeyDown={toggleDrawer(false)}
 			>
 				<List>
-					{['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-					<ListItem key={text} disablePadding>
+					{graphs.map((text, index) => (
+					<ListItem key={text} disablePadding
+						secondaryAction={
+							<IconButton edge="end">
+								<Delete />
+							</IconButton>
+						}
+					>
 						<ListItemButton>
 							<ListItemIcon>
-							{index % 2 === 0 ? <Inbox /> : <Mail />}
+								<Inbox />
 							</ListItemIcon>
 							<ListItemText primary={text} />
 						</ListItemButton>
@@ -44,18 +64,6 @@ export default function GraphNavigationBar({open, setOpen}) {
 				))}
 				</List>
 				<Divider />
-				<List>
-					{['All mail', 'Trash', 'Spam'].map((text, index) => (
-						<ListItem key={text} disablePadding>
-							<ListItemButton>
-								<ListItemIcon>
-									{index % 2 === 0 ? <Inbox /> : <Mail />}
-								</ListItemIcon>
-								<ListItemText primary={text} />
-							</ListItemButton>
-						</ListItem>
-					))}
-				</List>
 			</Box>
 		</SwipeableDrawer>
 	);
