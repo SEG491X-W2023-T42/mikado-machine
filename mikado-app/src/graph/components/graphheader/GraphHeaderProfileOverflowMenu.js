@@ -13,8 +13,6 @@ export default function GraphHeaderProfileOverflowMenu() {
 
   const displayName = getGoogleDisplayName();
   const profilePicture = getGoogleProfilePicture();
-  console.log(displayName);
-  console.log(profilePicture);
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -31,7 +29,6 @@ export default function GraphHeaderProfileOverflowMenu() {
       console.log(error);
     }
   };
-
 
   let settings = allSettings;
   let settingsFunctions = [handleCloseUserMenu, handleCloseUserMenu, handleCloseUserMenu, handleSignOut];
