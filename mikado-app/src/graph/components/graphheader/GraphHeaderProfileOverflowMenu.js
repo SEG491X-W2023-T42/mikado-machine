@@ -9,7 +9,12 @@ const settingsImplementedRange = [3, 4];
 export default function GraphHeaderProfileOverflowMenu() {
   const { hideUnimplementedProfileMenuItems } = getGatekeeperFlags();
   const [anchorUser, setAnchorUser] = React.useState(null);
-  const { logOut } = useFirebase();
+  const { logOut, getGoogleDisplayName, getGoogleProfilePicture } = useFirebase();
+
+  const displayName = getGoogleDisplayName();
+  const profilePicture = getGoogleProfilePicture();
+  console.log(displayName);
+  console.log(profilePicture);
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -27,6 +32,7 @@ export default function GraphHeaderProfileOverflowMenu() {
     }
   };
 
+
   let settings = allSettings;
   let settingsFunctions = [handleCloseUserMenu, handleCloseUserMenu, handleCloseUserMenu, handleSignOut];
   if (hideUnimplementedProfileMenuItems) {
@@ -37,10 +43,7 @@ export default function GraphHeaderProfileOverflowMenu() {
   return <Box sx={{ flexGrow: 0 }}>
     <Tooltip title="Open settings">
       <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-        {
-          // TODO Add icon based on google account
-        }
-        <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+        <Avatar alt={displayName} src={profilePicture} />
       </IconButton>
     </Tooltip>
     <Menu
