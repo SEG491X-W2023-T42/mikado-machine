@@ -66,17 +66,28 @@ div.MuiPaper-root {
   box-shadow: none;
 }
 
-ul.MuiList-root {
+.MuiMenu-paper {
   border-top: none !important;
   padding: 0px !important;
+  /* width: fit-content !important; */
+  
+  > ul.MuiList-root{
+    padding: 0px !important;
 
-  > .MuiMenuItem-root {
+    > .MuiMenuItem-root {
 
-    /* border-top: rgba(105,105,105) 1px solid;  */
+      border-top: rgba(105,105,105) 1px solid; 
     
+    }
   }
+
+  
 }
 
-div.MuiPopover-paper {
-  max-width: 25%;
+.help-popover {
+  > .MuiPopover-paper {
+     width: 25%;
+    min-width: 300px;
+    max-width: fit-content;
+  }
 }
