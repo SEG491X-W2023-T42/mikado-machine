@@ -46,7 +46,7 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 				onKeyDown={toggleDrawer(false)}
 			>
 				<List>
-					{graphs.map((text, index) => (
+					{graphs.map((text) => (
 					<ListItem key={text} disablePadding
 						secondaryAction={
 							<IconButton edge="end">
