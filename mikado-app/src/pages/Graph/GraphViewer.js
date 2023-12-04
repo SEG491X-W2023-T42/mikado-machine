@@ -26,6 +26,9 @@ function GraphViewer({ uid }) {
 
   // TODO get this from URL
   const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
+  const [navOpen, setNavOpen] = React.useState(false)
+
+
   const impersonateUid = useMemo(() => {
     try {
       const result = localStorage.getItem("impersonateUid");
@@ -143,8 +146,8 @@ function GraphViewer({ uid }) {
   const  key = uid + graph.subgraph;
   console.debug("GraphViewer graph", graph, "key", key);
   return <main>
-    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} />
-	<GraphNavigationBar />
+    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} />
+	<GraphNavigationBar open={navOpen} setOpen={setNavOpen}/>
     <GraphLayerViewer key={key} uid={uid}
                   graph={graph}
                   enterGraph={enterGraph}

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { db, getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import  HelpIcon from '@mui/icons-material/Help';
+import { Menu } from "@mui/icons-material";
 
 function serializeGraphWithTitle(title) {
   return {
@@ -16,7 +17,7 @@ function serializeGraphWithTitle(title) {
   }
 }
 
-export default function GraphHeader({ uid, graph: { id } }) {
+export default function GraphHeader({ uid, graph: { id }, setNavOpen }) {
   const { allowEditGraphName, hideProfileMenu } = getGatekeeperFlags();
   const [savedTitle, setSavedTitle] = useState(null);
   const [title, setTitle] = useState("");
@@ -85,6 +86,13 @@ export default function GraphHeader({ uid, graph: { id } }) {
           onDoubleClick={startEditingTitle}
           onContextMenu={startEditingTitle}
         >
+			<IconButton 
+				color="inherit"
+				size="large"
+				onClick={() => setNavOpen(true)}
+			>
+				<Menu fontSize="inherit" />
+			</IconButton>
           <SeamlessEditor
             label={title}
             editing={isEditingTitle}

@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, Divider, ListItemText, SwipeableDrawer } from '@mui/material';
-import { Mail, Inbox } from '@mui/icons-material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, Divider, ListItemText, SwipeableDrawer, Button } from '@mui/material';
+import { Mail, Inbox, Add } from '@mui/icons-material';
 
-export default function GraphNavigationBar() {
-
-	const [open, setOpen] = React.useState(true)
+export default function GraphNavigationBar({open, setOpen}) {
 	
 	const toggleDrawer = (open) => (event) => {
 		if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
@@ -20,6 +18,13 @@ export default function GraphNavigationBar() {
 			onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}
 		>
+			<Box
+				sx={{ width: 'auto' }}
+				role="presentation"
+			>
+				<Button variant="contained" startIcon={<Add />}>Add Graph</Button>
+			</Box>
+			<Divider />
 			<Box
 				sx={{ width: 'auto' }}
 				role="presentation"
