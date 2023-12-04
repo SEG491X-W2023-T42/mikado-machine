@@ -341,8 +341,8 @@ class GraphLayerViewerOperations {
   save(uid, notifyError) {
     this.#loading = true;
     saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName, this.#subgraphNodeID).then(x => {
-      this.#loading = false;
-      x || notifyError();
+		this.#loading = false;
+		x || notifyError();
     });
   }
 
