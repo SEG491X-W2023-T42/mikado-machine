@@ -40,6 +40,8 @@ function GraphViewer({ uid }) {
   if (impersonateUid) {
     uid = impersonateUid;
   }
+
+
   /*
   // TODO bring back the animations later
   const [fade, setFade] = useState(false);

@@ -190,6 +190,8 @@ function GraphLayerViewerInternal({ uid, graph }) {
     d3Selection.on('dblclick.zoom', null);
   }, []);
 
+
+
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
   return <main ref={reactFlowWrapper}>
@@ -200,7 +202,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
       nodesConnectable={false}
       nodesDraggable={!editingNodeId}
       panOnDrag={!editingNodeId}
-      panOnScroll={true}
       proOptions={proOptions}
       defaultEdgeOptions={DEFAULT_EDGE_OPTIONS}
       nodeTypes={NODE_TYPES}
