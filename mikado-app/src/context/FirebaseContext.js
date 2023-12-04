@@ -30,14 +30,12 @@ export const FirebaseContextProvider = ({ children }) => {
   }
 
   const getGoogleDisplayName = () => {
-    console.log(user.auth);
     if (user != null) {
       return user.auth.currentUser.displayName;
     }
   }
 
   const getGoogleProfilePicture = () => {
-    console.log(user.auth);
     if (user != null) {
       return user.auth.currentUser.photoURL;
     }
