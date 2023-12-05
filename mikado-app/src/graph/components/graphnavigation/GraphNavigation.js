@@ -96,13 +96,13 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 					{Object.keys(graphs).map((id) => (
 						<ListItem key={id} disablePadding
 							secondaryAction={
-								<IconButton edge="end" onClick={(e) => {
+								Object.keys(graphs).length > 1 ? <IconButton edge="end" onClick={(e) => {
 									e.stopPropagation();
 									setDeleteConfirmationDialogOpen(true);
 									setSelectedGraphToDelete(graphs[id]);
 								}}>
 									<Delete sx={{color:'#fff', fontSize:'20px'}}/>
-								</IconButton>
+								</IconButton> : null
 							}
 						>
 						<ListItemButton onClick={() => switchGraph(graphs[id])}>
