@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+.MuiDrawer-paper {
+    font-family: 'Inter', sans-serif !important;
+    width:fit-content;
+    max-width: 85%;
+    min-width: 15%;
+
+}
+
+.MuiListItemText-root{
+    .MuiTypography-root{
+        width: auto;
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+    }
+    
+}
+
+.MuiPaper-root {
+        background-color: #414141 !important;
+        border: rgba(105,105,105) 1px solid;
+        color: #fff !important;
+    }
+
+.add-doc-button{
+    background-color: transparent !important;
+    border: #fff 1px solid !important;
+    border-radius: 8px !important;
+    
+    font-family: 'Inter', sans-serif !important;
+    color: #fff !important;
+    text-transform: uppercase !important;
+
+    height: 50px;
+    margin:16px !important;
+}
+
+/* .confirm-deletion-dialog{
+    > .MuiPaper-root{
+        background-color: #fff;
+        color: #414141;
+    }
+    
+} */
+div.MuiDialog-paper {
+    background-color: #fff !important;
+    color: #414141 !important;
+}
+
+Button {
+    font-family: 'Inter', sans-serif !important;
+
+}
+    
