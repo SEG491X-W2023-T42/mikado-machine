@@ -6,7 +6,7 @@ import './GraphNavigation.css';
 
 export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
-	const [graphs, setGraphs] = React.useState([]);
+	const [graphs, setGraphs] = React.useState({});
 	const [isAddGraphDialogOpen, setAddGraphDialogOpen] = React.useState(false);
 	const [newGraphName, setNewGraphName] = React.useState('');
 	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
@@ -25,7 +25,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 		try {
 			const allGraphs = await getAllGraphs(uid);
 			
-			if (allGraphs.includes(newGraphName)) {
+			if (Object.keys(allGraphs).includes(newGraphName) || Object.values.includes(newGraphName)) {
 				setGraphExists(true);
 				return;
 			}
@@ -47,7 +47,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	const handleDeleteGraph = async () => {
 		try {
-			await deleteGraph(uid, selectedGraphToDelete);
+			await deleteGraph(uid, graphs[selectedGraphToDelete]);
 
 			//reload
 			const allGraphs = await getAllGraphs(uid);
@@ -92,19 +92,19 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 				onKeyDown={toggleDrawer(false)}
 			>
 				<List>
-					{graphs.map((id) => (
+					{Object.keys(graphs).map((id) => (
 						<ListItem key={id} disablePadding
 							secondaryAction={
 								<IconButton edge="end" onClick={(e) => {
 									e.stopPropagation();
 									setDeleteConfirmationDialogOpen(true);
-									setSelectedGraphToDelete(id);
+									setSelectedGraphToDelete(graphs[id]);
 								}}>
 									<Delete sx={{color:'#fff', fontSize:'20px'}}/>
 								</IconButton>
 							}
 						>
-						<ListItemButton onClick={() => switchGraph(id)}>
+						<ListItemButton onClick={() => switchGraph(graphs[id])}>
 							<ListItemText primary={id} />
 						</ListItemButton>
 					</ListItem>

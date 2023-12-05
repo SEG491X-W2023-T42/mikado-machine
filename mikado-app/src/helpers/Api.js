@@ -71,9 +71,17 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 
 export async function getAllGraphs(uid) {
 	const snapshot = await getDocs(collection(db, uid));
-	let names = [];
+	const changedNames = await getDocs(collection(db, "user", uid, "graphs"))
+
+	let names = {};
+
 	snapshot.forEach((doc) => {
-		names.push(doc.id);
+		const map = changedNames.docs.filter((nameDoc) => nameDoc.id == doc.id);
+		if (map.length != 0) {
+			names[map[0].data().name] = doc.id;
+		} else {
+			names[doc.id] = doc.id
+		}
 	})
 
 	return names;
