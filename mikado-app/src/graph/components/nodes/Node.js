@@ -4,7 +4,9 @@ import { runtime_assert } from "../../../graphlayer/store/Assert";
 import { useStoreHack } from "../../../context/StoreHackContext";
 import SeamlessEditor from "../SeamlessEditor";
 import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
-import { ArrowDownward, ArrowUpward} from '@mui/icons-material';
+import { ArrowDownward, ArrowUpward, Check, RemoveCircleOutline} from '@mui/icons-material';
+import { SvgIcon } from "@mui/material";
+import GoalIcon from "../../../assets/goal_icon";
 
 export const MY_NODE_CONNECTION_MODE = ConnectionMode.Loose;
 
@@ -36,7 +38,6 @@ export default function Node({ id, data, type, exporting = false, ...rest }) {
   const ariaLabel = ARIA_LABELS[type];
   runtime_assert(ariaLabel);
 
-
   const result = <>
     {exporting ? null : <NodeToolbar>
       {allowRemoveNode && notGoal && <button aria-label="Delete" data-icon="delete" title="Delete task" onClick={() => operations.deleteNode(id)} />}
@@ -67,7 +68,18 @@ export default function Node({ id, data, type, exporting = false, ...rest }) {
         singleLine={false}
       />
       <div className="node-icon-wrapper">
-        <div aria-label={ariaLabel} />
+		<div aria-label={ariaLabel}>
+			{ariaLabel == "Goal" ? 
+				<SvgIcon>
+					<GoalIcon />
+				</SvgIcon> 
+				: ariaLabel == "Blocked" ? 
+				<RemoveCircleOutline /> 
+				: ariaLabel == "Completed" ? 
+				<Check /> 
+				: null
+			}
+		</div>
       </div>
     </div>
     
