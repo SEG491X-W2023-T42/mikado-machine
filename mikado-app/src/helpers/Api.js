@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, setDoc, deleteDoc, collection } from "firebase/firestore";
+import { doc, getDoc, setDoc, getDocs, collection, deleteDoc } from "firebase/firestore";
 import * as Counter from "./Autoincrement";
 import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
 import { db } from "../graphlayer/store/Gatekeeper";
@@ -181,15 +181,48 @@ export function saveToDb(nodes, forwardConnections, uid, graphName, subgraphNode
 
   const data = { connections, node_names, positions, type };
   // Update users collection
-
   if (subgraphNodeID !== "") {
-    return setDoc(doc(db, uid, graphName, "subgraph", subgraphNodeID), data).then(() => true).catch((e) => {
+    return setDoc(doc(db, uid, graphName, "subgraph", subgraphNodeID), data).then(() => {removeOrphans(uid, graphName); return true;}).catch((e) => {
       console.log(e.message);
       return false;
     });
   }
-  return setDoc(doc(db, uid, graphName), data).then(() => true).catch((e) => {
+  return setDoc(doc(db, uid, graphName), data).then(() => {removeOrphans(uid, graphName); return true;}).catch((e) => {
     console.log(e.message);
     return false;
   });
+}
+
+export async function removeOrphans(uid, graphName) {
+	let unvisitedSubgraphs = [];
+	let visitedSubgraphs = [];
+	let subgraphs = {};
+
+	const docSnap = await getDoc(doc(db, uid, graphName));
+	const subgraphDocSnap = await getDocs(collection(db, uid, graphName, "subgraph"))
+
+	// Reduce docsnap to just graph ids
+	subgraphDocSnap.forEach((doc) => {
+		subgraphs[doc.id] = Object.values(doc.data().positions).filter((node) => node.subgraph != "").map((node) => node.subgraph);
+	});
+
+	unvisitedSubgraphs = unvisitedSubgraphs.concat(Object.values(docSnap.data().positions).filter((node) => node.subgraph != "").map((node) => node.subgraph))
+
+	// Mark all subgraphs that are connected
+	while (unvisitedSubgraphs.length > 0) {
+		const subgraphToVisit = unvisitedSubgraphs.pop();
+		
+		if (subgraphs[subgraphToVisit] !== undefined) {
+			unvisitedSubgraphs = unvisitedSubgraphs.concat(subgraphs[subgraphToVisit])
+		}
+		visitedSubgraphs.push(subgraphToVisit);		
+	}
+
+	// Delete all subgraphs that are not connected
+	for (const subgraph of Object.keys(subgraphs)) {
+		if (!visitedSubgraphs.includes(subgraph)) {
+			deleteDoc(doc(db, uid, graphName, "subgraph", subgraph));
+		}
+	}
+
 }

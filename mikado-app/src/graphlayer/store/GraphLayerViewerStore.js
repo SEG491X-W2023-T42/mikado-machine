@@ -341,8 +341,8 @@ class GraphLayerViewerOperations {
   save(uid, notifyError) {
     this.#loading = true;
     saveToDb(this.#state.nodes, this.#forwardConnections, uid, this.#graphName, this.#subgraphNodeID).then(x => {
-      this.#loading = false;
-      x || notifyError();
+		this.#loading = false;
+		x || notifyError();
     });
   }
 
@@ -854,6 +854,7 @@ class GraphLayerViewerOperations {
     const style = doc.createElement("style");
     head.append(style);
     style.append(doc.createTextNode([...document.styleSheets].flatMap(x => [...x.cssRules].map(x => {
+		
       if (x instanceof CSSImportRule) return x.cssText;
       if (!(x instanceof CSSStyleRule) ||
         !/body|div\.react-flow__node(?!\w|:hover)|react-flow__edge-path|seamless-editor/.test(x.selectorText)) return "";
@@ -876,8 +877,9 @@ class GraphLayerViewerOperations {
     });
 
     const edgesSvgImport = doc.importNode(edgesSvg, true);
-    edgesSvgImport.setAttribute("width", 0); // Prevent affecting size
-    edgesSvgImport.setAttribute("height", 0);
+
+    edgesSvgImport.setAttribute("width", 200); // Prevent affecting size
+    edgesSvgImport.setAttribute("height", 200);
     edgesSvgImport.style.position = "absolute";
     edgesSvgImport.style.transform = `translate(${positionOffset.x}px, ${positionOffset.y}px)`;
     edgesSvgImport.style.overflow = "visible";
@@ -885,19 +887,6 @@ class GraphLayerViewerOperations {
 
     printer.print();
     // Leave popup open so it can be saved to HTML
-  }
-
-  checkContainsMUI(classList) {
-    if (classList === undefined) {
-      return false;
-    }
-
-    for (let i = 0; i < classList.length; i++) {
-      if (classList[i].startsWith("Mui")) {
-        return true;
-      }
-    }
-    return false;
   }
 
   createSubgraphAndSaveIfNotExists(uid, id) {

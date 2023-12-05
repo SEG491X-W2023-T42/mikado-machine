@@ -116,6 +116,7 @@ export default function GraphHeader({ uid, graph: { id }, setNavOpen }) {
             </IconButton>
           </Tooltip>
           <Popover
+            className="help-popover"
             id={open ? 'help-popover' : undefined}
             open={open}
             anchorEl={anchorEl}
