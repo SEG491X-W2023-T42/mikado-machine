@@ -25,7 +25,8 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 		try {
 			const allGraphs = await getAllGraphs(uid);
 			
-			if (Object.keys(allGraphs).includes(newGraphName) || Object.values.includes(newGraphName)) {
+			console.log()
+			if (Object.keys(allGraphs).includes(newGraphName) || Object.values(allGraphs).includes(newGraphName)) {
 				setGraphExists(true);
 				return;
 			}
@@ -47,7 +48,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	const handleDeleteGraph = async () => {
 		try {
-			await deleteGraph(uid, graphs[selectedGraphToDelete]);
+			await deleteGraph(uid, selectedGraphToDelete);
 
 			//reload
 			const allGraphs = await getAllGraphs(uid);
