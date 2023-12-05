@@ -4,7 +4,7 @@ import { Add, Delete } from '@mui/icons-material';
 import { getAllGraphs, addGraph, deleteGraph } from '../../../helpers/Api';
 import './GraphNavigation.css';
 
-export default function GraphNavigationBar({open, setOpen, uid}) {
+export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	const [graphs, setGraphs] = React.useState([]);
 	const [isAddGraphDialogOpen, setAddGraphDialogOpen] = React.useState(false);
@@ -92,8 +92,8 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 				onKeyDown={toggleDrawer(false)}
 			>
 				<List>
-					{graphs.map((text) => (
-					<ListItem key={text} disablePadding
+					{graphs.map((id) => (
+					<ListItem key={id} disablePadding
 						secondaryAction={
 							<IconButton edge="end" onClick={(e) => {
 								e.stopPropagation();
@@ -104,6 +104,11 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 							</IconButton>
 						}
 					>
+						<ListItemButton onClick={() => switchGraph(id)}>
+							<ListItemIcon>
+								<Inbox />
+							</ListItemIcon>
+							<ListItemText primary={id} />
 						<ListItemButton>
 							<ListItemText primary={text} />
 						</ListItemButton>
