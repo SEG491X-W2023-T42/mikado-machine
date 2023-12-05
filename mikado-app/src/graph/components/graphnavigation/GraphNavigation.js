@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, Divider, ListItemText, IconButton, SwipeableDrawer, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
-import { Inbox, Add, Delete } from '@mui/icons-material';
+import { Box, List, ListItem, ListItemButton, Divider, ListItemText, IconButton, SwipeableDrawer, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
 import { getAllGraphs, addGraph, deleteGraph } from '../../../helpers/Api';
+import './GraphNavigation.css';
 
 export default function GraphNavigationBar({open, setOpen, uid}) {
 
@@ -11,7 +12,7 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 	const [deleteConfirmationDialogOpen, setDeleteConfirmationDialogOpen] = React.useState(false);
 	const [selectedGraphToDelete, setSelectedGraphToDelete] = React.useState('');
 	const [graphExists, setGraphExists] = React.useState(false);
-	
+
 	const toggleDrawer = (open) => (event) => {
 		if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
 			return;
@@ -81,9 +82,9 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 				sx={{ width: 'auto' }}
 				role="presentation"
 			>
-				<Button variant="contained" startIcon={<Add />} onClick={() => setAddGraphDialogOpen(true)}>Add Graph</Button>
+				<Button className="add-doc-button" variant="outlined" startIcon={<Add fontSize='large'/>} onClick={() => setAddGraphDialogOpen(true)}>Add document</Button>
 			</Box>
-			<Divider />
+			{/* <Divider /> */}
 			<Box
 				sx={{ width: 'auto' }}
 				role="presentation"
@@ -99,14 +100,11 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 								setDeleteConfirmationDialogOpen(true);
 								setSelectedGraphToDelete(text);
 							}}>
-								<Delete />
+								<Delete sx={{color:'#fff', fontSize:'20px'}}/>
 							</IconButton>
 						}
 					>
 						<ListItemButton>
-							<ListItemIcon>
-								<Inbox />
-							</ListItemIcon>
 							<ListItemText primary={text} />
 						</ListItemButton>
 					</ListItem>
@@ -114,44 +112,56 @@ export default function GraphNavigationBar({open, setOpen, uid}) {
 				</List>
 				<Divider />
 			</Box>
-			<Dialog open={isAddGraphDialogOpen} onClose={() => {
-				setAddGraphDialogOpen(false);
-				setNewGraphName('');
-				setGraphExists(false);
-			}}>
-				<DialogTitle>Add Graph</DialogTitle>
+			<Dialog
+				className="add-graph-dialog" 
+				open={isAddGraphDialogOpen} 
+				onClose={() => {
+					setAddGraphDialogOpen(false);
+					setNewGraphName('');
+					setGraphExists(false);
+				}}
+			>
+				<DialogTitle>Create new document</DialogTitle>
 				<DialogContent>
-				<TextField
-				autoFocus
-				margin="dense"
-				id="graphName"
-				label="Graph Name"
-				type="text"
-				fullWidth
-				value={newGraphName}
-				onChange={(e) => {setNewGraphName(e.target.value);
-				setGraphExists(false);}}
-				error = {graphExists}
-				helperText= {graphExists && `Graph "${newGraphName}" already exists, please select a new name.`}
-				/>
+					<TextField
+					autoFocus = {true}
+					margin="dense"
+					id="graphName"
+					label="New Document Name"
+					type="text"
+					// color="theme"
+					fullWidth
+					value={newGraphName}
+					onChange={(e) => {setNewGraphName(e.target.value);
+					setGraphExists(false);}}
+					error = {graphExists}
+					helperText= {graphExists && `Graph "${newGraphName}" already exists, please select a new name.`}
+					/>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => {
+					<Button 
+						variant='outlined'
+						color='inherit'	
+					onClick={() => {
 						setAddGraphDialogOpen(false);
 						setNewGraphName('');
 						setGraphExists(false);
 						}}>Cancel</Button>
-					<Button onClick={handleAddGraph}>Add</Button>
+					<Button 
+						variant='contained'
+						onClick={handleAddGraph}>Add</Button>
 				</DialogActions>
 			</Dialog>
-			<Dialog open={deleteConfirmationDialogOpen} onClose={() => setDeleteConfirmationDialogOpen(false)}>
+			<Dialog className="confirm-deletion-dialog"  open={deleteConfirmationDialogOpen} onClose={() => setDeleteConfirmationDialogOpen(false)}>
 				<DialogTitle>Confirm Deletion</DialogTitle>
 				<DialogContent>
-				<p>Are you sure you want to delete the graph &quot;{selectedGraphToDelete}&quot;?</p>
+				<p>Are you sure you want to delete the following document?</p>
+				<li><b>{selectedGraphToDelete}</b></li>
+				<p>This action cannot be undone.</p>
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={() => setDeleteConfirmationDialogOpen(false)}>Cancel</Button>
-					<Button onClick={handleDeleteGraph} color="error">
+					<Button variant="outlined" color="inherit" onClick={() => setDeleteConfirmationDialogOpen(false)}>Cancel</Button>
+					<Button variant="contained" onClick={handleDeleteGraph} color="error">
 					Delete
 					</Button>
 				</DialogActions>
