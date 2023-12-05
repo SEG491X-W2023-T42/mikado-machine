@@ -944,9 +944,6 @@ class GraphLayerViewerOperations {
 				obj[key] = [...this.#forwardConnections[key]];
 				return obj;
 			}, {})
-
-		// Save new subgraph with connected nodes to db
-		saveToDb(connectedNodes, connectedNodesForwardConnections, uid, this.#graphName, result)
 		
 		visitedNodes.forEach((nodeId) => {
 			if (nodeId != id) {
@@ -956,6 +953,9 @@ class GraphLayerViewerOperations {
 		
 		this.save(uid, () => {});
     }
+
+    // Save new subgraph with connected nodes to db
+		saveToDb(connectedNodes, connectedNodesForwardConnections, uid, this.#graphName, result)
 
     return result;
 
