@@ -3,6 +3,9 @@ import * as Counter from "./Autoincrement";
 import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
 import { db } from "../graphlayer/store/Gatekeeper";
 
+// Dont need to prune subgraphs every save. This is for keeping track of how many saves has occurred
+let saveCount = 0;
+
 /**
  * Loads the nodes and edges from the database.
  */
@@ -96,6 +99,7 @@ export function saveToDb(nodes, forwardConnections, uid, graphName, subgraphNode
    * problem that existed when the IDs were previously sequential, and that won't even be
    * probabilistically solved until moving to UUIDs per node.
    */
+
   const newIdsToDatabaseKeysLookup = {};
   // Serialize the nodes
   // For some reason, the database is in Struct-Of-Arrays layout even though it's NoSQL
@@ -122,14 +126,32 @@ export function saveToDb(nodes, forwardConnections, uid, graphName, subgraphNode
   const data = { connections, node_names, positions, type };
   // Update users collection
   if (subgraphNodeID !== "") {
-    return setDoc(doc(db, uid, graphName, "subgraph", subgraphNodeID), data).then(() => {removeOrphans(uid, graphName); return true;}).catch((e) => {
+    return setDoc(doc(db, uid, graphName, "subgraph", subgraphNodeID), data).then(() => {
+		if (saveCount > 10) {
+			saveCount = 0;
+			removeOrphans(uid, graphName);
+		} else {
+			saveCount++;
+		}
+
+		return true;
+	}).catch((e) => {
       console.log(e.message);
       return false;
     });
   }
-  return setDoc(doc(db, uid, graphName), data).then(() => {removeOrphans(uid, graphName); return true;}).catch((e) => {
-    console.log(e.message);
-    return false;
+  return setDoc(doc(db, uid, graphName), data).then(() => {
+		if (saveCount > 10) {
+			saveCount = 0;
+			removeOrphans(uid, graphName);
+		} else {
+			saveCount++;
+		}
+
+		return true;
+	}).catch((e) => {
+		console.log(e.message);
+		return false;
   });
 }
 

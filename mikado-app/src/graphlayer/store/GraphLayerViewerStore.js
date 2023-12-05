@@ -892,6 +892,10 @@ class GraphLayerViewerOperations {
   createSubgraphAndSaveIfNotExists(uid, id) {
     let result = "";
     let created = false;
+
+	let connectedNodes = [];
+	let connectedNodesForwardConnections = {};
+
     this.#set({
       nodes: this.#state.nodes.map(
         node => {
@@ -907,11 +911,54 @@ class GraphLayerViewerOperations {
         }
       ),
     });
+
     if (!result) throw new Error();
+
     if (created) {
-      this.save(uid, () => {});
+
+		// Move nodes into subgraph
+		let unvisitedNodes = [];
+		let visitedNodes = [];
+		unvisitedNodes = [...this.#forwardConnections[id]];
+
+		visitedNodes.push(id);
+		while (unvisitedNodes.length > 0) {
+			const nodeToVisit = unvisitedNodes.pop();
+
+			unvisitedNodes = unvisitedNodes.concat(this.#forwardConnections[nodeToVisit])
+			visitedNodes.push(nodeToVisit)
+		}
+
+		// Find all nodes under root node and change root node to goal
+		connectedNodes = this.#state.nodes.filter((node) => visitedNodes.includes(node.id)).map((node) => ({ ...node }));
+		connectedNodes.map((node) => {
+			if (node.id == id) {
+				node.type = "goal";
+			}
+			return node;
+		})
+
+		connectedNodesForwardConnections = Object.keys(this.#forwardConnections)
+			.filter(key => visitedNodes.includes(key))
+			.reduce((obj, key) => {
+				obj[key] = [...this.#forwardConnections[key]];
+				return obj;
+			}, {})
+
+		// Save new subgraph with connected nodes to db
+		saveToDb(connectedNodes, connectedNodesForwardConnections, uid, this.#graphName, result)
+		
+		visitedNodes.forEach((nodeId) => {
+			if (nodeId != id) {
+				this.deleteNode(nodeId);
+			}
+		})
+		
+		this.save(uid, () => {});
     }
+
     return result;
+
   }
 }
 
