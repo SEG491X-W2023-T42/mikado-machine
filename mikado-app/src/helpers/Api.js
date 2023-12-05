@@ -66,6 +66,66 @@ export async function loadFromDb(uid, graphName, subgraphName) {
   return [newNodes, newEdges, forwardConnections, backwardConnections];
 }
 
+export async function getAllGraphs(uid) {
+	const snapshot = await getDocs(collection(db, uid));
+	let names = [];
+	snapshot.forEach((doc) => {
+		names.push(doc.id);
+	})
+
+	return names;
+
+}
+
+export async function addGraph(uid, graphName) {
+
+  try {
+    // check if graph already exist
+    const graphDocRef = doc(db, uid, graphName);
+    const graphDocSnap = await getDoc(graphDocRef);
+  
+    if (graphDocSnap.exists()) {
+      throw new Error("Graph with the same name already exists.");
+    }
+  
+    const data = {
+  
+      node_names: {},
+      positions: {},
+      connections: {},
+      type: {},
+  
+    };
+  
+    await setDoc(graphDocRef, data);
+  
+    return true;
+  } catch (error) {
+    console.error("Error adding graph: ", error);
+    return false;
+  }
+}
+
+export async function deleteGraph(uid, graphName) {
+  
+  try {
+    // check if graph already exist
+    const graphDocRef = doc(db, uid, graphName);
+    const graphDocSnap = await getDoc(graphDocRef);
+
+    if (!graphDocSnap.exists()) {
+      throw new Error("Graph does not exist, can't delete.");
+    }
+
+    await deleteDoc(graphDocRef);
+    return true;
+
+  } catch (error) {
+    console.error("Error deleting grpah: ", error);
+    return false;
+  }
+}
+
 /**
  * Saves the nodes and edges to the database.
  */
