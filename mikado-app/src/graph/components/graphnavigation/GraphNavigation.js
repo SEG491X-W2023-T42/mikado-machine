@@ -48,7 +48,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	const handleDeleteGraph = async () => {
 		try {
-			await deleteGraph(uid, selectedGraphToDelete);
+			await deleteGraph(uid, graphs[selectedGraphToDelete]);
 
 			//reload
 			const allGraphs = await getAllGraphs(uid);
@@ -99,7 +99,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 								Object.keys(graphs).length > 1 ? <IconButton edge="end" onClick={(e) => {
 									e.stopPropagation();
 									setDeleteConfirmationDialogOpen(true);
-									setSelectedGraphToDelete(graphs[id]);
+									setSelectedGraphToDelete(id);
 								}}>
 									<Delete sx={{color:'#fff', fontSize:'20px'}}/>
 								</IconButton> : null
