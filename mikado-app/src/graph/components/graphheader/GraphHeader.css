@@ -32,15 +32,21 @@ div.MuiToolbar-root {
   min-height: var(--header-height);
 
   > .seamless-editor {
+    height: 25px;
     -webkit-text-fill-color: #fff;
     color: #fff;
     font-size: 15pt;
+    line-height: 110%;
     font-family: 'Inter', sans-serif;
     font-weight: 500;
     /* letter-spacing: .2rem; */
     text-align: center;
     box-shadow: 0 1px 0 lightgrey;
     justify-self: center;
+
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 
     &[disabled] {
       box-shadow: none;
