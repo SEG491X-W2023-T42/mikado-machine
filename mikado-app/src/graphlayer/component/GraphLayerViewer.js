@@ -122,6 +122,10 @@ function GraphLayerViewerInternal({ uid, graph }) {
     console.log("copy");
     if (!isSelectingNotEditing()) return;
     e.preventDefault();
+    // const toSelect = selectedNodeIds.current;
+    // TODO for some reason the above works on Daniel's computers but not Dish's, Daniel will use this workaround
+    const toSelect = operations.getSelectedNodes().map(x => x.id);
+    console.log("trying to select", toSelect);
     e.clipboardData.setData("text/plain", serializeSelection(nodes, edges, selectedNodeIds.current));
   }
 
