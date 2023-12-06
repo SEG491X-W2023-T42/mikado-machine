@@ -27,7 +27,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 		if (!docSnap.exists()) {
 			docSnap = await getDoc(doc(db, "public", "tutorial", "subgraph", "1701890265145"))
 		}
-	}else if (subgraphName !== "") {
+	} else if (subgraphName !== "") {
 		docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
 	} else {
 		docSnap = await getDoc(doc(db, uid, graphName));
