@@ -11,21 +11,37 @@ let saveCount = 0;
  * Loads the nodes and edges from the database.
  */
 export async function loadFromDb(uid, graphName, subgraphName) {
-  // Grab the user's graph
-  let docSnap;
-  if (subgraphName !== "") {
-    docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
-  } else {
-    docSnap = await getDoc(doc(db, uid, graphName));
-  }
 
-  if (!docSnap.exists()) {
-    return [[createNodeObject("0", 0, 0, "goal", "My First Goal", false)], [], {0: []}, {0: []}, []]
-  }
+	const coll = collection(db, uid);
+	const querySnapshot = await getDocs(coll);
+	let isFirstGraph = false;
 
-  // TODO add a version key and prevent loading newer schemas
-  const { node_names, positions, connections, type } = docSnap.data();
+	// Grab the user's graph
+	let docSnap;
 
+	// Check if user is new or has no existing graphs
+	if (querySnapshot.size == 0) {
+		// User is new, set their first graph with data from the public tutorial graph
+		isFirstGraph = true
+		docSnap = await getDoc(doc(db, "public", "tutorial"));
+	} else if (subgraphName == "1701890265145") {
+		docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
+		if (!docSnap.exists()) {
+			docSnap = await getDoc(doc(db, "public", "tutorial", "subgraph", "1701890265145"))
+		}
+	} else if (subgraphName !== "") {
+		docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
+	} else {
+		docSnap = await getDoc(doc(db, uid, graphName));
+	}
+
+	if (!docSnap.exists()) {
+		return [[createNodeObject("0", 0, 0, "goal", "My First Goal", false)], [], {0: []}, {0: []}, []]
+	}
+
+	// TODO add a version key and prevent loading newer schemas
+	const { node_names, positions, connections, type } = docSnap.data();
+  
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.
    *
@@ -66,6 +82,10 @@ export async function loadFromDb(uid, graphName, subgraphName) {
     });
   });
   // TODO verify acyclic (#41)
+
+  if (isFirstGraph) {
+	saveToDb(newNodes, forwardConnections, uid, "graph-1", "");
+  }
 
   return [newNodes, newEdges, forwardConnections, backwardConnections];
 }

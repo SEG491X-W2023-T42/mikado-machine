@@ -903,6 +903,11 @@ class GraphLayerViewerOperations {
 	let connectedNodes = [];
 	let connectedNodesForwardConnections = {};
 
+	if (id === -1) {
+		this.save(uid, () => {});
+		return null;
+	}
+
     this.#set({
       nodes: this.#state.nodes.map(
         node => {
