@@ -20,7 +20,7 @@ import { EnterGraphHackContext } from "../../context/EnterGraphHackContext.js";
 import AddNodeFab from '../../graph/components/overlays/AddNodeFAB.js';
 import { getGatekeeperFlags } from "../store/Gatekeeper.js";
 import QuestOverlay from '../../graph/components/overlays/QuestOverlay.js';
-import { serializeSelection } from "./NodeSerializer";
+import { deserializeSelection, serializeSelection } from "./NodeSerializer";
 
 
 /**
@@ -119,30 +119,41 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   function onCopy(e) {
     if (!isSelectingNotEditing()) return;
-    // TODO NodeSerializer.js isn't working right now, so this will have to do
-    e.clipboardData.setData("text/plain", "Mikado" + JSON.stringify(selectedNodeIds.current));
     e.preventDefault();
+    e.clipboardData.setData("text/plain", serializeSelection(nodes, edges, selectedNodeIds.current));
   }
 
   function onCut(e) {
     if (!isSelectingNotEditing()) return;
-    console.log("cut", e);
-    // TODO
     e.preventDefault();
+    // TODO
+    // Actually the cut feature wasn't in the requirements
+    // and it's quite dangerous because it will destroy edges that cross out of the selection
   }
 
   function onPaste(e) {
     if (!isSelectingNotEditing()) return;
     e.preventDefault();
-    let input = e.clipboardData.getData("text");
-    if (!input.startsWith("Mikado")) return;
-    input = input.subString(3);
-    const pasted = JSON.parse(input);
-    for (const node of pasted) {
-      const id = operations.addNode(nodes[node].position, true);
-      operations.setNodeLabel(id, nodes[node].label);
+    const input = e.clipboardData.getData("text");
+    const deserialized = deserializeSelection(input);
+    if (!deserialized) return;
+    const [positions, labels, toComplete, toConnect] = deserialized;
+    const ids = [];
+    for (const position of positions) {
+      ids.push(operations.addNode(position));
     }
-    // console.log("paste", e);
+    for (const [id, label] of labels.entries()) {
+      operations.setNodeLabel(ids[id], label);
+    }
+    for (const id of toComplete) {
+      operations.setNodeCompleteDeferred(ids[id], true);
+    }
+    for (const id of toComplete) {
+      operations.doSetNodeCompleteUpdateDeferredUpdate(ids[id]);
+    }
+    for (const [source, target] of toConnect) {
+      operations.connectOrDisconnect(ids[source], ids[target]);
+    }
   }
 
   function onNodeDragStart(_, node) {

@@ -632,15 +632,20 @@ class GraphLayerViewerOperations {
 
   }
 
-  setNodeCompleted(id, completed) {
-    const backwardConnections = this.#backwardConnections[id]
-
+  setNodeCompleteDeferred(id, completed) {
     this.setNodeType(id, completed ? "complete" : "ready");
+  }
 
-    backwardConnections.forEach(id => {
+  setNodeCompleted(id, completed) {
+    this.setNodeCompleteDeferred(id, completed);
+    this.doSetNodeCompleteUpdateDeferredUpdate(id);
+  }
+
+  doSetNodeCompleteUpdateDeferredUpdate(id) {
+    this.#backwardConnections[id].forEach(id => {
       this.updateNodeType(id)
     })
-	this.updateQuestParents();
+    this.updateQuestParents();
   }
 
   /**
