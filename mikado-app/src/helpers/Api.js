@@ -14,6 +14,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 
 	const coll = collection(db, uid);
 	const querySnapshot = await getDocs(coll);
+	let isFirstGraph = false;
 
 	// Grab the user's graph
 	let docSnap;
@@ -21,6 +22,7 @@ export async function loadFromDb(uid, graphName, subgraphName) {
 	// Check if user is new or has no existing graphs
 	if (querySnapshot.size == 0) {
 		// User is new, set their first graph with data from the public tutorial graph
+		isFirstGraph = true
 		docSnap = await getDoc(doc(db, "public", "tutorial"));
 	} else if (subgraphName == "1701890265145") {
 		docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
@@ -80,6 +82,10 @@ export async function loadFromDb(uid, graphName, subgraphName) {
     });
   });
   // TODO verify acyclic (#41)
+
+  if (isFirstGraph) {
+	saveToDb(newNodes, forwardConnections, uid, "graph-1", "");
+  }
 
   return [newNodes, newEdges, forwardConnections, backwardConnections];
 }
