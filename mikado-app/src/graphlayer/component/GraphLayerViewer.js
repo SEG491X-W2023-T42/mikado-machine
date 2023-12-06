@@ -179,12 +179,26 @@ function GraphLayerViewerInternal({ uid, graph }) {
       if ("maxLength" in document.activeElement) return; // Ignore when already in text field
       selectedNodeId.current && startEditingNode(selectedNodeId.current, true);
     }
+
+	function deleteListener(e) {
+		if (e.key !== "Delete") return;
+		if ("maxLength" in document.activeElement) return;
+
+		for (const node of operations.getSelectedNodes()) {
+			if (node.type !== 'goal' ) {
+				operations.deleteNode(node.id);
+			}
+		}
+	}
+
     // keypress is deprecated but it is used to filter out CTRL, ALT, etc.
     document.addEventListener('keypress', pressListener);
     document.addEventListener('keyup', backspaceListener);
+	document.addEventListener('keyup', deleteListener)
     return () => {
-      document.removeEventListener('keypress', pressListener);
-      document.removeEventListener('keyup', backspaceListener);
+		document.removeEventListener('keypress', pressListener);
+		document.removeEventListener('keyup', backspaceListener);
+		document.removeEventListener('keyup', deleteListener);
     }
   }, []);
 
