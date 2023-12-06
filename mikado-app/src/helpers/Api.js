@@ -93,10 +93,10 @@ export async function addGraph(uid, graphName) {
   
     const data = {
   
-      node_names: {},
-      positions: {},
-      connections: {},
-      type: {},
+      node_names: {0: 'My First Goal'},
+      positions: {0: {x: 0, y: 0, subgraph: ''}},
+      connections: {0: []},
+      type: {0: 'goal'},
   
     };
   
