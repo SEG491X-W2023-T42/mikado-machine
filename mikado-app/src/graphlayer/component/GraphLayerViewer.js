@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import ReactFlow, {
-    Background,
-    ReactFlowProvider,
-    useOnSelectionChange,
-    useReactFlow,
-    useStoreApi as useReactFlowStoreApi
+  Background,
+  ReactFlowProvider,
+  useOnSelectionChange,
+  useReactFlow,
+  useStoreApi as useReactFlowStoreApi
 } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../graph/components/CustomControl.js';
@@ -20,7 +20,8 @@ import { EnterGraphHackContext } from "../../context/EnterGraphHackContext.js";
 import AddNodeFab from '../../graph/components/overlays/AddNodeFAB.js';
 import { getGatekeeperFlags } from "../store/Gatekeeper.js";
 import QuestOverlay from '../../graph/components/overlays/QuestOverlay.js';
-import { deserializeSelection, serializeSelection } from "./NodeSerializer";
+import { deserializeSelection, getNodesMaxXY, serializeSelection } from "./NodeSerializer";
+import { dimensions } from "../../helpers/NodeConstants";
 
 
 /**
@@ -134,16 +135,30 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   function onPaste(e) {
     console.log("paste");
-    if (!isSelectingNotEditing()) return;
-    e.preventDefault();
+    if (!allowAddNode) return;
+
     const input = e.clipboardData.getData("text");
     const deserialized = deserializeSelection(input);
-    if (!deserialized) return;
+    if (!deserialized) {
+      console.log("Pasting non-Mikado");
+      return;
+    }
+    e.preventDefault();
     const [positions, labels, toComplete, toConnect] = deserialized;
     const ids = [];
-    for (const position of positions) {
-      ids.push(operations.addNode(position));
+
+    const offsetPosition = getNodesMaxXY(nodes);
+    offsetPosition.x += dimensions.width;
+    offsetPosition.y += dimensions.height;
+    for (const relativePosition of positions) {
+      const absolutePosition = {
+        x: relativePosition.x + offsetPosition.x,
+        y: relativePosition.y + offsetPosition.y,
+      };
+      console.log(absolutePosition, "placing");
+      ids.push(operations.addNode(absolutePosition, true));
     }
+
     for (const [id, label] of labels.entries()) {
       operations.setNodeLabel(ids[id], label);
     }
@@ -156,6 +171,9 @@ function GraphLayerViewerInternal({ uid, graph }) {
     for (const [source, target] of toConnect) {
       operations.connectOrDisconnect(ids[source], ids[target]);
     }
+
+    fitView();
+    console.log("Paste OK");
   }
 
   function onNodeDragStart(_, node) {

@@ -1,3 +1,17 @@
+export function getNodesMaxXY(nodes) {
+  if (!nodes.length) {
+    return {x: 0, y: 0};
+  }
+  const firstNode = nodes[0];
+  let { x: xMax, y: yMax } = firstNode.position;
+  for (const node of nodes) {
+    const { x, y } = node.position;
+    xMax = Math.max(xMax, x);
+    yMax = Math.max(yMax, y);
+  }
+  return { x: xMax, y: yMax };
+}
+
 function getMinXY(nodes) {
   if (!nodes.length) {
     return {x: 0, y: 0};

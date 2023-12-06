@@ -462,7 +462,7 @@ class GraphLayerViewerOperations {
     this.#nodeLabels[newNode.id] = newNode.data.label;
     this.#set({ nodes: [...nodes, newNode] }); // defaults to ready since new node is always ready with no dependencies
 
-    // this.#hasChanged = true;
+    this.#hasChanged = true;
     return newNode.id;
   }
 
