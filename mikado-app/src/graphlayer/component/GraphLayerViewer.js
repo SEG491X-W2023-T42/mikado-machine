@@ -57,8 +57,13 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   // Load data from db
   useEffect(() => {
-    operations.load(uid, graph.id, graph.subgraph)
+    operations.load(uid, graph.id, graph.subgraph);
   }, [uid, operations, graph]);
+
+  // Hack together autofocus
+  useEffect(() => {
+	setTimeout(() => {fitView()}, 300);
+  }, [graph])
 
   const [testCount, setTestCount] = useState(0);
   useEffect(() => {
@@ -189,8 +194,6 @@ function GraphLayerViewerInternal({ uid, graph }) {
     const { d3Selection } = reactFlowStore.getState();
     d3Selection.on('dblclick.zoom', null);
   }, []);
-
-
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
