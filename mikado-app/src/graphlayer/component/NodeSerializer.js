@@ -57,7 +57,7 @@ export function serializeSelection(nodes, edges, nodeIds) {
   return "Mikado" + JSON.stringify([resultNodes, resultEdges]);
 }
 
-export function deserializeSelection(input, position) {
+export function deserializeSelection(input) {
   if (!input.startsWith("Mikado[")) return void 0;
   input = input.substring(6);
   const positions = [];
