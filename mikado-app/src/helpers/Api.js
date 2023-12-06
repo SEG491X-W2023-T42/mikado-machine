@@ -12,71 +12,34 @@ let saveCount = 0;
  */
 export async function loadFromDb(uid, graphName, subgraphName) {
 
-  const coll = collection(db, uid);
-  const querySnapshot = await getDocs(coll);
+	const coll = collection(db, uid);
+	const querySnapshot = await getDocs(coll);
 
-  // if (querySnapshot.size === 0) {
-  //   // give a new user the tutorial graph from public db
-  //   const publicSnap = await getDoc(doc(db, "public", "tutorial"));
-  //   const publicData = publicSnap.data();
-  //   const graphDocRef = doc(db, uid, graphName);
+	// Grab the user's graph
+	let docSnap;
 
-  //   await setDoc(graphDocRef, publicData);
-  // }
+	// Check if user is new or has no existing graphs
+	if (querySnapshot.size == 0) {
+		// User is new, set their first graph with data from the public tutorial graph
+		docSnap = await getDoc(doc(db, "public", "tutorial"));
+	} else if (subgraphName == "1701890265145") {
+		docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
+		if (!docSnap.exists()) {
+			docSnap = await getDoc(doc(db, "public", "tutorial", "subgraph", "1701890265145"))
+		}
+	}else if (subgraphName !== "") {
+		docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
+	} else {
+		docSnap = await getDoc(doc(db, uid, graphName));
+	}
 
-  if (querySnapshot.size != 0) {
-    console.log("testing here");
-    // User is new, set their first graph with data from the public tutorial graph
-    const publicTutorialDocRef = doc(db, "public", "tutorial");
-    const publicTutorialSnap = await getDoc(publicTutorialDocRef);
-    const publicTutorialData = publicTutorialSnap.data();
-    const subgraphCollectionRef = collection(db, "public", "tutorial", "subgraph");
-    const subgraphSnap = await getDocs(subgraphCollectionRef);
+	if (!docSnap.exists()) {
+		return [[createNodeObject("0", 0, 0, "goal", "My First Goal", false)], [], {0: []}, {0: []}, []]
+	}
 
-    // const graphDocRef = doc(db, uid, graphName);
-    // await setDoc(graphDocRef, publicTutorialData);
-
-      // Check if there is a subgraph in the tutorial data
-    if (!subgraphSnap.empty) {
-      console.log("has subgraph in tutorial");
-
-      // Process each subgraph document
-      const subgraphData = {};
-      subgraphSnap.forEach(doc => {
-        subgraphData[doc.id] = doc.data();
-      });
-
-      // Print out the subgraph data
-      console.log("Subgraph Data:", subgraphData);
-
-      // still dk how to set the user grpah with intended subgraphaaa @dish
-      if (subgraphName == '1701890265145') {
-        docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
-      }
-
-    } else {
-      // If there is no subgraph in the tutorial data, set the user's graph with tutorial data only
-      console.log("setting the graph without tutorial subgraph")
-      const graphDocRef = doc(db, uid, graphName);
-      await setDoc(graphDocRef, publicTutorialData);
-    }
-  }
-
-  // Grab the user's graph
-  let docSnap;
-  if (subgraphName !== "") {
-    docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
-  } else {
-    docSnap = await getDoc(doc(db, uid, graphName));
-  }
-
-  if (!docSnap.exists()) {
-    return [[createNodeObject("0", 0, 0, "goal", "My First Goal", false)], [], {0: []}, {0: []}, []]
-  }
-
-  // TODO add a version key and prevent loading newer schemas
-  const { node_names, positions, connections, type } = docSnap.data();
-
+	// TODO add a version key and prevent loading newer schemas
+	const { node_names, positions, connections, type } = docSnap.data();
+  
   /**
    * Lookup table so that newEdges can follow the remapped ids in newNodes.
    *

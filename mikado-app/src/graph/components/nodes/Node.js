@@ -88,7 +88,7 @@ export default function Node({ id, data, type, exporting = false, ...rest }) {
       <button className="enter-exit-subgraph-button" // button to enter or exit subgraph
         aria-label = {notGoal? "Enter subgraph" : "Return to parent graph"}
         onClick= {notGoal? () => enterGraph((uid) => operations.createSubgraphAndSaveIfNotExists(uid, id)) 
-                  : () => enterGraph(-1)
+                  : () => enterGraph((uid) => operations.createSubgraphAndSaveIfNotExists(uid, -1))
                 }
       >
         {notGoal? <ArrowDownward sx={{fontSize:16}} /> : <ArrowUpward sx={{fontSize:16}}/>}

@@ -130,11 +130,13 @@ function GraphViewer({ uid }) {
   }
    */
   function enterGraph(lambda) {
-	if (lambda == -1) {
+
+	const subgraph = lambda(uid);
+
+	if (subgraph == null) {
 		console.debug("trying to leave subgraph");
 		graphStack.pop()
 	} else {
-		const subgraph = lambda(uid);
 		console.debug("trying to enter subgraph", subgraph);
 		graphStack.push(subgraph)
 	}
