@@ -105,7 +105,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 							}
 						>
 						<ListItemButton onClick={() => switchGraph(id)}>
-							<ListItemText primary={graphs[id]} />
+							<ListItemText primary={graphs[id]} title={graphs[id]}/>
 						</ListItemButton>
 					</ListItem>
 					))}
