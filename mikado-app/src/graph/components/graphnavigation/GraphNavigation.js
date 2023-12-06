@@ -47,7 +47,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	const handleDeleteGraph = async () => {
 		try {
-			await deleteGraph(uid, graphs[selectedGraphToDelete]);
+			await deleteGraph(uid, selectedGraphToDelete);
 
 			//reload
 			const allGraphs = await getAllGraphs(uid);
