@@ -118,6 +118,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
   });
 
   function onCopy(e) {
+    console.log("copy");
     if (!isSelectingNotEditing()) return;
     e.preventDefault();
     e.clipboardData.setData("text/plain", serializeSelection(nodes, edges, selectedNodeIds.current));
@@ -132,6 +133,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
   }
 
   function onPaste(e) {
+    console.log("paste");
     if (!isSelectingNotEditing()) return;
     e.preventDefault();
     const input = e.clipboardData.getData("text");
@@ -261,9 +263,21 @@ function GraphLayerViewerInternal({ uid, graph }) {
     d3Selection.on('dblclick.zoom', null);
   }, []);
 
+  // Workaround because global onCopy doesn't work on non-Firefox
+  useEffect(() => {
+    document.addEventListener('copy', onCopy);
+    void onCut;
+    document.addEventListener('paste', onPaste);
+    return () => {
+      document.removeEventListener('copy', onCopy);
+      document.removeEventListener('paste', onPaste);
+    }
+  })
+
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
-  return <main ref={reactFlowWrapper} onCopy={onCopy} onCut={onCut} onPaste={onPaste}>
+  // return <main ref={reactFlowWrapper} onCopy={onCopy} onCut={onCut} onPaste={onPaste}>
+  return <main ref={reactFlowWrapper}>
     <ReactFlow
       nodes={nodes}
       edges={edges}
