@@ -52,6 +52,7 @@ function isSelectingNotEditing() {
 function GraphLayerViewerInternal({ uid, graph }) {
   const { hideGraphControls, allowEditNodeLabel, allowAddNode, enableQuestline } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
+  const fakeInput = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeIds = useRef([]);
@@ -286,20 +287,27 @@ function GraphLayerViewerInternal({ uid, graph }) {
   }, []);
 
   // Workaround because global onCopy doesn't work on non-Firefox
+  // useEffect(() => {
+  //   document.addEventListener('copy', onCopy);
+  //   void onCut;
+  //   document.addEventListener('paste', onPaste);
+  //   return () => {
+  //     document.removeEventListener('copy', onCopy);
+  //     document.removeEventListener('paste', onPaste);
+  //   }
+  // })
+  // Workaround for Safari?
   useEffect(() => {
-    document.addEventListener('copy', onCopy);
-    void onCut;
-    document.addEventListener('paste', onPaste);
-    return () => {
-      document.removeEventListener('copy', onCopy);
-      document.removeEventListener('paste', onPaste);
+    if (isSelectingNotEditing()) {
+      fakeInput.current.focus();
     }
-  })
+  });
 
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
   // return <main ref={reactFlowWrapper} onCopy={onCopy} onCut={onCut} onPaste={onPaste}>
   return <main ref={reactFlowWrapper}>
+    <input type="text" style={{opacity:0, zIndex:-1}} onCopy={onCopy} onPaste={onPaste} ref={fakeInput} />
     <ReactFlow
       nodes={nodes}
       edges={edges}
