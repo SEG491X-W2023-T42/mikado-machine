@@ -25,8 +25,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 		try {
 			const allGraphs = await getAllGraphs(uid);
 			
-			console.log()
-			if (Object.keys(allGraphs).includes(newGraphName) || Object.values(allGraphs).includes(newGraphName)) {
+			if (Object.values(allGraphs).includes(newGraphName)) {
 				setGraphExists(true);
 				return;
 			}
@@ -105,8 +104,8 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 								</IconButton> : null
 							}
 						>
-						<ListItemButton onClick={() => switchGraph(graphs[id])}>
-							<ListItemText primary={id} />
+						<ListItemButton onClick={() => switchGraph(id)}>
+							<ListItemText primary={graphs[id]} />
 						</ListItemButton>
 					</ListItem>
 					))}
@@ -157,7 +156,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 				<DialogTitle>Confirm Deletion</DialogTitle>
 				<DialogContent>
 				<p>Are you sure you want to delete the following document?</p>
-				<li><b>{selectedGraphToDelete}</b></li>
+				<li><b>{graphs[selectedGraphToDelete]}</b></li>
 				<p>This action cannot be undone.</p>
 				</DialogContent>
 				<DialogActions>

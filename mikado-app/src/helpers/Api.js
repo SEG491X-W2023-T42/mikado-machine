@@ -2,6 +2,7 @@ import { doc, getDoc, setDoc, getDocs, collection, deleteDoc } from "firebase/fi
 import * as Counter from "./Autoincrement";
 import { createEdgeObject, createNodeObject } from "../graphlayer/store/DisplayObjectFactory";
 import { db } from "../graphlayer/store/Gatekeeper";
+import { v4 as uuidv4 } from 'uuid';
 
 // Dont need to prune subgraphs every save. This is for keeping track of how many saves has occurred
 let saveCount = 0;
@@ -78,21 +79,22 @@ export async function getAllGraphs(uid) {
 	snapshot.forEach((doc) => {
 		const map = changedNames.docs.filter((nameDoc) => nameDoc.id == doc.id);
 		if (map.length != 0) {
-			names[map[0].data().name] = doc.id;
+			names[doc.id] = map[0].data().name;
 		} else {
 			names[doc.id] = doc.id
 		}
 	})
-
 	return names;
 
 }
 
 export async function addGraph(uid, graphName) {
 
+	const graphId = uuidv4();
+
   try {
     // check if graph already exist
-    const graphDocRef = doc(db, uid, graphName);
+    const graphDocRef = doc(db, uid, graphId);
     const graphDocSnap = await getDoc(graphDocRef);
   
     if (graphDocSnap.exists()) {
@@ -109,7 +111,17 @@ export async function addGraph(uid, graphName) {
     };
   
     await setDoc(graphDocRef, data);
-  
+
+	// Add graph name
+
+	const snap = await getDoc(doc(db, "user", uid, "graphs", graphId))
+	let nameData = {name: graphName, version: 0};
+
+	if (snap.exists()) {
+		nameData.version = snap.data().version++;
+	}
+
+	await setDoc(doc(db, "user", uid, "graphs", graphId), nameData)
     return true;
   } catch (error) {
     console.error("Error adding graph: ", error);
