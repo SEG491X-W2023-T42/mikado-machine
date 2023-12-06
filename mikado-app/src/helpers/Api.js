@@ -11,6 +11,57 @@ let saveCount = 0;
  * Loads the nodes and edges from the database.
  */
 export async function loadFromDb(uid, graphName, subgraphName) {
+
+  const coll = collection(db, uid);
+  const querySnapshot = await getDocs(coll);
+
+  // if (querySnapshot.size === 0) {
+  //   // give a new user the tutorial graph from public db
+  //   const publicSnap = await getDoc(doc(db, "public", "tutorial"));
+  //   const publicData = publicSnap.data();
+  //   const graphDocRef = doc(db, uid, graphName);
+
+  //   await setDoc(graphDocRef, publicData);
+  // }
+
+  if (querySnapshot.size != 0) {
+    console.log("testing here");
+    // User is new, set their first graph with data from the public tutorial graph
+    const publicTutorialDocRef = doc(db, "public", "tutorial");
+    const publicTutorialSnap = await getDoc(publicTutorialDocRef);
+    const publicTutorialData = publicTutorialSnap.data();
+    const subgraphCollectionRef = collection(db, "public", "tutorial", "subgraph");
+    const subgraphSnap = await getDocs(subgraphCollectionRef);
+
+    // const graphDocRef = doc(db, uid, graphName);
+    // await setDoc(graphDocRef, publicTutorialData);
+
+      // Check if there is a subgraph in the tutorial data
+    if (!subgraphSnap.empty) {
+      console.log("has subgraph in tutorial");
+
+      // Process each subgraph document
+      const subgraphData = {};
+      subgraphSnap.forEach(doc => {
+        subgraphData[doc.id] = doc.data();
+      });
+
+      // Print out the subgraph data
+      console.log("Subgraph Data:", subgraphData);
+
+      // still dk how to set the user grpah with intended subgraphaaa @dish
+      if (subgraphName == '1701890265145') {
+        docSnap = await getDoc(doc(db, uid, graphName, "subgraph", subgraphName))
+      }
+
+    } else {
+      // If there is no subgraph in the tutorial data, set the user's graph with tutorial data only
+      console.log("setting the graph without tutorial subgraph")
+      const graphDocRef = doc(db, uid, graphName);
+      await setDoc(graphDocRef, publicTutorialData);
+    }
+  }
+
   // Grab the user's graph
   let docSnap;
   if (subgraphName !== "") {
