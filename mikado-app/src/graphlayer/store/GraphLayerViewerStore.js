@@ -736,6 +736,13 @@ class GraphLayerViewerOperations {
     throw new Error();
   }
 
+  /**
+   * Gets all selected nodes
+   */
+  getSelectedNodes() {
+	return this.#state.nodes.filter((node) => node.selected);
+  }
+
   getOneNodeParent(childId) {
     const parents = this.#backwardConnections[childId];
     if (!parents) return void 0;
