@@ -1,18 +1,18 @@
 import { useContext, createContext, useState, useEffect } from 'react';
-import { 
-  connectAuthEmulator, 
-  getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  onAuthStateChanged, 
-  signOut } 
+import {
+  connectAuthEmulator,
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  onAuthStateChanged,
+  signOut }
 from 'firebase/auth';
-import { firebase, USING_DEBUG_EMULATORS } from '../Firebase';
+import { DEBUG_EMULATORS_HOSTNAME, firebase, USING_DEBUG_EMULATORS } from '../Firebase';
 
 const ctxt = createContext(void 0);
 const auth = getAuth(firebase);
 if (USING_DEBUG_EMULATORS) {
-  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true })
+  connectAuthEmulator(auth, `http://${DEBUG_EMULATORS_HOSTNAME}:9099`, { disableWarnings: true })
 }
 
 export const FirebaseContextProvider = ({ children }) => {
