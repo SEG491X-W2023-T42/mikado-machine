@@ -25,6 +25,7 @@
     "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
     "reactflow": "^11.6.1",
+    "uuid": "^9.0.1",
     "web-vitals": "^2.1.4",
     "zustand": "^4.3.3"
   },
