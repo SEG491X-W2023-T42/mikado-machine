@@ -959,10 +959,11 @@ class GraphLayerViewerOperations {
 		})
 		
 		this.save(uid, () => {});
-    }
-
-    // Save new subgraph with connected nodes to db
+		
+		// Save new subgraph with connected nodes to db
 		saveToDb(connectedNodes, connectedNodesForwardConnections, uid, this.#graphName, result)
+
+    }
 
     return result;
 
