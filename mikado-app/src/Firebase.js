@@ -11,4 +11,5 @@ const firebaseConfig = {
 };
 
 export const firebase = initializeApp(firebaseConfig);
-export const USING_DEBUG_EMULATORS = window.location === "localhost";
+export const DEBUG_EMULATORS_HOSTNAME = "daniel-desktop3.local";
+export const USING_DEBUG_EMULATORS = window.location.hostname === DEBUG_EMULATORS_HOSTNAME;
