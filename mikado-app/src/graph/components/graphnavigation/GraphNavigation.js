@@ -74,6 +74,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	return (
 		<SwipeableDrawer
+			className='graph-navigation-drawer'
 			open={open}
 			onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}

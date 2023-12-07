@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+
+.quest-modal{
+    .MuiDialog-paper {
+        background-color: #414141 !important;
+        color: #fff !important;
+        border: rgba(105,105,105) 1px solid; 
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    .MuiTypography-root{
+        font-family: 'Inter', sans-serif !important;
+        color: #fff;
+    }
+}
+
+.MuiListItemText-root{
+    .MuiListItemText-primary{
+        font-size: 10pt;
+        font-weight: 500;
+    }
+
+    .MuiListItemText-secondary{
+        font-size: 12pt;
+        font-weight:400;
+    }
+}
+
+.quest-dialog-title{
+    font-size: 14pt;
+    font-weight: 600;
+}
+
+.quest-dialog-subtitle{
+    font-size: 12pt;
+    font-weight: 600;
+}
+
+.quest-progress-subtitle{
+    margin-left: 16px;
+    margin-bottom: 8px;
+
+    font-size: 12pt;
+}

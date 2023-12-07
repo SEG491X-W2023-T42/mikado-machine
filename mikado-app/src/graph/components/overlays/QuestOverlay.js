@@ -12,14 +12,14 @@ const selector = (store) => store.currentTwoTasks;
  */
 function QuestOverlayInner({ handleClickOpen }) {
   const [currentTask] = useStoreHack()(selector, shallow);
-  return <Button variant="outlined" className="overlay" onClick={handleClickOpen}>
-    <h1>Current Quest:</h1>
-    <Typography variant="h5" fontFamily="Inter">{currentTask?.data?.label ?? NO_TASKS_TEXT}</Typography>
-    {/*TODO idk why the following code is there, but it wasn't in the design*/}
-    {/*<ButtonGroup variant="contained">*/}
-    {/*	<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} onClick={completeClick} disabled={currentTask == undefined || currentTask.length == 0}>Complete</Button>*/}
-    {/*	<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} disabled={currentTask == undefined || currentTask.length == 0} onClick={handleClickOpen}>See More</Button>*/}
-    {/*</ButtonGroup>*/}
+  return <Button variant="contained" className="overlay" onClick={handleClickOpen}>
+    <Typography className='quest-button-title'>Current Task</Typography>
+    <Typography className='quest-task-name' >{currentTask?.data?.label ?? NO_TASKS_TEXT}</Typography>
+      {/*TODO idk why the following code is there, but it wasn't in the design*/}
+      {/*<ButtonGroup variant="contained">*/}
+      {/*	<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} onClick={completeClick} disabled={currentTask == undefined || currentTask.length == 0}>Complete</Button>*/}
+      {/*	<Button sx={{fontFamily: 'Inter', fontWeight: 'bold'}} disabled={currentTask == undefined || currentTask.length == 0} onClick={handleClickOpen}>See More</Button>*/}
+      {/*</ButtonGroup>*/}
   </Button>;
 }
 
