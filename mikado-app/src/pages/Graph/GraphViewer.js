@@ -171,6 +171,8 @@ function GraphViewer({ uid }) {
 
   const key1 = uid + graph1.subgraph;
   const key2 = uid + graph2?.subgraph;
+  void key2;
+  void graph2Class;
   // console.debug("GraphViewer graph", graph, "key", key);
   return <main>
     <GraphHeader uid={uid} graph={graph1} graphHandle={setGraph1} setNavOpen={setNavOpen} />
