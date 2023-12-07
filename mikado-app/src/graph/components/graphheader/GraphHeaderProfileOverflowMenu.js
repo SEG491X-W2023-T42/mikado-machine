@@ -1,4 +1,4 @@
-import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography, Switch, FormControlLabel, ListItemText } from "@mui/material";
+import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography, Switch, FormControlLabel } from "@mui/material";
 import * as React from "react";
 import { useFirebase } from '../../../context/FirebaseContext';
 import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
