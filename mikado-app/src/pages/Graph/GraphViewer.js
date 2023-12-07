@@ -176,7 +176,7 @@ function GraphViewer({ uid }) {
   // console.debug("GraphViewer graph", graph, "key", key);
   return <main>
     <GraphHeader uid={uid} graph={graph1} graphHandle={setGraph1} setNavOpen={setNavOpen} questlineEnabled={questlineEnabled} setQuestlineEnabled={setQuestlineEnabled}/>
-	  <GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid} switchGraph={switchGraph}/>
+	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid} switchGraph={switchGraph}/>
     <section>
     <section className={graph1Class} key={key1}>
       <GraphLayerViewer key={key1} uid={uid} graph={graph1} enterGraph={enterGraph} />
