@@ -1,9 +1,9 @@
 import { connectFirestoreEmulator, doc, getDoc, getFirestore } from "firebase/firestore";
-import { firebase, USING_DEBUG_EMULATORS } from "../../Firebase";
+import { DEBUG_EMULATORS_HOSTNAME, firebase, USING_DEBUG_EMULATORS } from "../../Firebase";
 
 export const db = getFirestore(firebase);
 if (USING_DEBUG_EMULATORS) {
-  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFirestoreEmulator(db, DEBUG_EMULATORS_HOSTNAME, 8080);
 }
 
 function sanitizeInt(x, fallback) {

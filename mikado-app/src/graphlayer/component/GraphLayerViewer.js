@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import ReactFlow, {
-    Background,
-    ReactFlowProvider,
-    useOnSelectionChange,
-    useReactFlow,
-    useStoreApi as useReactFlowStoreApi
+  Background,
+  ReactFlowProvider,
+  useOnSelectionChange,
+  useReactFlow,
+  useStoreApi as useReactFlowStoreApi
 } from 'reactflow';
 import { shallow } from "zustand/shallow";
 import CustomControl from '../../graph/components/CustomControl.js';
@@ -20,6 +20,8 @@ import { EnterGraphHackContext } from "../../context/EnterGraphHackContext.js";
 import AddNodeFab from '../../graph/components/overlays/AddNodeFAB.js';
 import { getGatekeeperFlags } from "../store/Gatekeeper.js";
 import QuestOverlay from '../../graph/components/overlays/QuestOverlay.js';
+import { deserializeSelection, getNodesMaxXY, serializeSelection } from "./NodeSerializer";
+import { dimensions } from "../../helpers/NodeConstants";
 
 
 /**
@@ -34,20 +36,26 @@ const selector = (state) => state;
 
 const notifySaveError = notifyError.bind(null, "There was a problem saving your graph. Please check console for more details.");
 
+function isSelectingNotEditing() {
+  const { classList } = document.activeElement;
+  return (classList.contains("react-flow__node") && classList.contains("selected")) // 1 node
+    || classList.contains("react-flow__nodesselection-rect") // 2+ nodes
+    ; // Otherwise don't interfere with text editing
+}
+
 /**
  * @see GraphLayerViewer
  *
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function GraphLayerViewerInternal({ uid, graph }) {
-  const { hideGraphControls, allowEditNodeLabel, allowAddNode, enableQuestline } = getGatekeeperFlags();
+function GraphLayerViewerInternal({ uid, graph, questlineEnabled }) {
+  const { hideGraphControls, allowEditNodeLabel, allowAddNode } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
-  const selectedNodeId = useRef(void 0);
+  const selectedNodeIds = useRef([]);
   const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
-  const [currentTask] = useState();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the GraphLayerViewer, which can be enforced by setting a React key prop on it
@@ -105,9 +113,71 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   useOnSelectionChange({
     onChange({ nodes }) {
-      selectedNodeId.current = nodes.length !== 1 ? void 0 : nodes[0].id;
+      selectedNodeIds.current = nodes.map(x => x.id);
     }
   });
+
+  function onCopy(e) {
+    console.log("copy");
+    if (!isSelectingNotEditing()) return;
+    e.preventDefault();
+    // const toSelect = selectedNodeIds.current;
+    // TODO for some reason the above works on Daniel's computers but not Dish's, Daniel will use this workaround
+    const toSelect = operations.getSelectedNodes().map(x => x.id);
+    console.log("trying to select", toSelect);
+    e.clipboardData.setData("text/plain", serializeSelection(nodes, edges, toSelect));
+  }
+
+  function onCut(e) {
+    if (!isSelectingNotEditing()) return;
+    e.preventDefault();
+    // TODO
+    // Actually the cut feature wasn't in the requirements
+    // and it's quite dangerous because it will destroy edges that cross out of the selection
+  }
+
+  function onPaste(e) {
+    console.log("paste");
+    if (!allowAddNode) return;
+
+    const input = e.clipboardData.getData("text");
+    const deserialized = deserializeSelection(input);
+    if (!deserialized) {
+      console.log("Pasting non-Mikado");
+      return;
+    }
+    e.preventDefault();
+    const [positions, labels, toComplete, toConnect] = deserialized;
+    const ids = [];
+
+    const offsetPosition = getNodesMaxXY(nodes);
+    offsetPosition.x += dimensions.width;
+    offsetPosition.y += dimensions.height;
+    for (const relativePosition of positions) {
+      const absolutePosition = {
+        x: relativePosition.x + offsetPosition.x,
+        y: relativePosition.y + offsetPosition.y,
+      };
+      console.log(absolutePosition, "placing");
+      ids.push(operations.addNode(absolutePosition, true));
+    }
+
+    for (const [id, label] of labels.entries()) {
+      operations.setNodeLabel(ids[id], label);
+    }
+    for (const id of toComplete) {
+      operations.setNodeCompleteDeferred(ids[id], true);
+    }
+    for (const id of toComplete) {
+      operations.doSetNodeCompleteUpdateDeferredUpdate(ids[id]);
+    }
+    for (const [source, target] of toConnect) {
+      operations.connectOrDisconnect(ids[source], ids[target]);
+    }
+
+    fitView();
+    console.log("Paste OK");
+  }
 
   function onNodeDragStart(_, node) {
     operations.markNodePosition(node.id);
@@ -157,6 +227,11 @@ function GraphLayerViewerInternal({ uid, graph }) {
 
   function startEditingNode(id, isBackspace) {
     if (!allowEditNodeLabel) return;
+    if (!id) {
+      const { current } = selectedNodeIds;
+      if (current.length !== 1) return;
+      id = current[0];
+    }
     const defaultText = isBackspace ? "" : operations.getNodeLabel(id);
     editNode(id, defaultText);
   }
@@ -172,12 +247,12 @@ function GraphLayerViewerInternal({ uid, graph }) {
       if ("maxLength" in document.activeElement) return; // Ignore when already in text field
       // Not bothering to try adding the key to the text field, whether appending or replacing
       // That would break accessibility, keyboard layouts, and IMEs
-      selectedNodeId.current && startEditingNode(selectedNodeId.current, false);
+      startEditingNode(void 0, false);
     }
     function backspaceListener(e) {
       if (e.key !== "Backspace") return;
       if ("maxLength" in document.activeElement) return; // Ignore when already in text field
-      selectedNodeId.current && startEditingNode(selectedNodeId.current, true);
+      startEditingNode(void 0, true);
     }
 
 	function deleteListener(e) {
@@ -209,8 +284,20 @@ function GraphLayerViewerInternal({ uid, graph }) {
     d3Selection.on('dblclick.zoom', null);
   }, []);
 
+  // Workaround because global onCopy doesn't work on non-Firefox
+  useEffect(() => {
+    document.addEventListener('copy', onCopy);
+    void onCut;
+    document.addEventListener('paste', onPaste);
+    return () => {
+      document.removeEventListener('copy', onCopy);
+      document.removeEventListener('paste', onPaste);
+    }
+  })
+
   // TODO move frame-motion animations except "zoom to focus node" to plaza so that it works properly
   // TODO look into what the fitView property actually does compared to the function and whether it works on reloading nodes
+  // return <main ref={reactFlowWrapper} onCopy={onCopy} onCut={onCut} onPaste={onPaste}>
   return <main ref={reactFlowWrapper}>
     <ReactFlow
       nodes={nodes}
@@ -234,7 +321,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       fitView
     >
 
-      { <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      { questlineEnabled && <QuestOverlay/> }
       <Background />
 
     </ReactFlow>
@@ -253,13 +340,13 @@ function GraphLayerViewerInternal({ uid, graph }) {
  * A new GraphLayerViewer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function GraphLayerViewer({ uid, graph, enterGraph }) {
+function GraphLayerViewer({ uid, graph, enterGraph, questlineEnabled }) {
   const [useStore] = useState(() => useGraphLayerViewerStore());
   return (
     <ReactFlowProvider>
       <StoreHackContext.Provider value={useStore}>
         <EnterGraphHackContext.Provider value={enterGraph}>
-          <GraphLayerViewerInternal uid={uid} graph={graph} />
+          <GraphLayerViewerInternal uid={uid} graph={graph} questlineEnabled={questlineEnabled} />
         </EnterGraphHackContext.Provider>
       </StoreHackContext.Provider>
     </ReactFlowProvider>
