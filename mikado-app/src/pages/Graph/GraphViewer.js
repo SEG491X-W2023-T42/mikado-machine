@@ -27,7 +27,7 @@ function GraphViewer({ uid }) {
   // TODO get this from URL
   const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
   const [navOpen, setNavOpen] = React.useState(false)
-
+  const [questlineEnabled, setQuestlineEnabled] = React.useState(true)
 
   const impersonateUid = useMemo(() => {
     try {
@@ -158,11 +158,12 @@ function GraphViewer({ uid }) {
   const  key = uid + graph.subgraph;
   console.debug("GraphViewer graph", graph, "key", key);
   return <main>
-    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} />
+    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} questlineEnabled={questlineEnabled} setQuestlineEnabled={setQuestlineEnabled}/>
 	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid} switchGraph={switchGraph}/>
     <GraphLayerViewer key={key} uid={uid}
-                  graph={graph}
-                  enterGraph={enterGraph}
+		graph={graph}
+		enterGraph={enterGraph}
+		questlineEnabled={questlineEnabled}
     />
   </main>
 }

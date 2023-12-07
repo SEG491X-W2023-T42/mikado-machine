@@ -49,7 +49,7 @@ function isSelectingNotEditing() {
  * This is a separate component so that it can be wrapped in ReactFlowProvider for useReactFlow() to work.
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
-function GraphLayerViewerInternal({ uid, graph }) {
+function GraphLayerViewerInternal({ uid, graph, questlineEnabled }) {
   const { hideGraphControls, allowEditNodeLabel, allowAddNode, enableQuestline } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
@@ -322,7 +322,7 @@ function GraphLayerViewerInternal({ uid, graph }) {
       fitView
     >
 
-      { enableQuestline && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      { questlineEnabled && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
       <Background />
 
     </ReactFlow>
@@ -341,13 +341,13 @@ function GraphLayerViewerInternal({ uid, graph }) {
  * A new GraphLayerViewer is created and replaces the current one when entering/exiting a subtree.
  * The Plaza survives on the other hand such an action and contains long-living UI controls.
  */
-function GraphLayerViewer({ uid, graph, enterGraph }) {
+function GraphLayerViewer({ uid, graph, enterGraph, questlineEnabled }) {
   const [useStore] = useState(() => useGraphLayerViewerStore());
   return (
     <ReactFlowProvider>
       <StoreHackContext.Provider value={useStore}>
         <EnterGraphHackContext.Provider value={enterGraph}>
-          <GraphLayerViewerInternal uid={uid} graph={graph} />
+          <GraphLayerViewerInternal uid={uid} graph={graph} questlineEnabled={questlineEnabled} />
         </EnterGraphHackContext.Provider>
       </StoreHackContext.Provider>
     </ReactFlowProvider>
