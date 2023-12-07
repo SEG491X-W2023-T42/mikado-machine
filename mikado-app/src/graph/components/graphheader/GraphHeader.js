@@ -17,7 +17,7 @@ function serializeGraphWithTitle(title) {
   }
 }
 
-export default function GraphHeader({ uid, graph: { id }, setNavOpen }) {
+export default function GraphHeader({ uid, graph: { id }, setNavOpen, questlineEnabled, setQuestlineEnabled }) {
   const { allowEditGraphName, hideProfileMenu } = getGatekeeperFlags();
   const [savedTitle, setSavedTitle] = useState(null);
   const [title, setTitle] = useState("");
@@ -155,7 +155,7 @@ export default function GraphHeader({ uid, graph: { id }, setNavOpen }) {
               </p>
             </Typography>
           </Popover>
-          {!hideProfileMenu && <GraphHeaderProfileOverflowMenu />}
+          {!hideProfileMenu && <GraphHeaderProfileOverflowMenu questlineEnabled={questlineEnabled} setQuestlineEnabled={setQuestlineEnabled}/>}
         </Toolbar>
       </Container>
     </AppBar>

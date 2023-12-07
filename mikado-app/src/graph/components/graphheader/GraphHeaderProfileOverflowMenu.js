@@ -1,4 +1,4 @@
-import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, IconButton, Menu, MenuItem, Tooltip, Typography, Switch, FormControlLabel, ListItemText } from "@mui/material";
 import * as React from "react";
 import { useFirebase } from '../../../context/FirebaseContext';
 import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
@@ -6,13 +6,17 @@ import { getGatekeeperFlags } from "../../../graphlayer/store/Gatekeeper";
 const allSettings = ['Profile', 'Account', 'Dashboard', 'Log out'];
 const settingsImplementedRange = [3, 4];
 
-export default function GraphHeaderProfileOverflowMenu() {
+export default function GraphHeaderProfileOverflowMenu({ questlineEnabled, setQuestlineEnabled }) {
   const { hideUnimplementedProfileMenuItems } = getGatekeeperFlags();
   const [anchorUser, setAnchorUser] = React.useState(null);
   const { logOut, getGoogleDisplayName, getGoogleProfilePicture } = useFirebase();
 
   const displayName = getGoogleDisplayName();
   const profilePicture = getGoogleProfilePicture();
+
+  const handleSwitchChange = (event) => {
+	setQuestlineEnabled(event.target.checked);
+  }
 
   const handleOpenUserMenu = (event) => {
     setAnchorUser(event.currentTarget);
@@ -60,9 +64,22 @@ export default function GraphHeaderProfileOverflowMenu() {
       open={!!anchorUser}
       onClose={handleCloseUserMenu}
     >
+		<MenuItem>
+			<FormControlLabel 
+				sx={{margin: 0, padding: 0}}
+				labelPlacement="start" 
+				control={
+					<Switch 
+						checked={questlineEnabled}
+						onChange={handleSwitchChange}
+					/>
+				} 
+				label={<Typography sx={{fontSize: "12pt", fontFamily: "Inter"}}>Questline</Typography>}
+			/>
+		</MenuItem>
       {settings.map((setting, index) => (
         <MenuItem key={setting} onClick={settingsFunctions[index]}>
-          <Typography textAlign="center" sx={{fontSize: "11pt"}}>{setting}</Typography>
+			<Typography textAlign="center" sx={{fontSize: "11pt", fontFamily: "Inter"}}>{setting}</Typography>
         </MenuItem>
       ))}
     </Menu>

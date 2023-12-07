@@ -30,7 +30,7 @@ function GraphViewer({ uid }) {
   const [graph1Class, setGraph1Class] = useState("graphInDown");
   const [graph2Class, setGraph2Class] = useState("graphInDown");
   const [navOpen, setNavOpen] = React.useState(false)
-
+  const [questlineEnabled, setQuestlineEnabled] = React.useState(false)
 
   const impersonateUid = useMemo(() => {
     try {
@@ -175,11 +175,11 @@ function GraphViewer({ uid }) {
   void graph2Class;
   // console.debug("GraphViewer graph", graph, "key", key);
   return <main>
-    <GraphHeader uid={uid} graph={graph1} graphHandle={setGraph1} setNavOpen={setNavOpen} />
+    <GraphHeader uid={uid} graph={graph1} graphHandle={setGraph1} setNavOpen={setNavOpen} questlineEnabled={questlineEnabled} setQuestlineEnabled={setQuestlineEnabled}/>
 	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid} switchGraph={switchGraph}/>
     <section>
     <section className={graph1Class} key={key1}>
-      <GraphLayerViewer key={key1} uid={uid} graph={graph1} enterGraph={enterGraph} />
+      <GraphLayerViewer key={key1} uid={uid} graph={graph1} enterGraph={enterGraph} questlineEnabled={questlineEnabled} />
     </section>
       {/*graph2 isn't working oh well, but the rest works*/}
     {/*{graph2 &&*/}
