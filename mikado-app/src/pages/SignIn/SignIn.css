@@ -16,7 +16,7 @@
 
 .sign-in-card {
   width: fit-content;
-  max-width: 450px;
+  max-width: 60% ;
   height: fit-content+20px;
   position:absolute;
   top: 40%;
@@ -41,7 +41,9 @@
 .google-sign-in-button {
   background-color: #DAEFFF !important;
   color: black !important;
-  height: 50px;
+  width:fit-content;
+  height: fit-content;
+  min-height: 50px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
   border-radius: 8px !important;
   font-family: 'Inter', sans-serif !important;

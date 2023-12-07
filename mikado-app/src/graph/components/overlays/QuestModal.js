@@ -3,6 +3,7 @@ import { Box, Dialog, Divider, ListItemText, DialogActions, DialogTitle, Button,
 import { Close, ArrowForward } from '@mui/icons-material';
 import { useStoreHack } from "../../../context/StoreHackContext";
 import { shallow } from "zustand/shallow";
+import './QuestModal.css' 
 
 export const NO_TASKS_TEXT = "Connect a non-complete node to the Goal Node to start a new Quest!";
 const NO_NEXT_TASK_TEXT = "Profit!";
@@ -15,14 +16,16 @@ const selector = (store) => ({
 
 function LinearProgressWithLabel(props) {
 	return (
-		<Box sx={{ display: 'flex', alignItems: 'center' }}>
-			<Box sx={{ width: '100%', mr: 1 }}>
-				<LinearProgress variant="determinate" {...props} />
-			</Box>
-			<Box sx={{ minWidth: 35 }}>
-				<Typography variant="body2" color="text.secondary">{`${Math.round(
-					props.value,
-				)}%`}</Typography>
+    
+		<Box sx={{ display: 'flex', flexDirection:'column', alignItems: 'left', width:'100%' }}>
+      <Typography className='quest-dialog-subtitle'>Quest Progress</Typography>
+			<Box sx={{ display:'flex', flexDirection:'row', width: 'auto', mr: 1 , marginLeft:'16px', marginRight:'16px', marginTop:'8px'}}>
+				<LinearProgress variant="determinate" {...props} sx={{width:'100%', alignSelf:'center'}}/>
+        <Box sx={{marginLeft:'8px'}}>
+          <Typography variant="body2" color="text.secondary">
+            {`${Math.round(props.value,)}%`}
+          </Typography>
+        </Box>
 			</Box>
 		</Box>
 	);
@@ -49,7 +52,7 @@ function QuestModalInner() {
 		</List>
     </DialogContent>
     { operations.getAllQuests().length > 1 && <DialogContent dividers>
-		{<Typography variant="h4" fontFamily="Inter">Other Quests</Typography>}
+		{<Typography className='quest-dialog-subtitle'>Other Quests</Typography>}
       <List disablePadding>
         {
           operations.getAllQuests().flatMap((parent, i) => {
@@ -59,7 +62,7 @@ function QuestModalInner() {
 				<div key={id}>
 					<ListItem
 						secondaryAction={
-							<IconButton edge="end" onClick={() => operations.setCurrentQuestlineId(id)}>
+							<IconButton color='inherit' edge="end" onClick={() => operations.setCurrentQuestlineId(id)}>
 								<ArrowForward />
 							</IconButton>
 						}
@@ -69,7 +72,7 @@ function QuestModalInner() {
 								<Typography sx={{ display: 'inline' }}>
 									{label}
 								</Typography>
-								<Typography color="text.secondary" align="right" sx={{ display: 'inline'}}>
+								<Typography color="text.secondary" align="right" sx={{ display: 'inline', marginRight:0}}>
 									&nbsp;- {operations.getQuestlineProgress()[id]}%
 								</Typography>
 							</React.Fragment>
@@ -96,13 +99,14 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
 
 export default function QuestModal({ open, handleClose }) {
   return <StyledDialog
+    className='quest-modal'
     open={open}
     onClose={handleClose}
     fullWidth={true}
     maxWidth={'sm'}
   >
     <DialogTitle>
-      {<Typography variant="h4" fontFamily="Inter">Questline Details</Typography>}
+      {<Typography className='quest-dialog-title'>Questline Details</Typography>}
     </DialogTitle>
     <IconButton
       aria-label="close"
@@ -118,7 +122,7 @@ export default function QuestModal({ open, handleClose }) {
     </IconButton>
     <QuestModalInner />
     <DialogActions>
-      <Button onClick={handleClose} autoFocus>Back</Button>
+      <Button onClick={handleClose} color='inherit' autoFocus>Back</Button>
     </DialogActions>
   </StyledDialog>;
 }

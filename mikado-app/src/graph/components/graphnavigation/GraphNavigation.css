@@ -10,6 +10,7 @@
 
 .MuiListItemText-root{
     .MuiTypography-root{
+        font-size: 12pt;
         width: auto;
         max-width: 300px;
         overflow: hidden;
@@ -19,11 +20,14 @@
     
 }
 
-.MuiPaper-root {
+.graph-navigation-drawer {
+    .MuiPaper-root {
         background-color: #414141 !important;
         border: rgba(105,105,105) 1px solid;
         color: #fff !important;
     }
+}
+
 
 .add-doc-button{
     background-color: transparent !important;
@@ -46,7 +50,7 @@
     
 } */
 div.MuiDialog-paper {
-    background-color: #fff !important;
+    background-color: #fff ;
     color: #414141 !important;
 }
 

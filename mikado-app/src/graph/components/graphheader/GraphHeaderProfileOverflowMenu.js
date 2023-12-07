@@ -69,12 +69,14 @@ export default function GraphHeaderProfileOverflowMenu({ questlineEnabled, setQu
 				sx={{margin: 0, padding: 0}}
 				labelPlacement="start" 
 				control={
-					<Switch 
+					<Switch
+            size="small"
 						checked={questlineEnabled}
 						onChange={handleSwitchChange}
+            sx={{marginLeft: "32px", alignSelf: "right"}}
 					/>
 				} 
-				label={<Typography sx={{fontSize: "12pt", fontFamily: "Inter"}}>Questline</Typography>}
+				label={<Typography sx={{fontSize: "12pt", fontFamily: "Inter"}}>Quests</Typography>}
 			/>
 		</MenuItem>
       {settings.map((setting, index) => (

@@ -74,6 +74,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 
 	return (
 		<SwipeableDrawer
+			className='graph-navigation-drawer'
 			open={open}
 			onClose={toggleDrawer(false)}
             onOpen={toggleDrawer(true)}
@@ -105,7 +106,7 @@ export default function GraphNavigationBar({open, setOpen, uid, switchGraph}) {
 							}
 						>
 						<ListItemButton onClick={() => switchGraph(id)}>
-							<ListItemText primary={graphs[id]} />
+							<ListItemText primary={graphs[id]} title={graphs[id]}/>
 						</ListItemButton>
 					</ListItem>
 					))}

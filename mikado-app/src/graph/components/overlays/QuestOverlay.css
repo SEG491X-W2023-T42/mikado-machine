@@ -1,29 +1,46 @@
 @import "reactflow/dist/base.css";
 @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
 
-.overlay.overlay {
-  	display: block;
+button.overlay {
+	background: #414141;
+	color: #fff;
+	border: rgba(105,105,105) 1px solid; 
+	border-radius: 8px;
+	box-shadow: 0 0 10px 0 #bebcc5;
+
+	font-family: 'Inter', sans-serif !important;
+	text-transform: none;
+	text-align: left;
+
 	min-width: 300px;
 	max-width: 400px;
 	height: fit-content+20px;
-	text-transform: none;
-	border-radius: 10px;
-	border-color: #686372;
-	border-style: solid;
-	box-shadow: 0 0 20px 0 #bebcc5;
-	padding: 6px;
-	padding-bottom: 15px;
-	font-family: 'Inter', sans-serif !important;
-	text-align: center;
-	color: #0a021c;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	padding-left: 16px;
+	padding-right: 16px;
+
+	display: block;
 	position: absolute;
 	top: 2em;
 	left: 2em;
 	z-index: 100;
-  &, &:hover {
-    background: #e6e4f2;
+
+  &:hover {
+    background: #6e6e6e;
   }
-	
+
+  .quest-button-title{
+	text-transform: none;
+	font-size: 12pt;
+	font-weight: 600;
+  }
+
+  .quest-task-name{
+	text-transform: none;
+	font-size: 14pt;
+	font-weight: 500;
+  }
 }
 
 .questlineTask {
