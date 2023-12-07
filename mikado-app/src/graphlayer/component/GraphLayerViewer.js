@@ -50,13 +50,12 @@ function isSelectingNotEditing() {
  * That wrapper must not be in Plaza, because Plaza could have multiple React Flow graphs animating.
  */
 function GraphLayerViewerInternal({ uid, graph, questlineEnabled }) {
-  const { hideGraphControls, allowEditNodeLabel, allowAddNode, enableQuestline } = getGatekeeperFlags();
+  const { hideGraphControls, allowEditNodeLabel, allowAddNode } = getGatekeeperFlags();
   const reactFlowWrapper = useRef(void 0);
   const { nodes, edges, operations, editNode, editingNodeId } = useStoreHack()(selector, shallow);
   const { project, fitView } = useReactFlow();
   const selectedNodeIds = useRef([]);
   const isTouchscreen = window.matchMedia("(pointer: coarse)").matches;
-  const [currentTask] = useState();
 
   // Assert uid will never change
   // Changing layers should be done by replacing the GraphLayerViewer, which can be enforced by setting a React key prop on it
