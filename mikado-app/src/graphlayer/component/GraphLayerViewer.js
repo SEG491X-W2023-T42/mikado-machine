@@ -322,7 +322,7 @@ function GraphLayerViewerInternal({ uid, graph, questlineEnabled }) {
       fitView
     >
 
-      { questlineEnabled && <QuestOverlay currentTask={currentTask} completeClick={() => operations.completeCurrentTask()}/> }
+      { questlineEnabled && <QuestOverlay/> }
       <Background />
 
     </ReactFlow>
