@@ -10,6 +10,7 @@
 
 .MuiListItemText-root{
     .MuiTypography-root{
+        font-size: 12pt;
         width: auto;
         max-width: 300px;
         overflow: hidden;
