@@ -25,7 +25,10 @@ function GraphViewer({ uid }) {
   const DEFAULT_GRAPH_ID = "graph-1";
 
   // TODO get this from URL
-  const [graph, setGraph] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
+  const [graph1, setGraph1] = useState({id: DEFAULT_GRAPH_ID, subgraph: ""});
+  const [graph2, setGraph2] = useState(null);
+  const [graph1Class, setGraph1Class] = useState("graphInDown");
+  const [graph2Class, setGraph2Class] = useState("graphInDown");
   const [navOpen, setNavOpen] = React.useState(false)
 
 
@@ -135,35 +138,54 @@ function GraphViewer({ uid }) {
 
 	if (subgraph == null) {
 		console.debug("trying to leave subgraph");
-		graphStack.pop()
+    graphStack.pop()
+    setGraph2(graph1);
+    setGraph1({
+      id: graph1.id,
+      subgraph: graphStack.at(-1)
+    });
+    setGraph1Class("graphInUp");
+    setGraph2Class("graphOutDown");
 	} else {
 		console.debug("trying to enter subgraph", subgraph);
-		graphStack.push(subgraph)
+		graphStack.push(subgraph);
+    setGraph2(graph1);
+    setGraph1({
+      id: graph1.id,
+      subgraph: graphStack.at(-1)
+    });
+    setGraph1Class("graphInDown");
+    setGraph2Class("graphOutUp");
 	}
-	setGraph({
-		id: graph.id,
-		subgraph: graphStack.at(-1)
-	});
-	
   }
 
   function switchGraph(graphId) {
 	graphStack.length = 1;
-	setGraph({
+	setGraph1({
 		id: graphId,
 		subgraph: graphStack.at(-1)
-	})
+	});
+  setGraph2(null);
+  setGraph1Class("graphInDown");
   }
 
-  const  key = uid + graph.subgraph;
-  console.debug("GraphViewer graph", graph, "key", key);
+  const key1 = uid + graph1.subgraph;
+  const key2 = uid + graph2?.subgraph;
+  // console.debug("GraphViewer graph", graph, "key", key);
   return <main>
-    <GraphHeader uid={uid} graph={graph} graphHandle={setGraph} setNavOpen={setNavOpen} />
+    <GraphHeader uid={uid} graph={graph1} graphHandle={setGraph1} setNavOpen={setNavOpen} />
 	<GraphNavigationBar open={navOpen} setOpen={setNavOpen} uid={uid} switchGraph={switchGraph}/>
-    <GraphLayerViewer key={key} uid={uid}
-                  graph={graph}
-                  enterGraph={enterGraph}
-    />
+    <section>
+    <section className={graph1Class} key={key1}>
+      <GraphLayerViewer key={key1} uid={uid} graph={graph1} enterGraph={enterGraph} />
+    </section>
+      {/*graph2 isn't working oh well, but the rest works*/}
+    {/*{graph2 &&*/}
+    {/*  <section className={graph2Class} key={key2}>*/}
+    {/*    <GraphLayerViewer key={key2} uid={uid} graph={graph2} enterGraph={() => {}} />*/}
+    {/*  </section>*/}
+    {/*}*/}
+    </section>
   </main>
 }
 
